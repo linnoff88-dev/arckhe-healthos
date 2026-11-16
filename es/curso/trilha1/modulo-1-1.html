@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Módulo 1.1 — Qué es HealthOS | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento emerald (T1) */
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5,150,105,0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5,150,105,0.08); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5,150,105,0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5,150,105,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha1/modulo-1-1.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha1/modulo-1-1.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha1/modulo-1-1.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha1/modulo-1-1.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="../../../en/curso/trilha1/modulo-1-1.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="modulo-1-1.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-emerald-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Saltar al contenido</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-emerald-400 bg-emerald-500/10" href="index.html">
+<span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentos</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html">
+<span class="sm:hidden">T2</span><span class="hidden sm:inline">Paso a paso</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html">
+<span class="sm:hidden">T3</span><span class="hidden sm:inline">Cómo usar</span>
+</a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="Mi recorrido" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">Mi recorrido</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Apariencia" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Apariencia</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tema</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Oscuro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Claro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sepia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Enfoque</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">Alto contraste</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tamaño del texto</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Ancho · interlineado</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Estrecho</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Medio</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Ancho</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compacto</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Cómodo</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Fuente</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">Sistema</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Lectura</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Ruta de navegación" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-emerald-400" href="../../index.html">Inicio</a><span>/</span>
+<a class="hover:text-emerald-400" href="index.html">Fundamentos</a><span>/</span>
+<span class="text-emerald-400">Módulo 1.1</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-emerald-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="1-1" data-inema-track="1">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full mb-4">MÓDULO 1.1</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">🫀 Qué es HealthOS</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">Antes de construir, entiende la idea central: un coach de salud que piensa con los <strong class="text-emerald-400">tus</strong> datos — wearable, sangre, ADN y dieta — dentro de Telegram. Aquí ves el problema que resuelve, cómo encajan las piezas y por qué esto es diferente de pedirle un consejo a un chatbot.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">7</div><div class="text-xs text-neutral-400">Temas</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">~35</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">Básico</div><div class="text-xs text-neutral-400">Nivel</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">Teoría</div><div class="text-xs text-neutral-400">Tipo</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:1-1">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Tu progreso en este módulo</span>
+<span class="text-emerald-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 de 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-emerald-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Índice de la página" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Sección <span class="inema-toc-pos">1</span> de <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-1">1. El problema</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-2">2. Qué es HealthOS</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-3">3. Las 4 fuentes de datos</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-4">4. La arquitectura</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-5">5. Un día en la vida</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-6">6. Privacidad</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-7">7. No es consejo médico</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-1-1#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">🎯 El problema: consejo genérico × tus datos</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-1-t1-p1">Pregúntale a un chatbot común "¿debería tomar café ahora?" y te responderá con una <strong class="text-emerald-400">promedio de Internet</strong>: "evita después de las 14h". La respuesta es igual para todos: no sabe cómo dormiste, qué hora es para tu cuerpo ni cómo metabolizas la cafeína. HealthOS reemplaza ese promedio por una respuesta basada en <strong class="text-emerald-400">tú</strong>.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Consejo genérico</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>"Duerme 8 horas" — sin saber cuánto dormiste AYER.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>"Come menos sal" — sin ver que tu presión sube 10-15% después de un almuerzo salado.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Lo olvida todo en la próxima conversación. Sin memoria, sin patrones.</span></li>
+</ul>
+</div>
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ Coaching con tus datos</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>"Recovery 48% hoy — probablemente el vino de ayer influyó. Tómalo con calma."</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>"Metabolizas la cafeína rápido (CYP1A2): café temprano, déjalo por la tarde."</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Recuerda semanas atrás: «cada vez que cenas tarde, duermes menos».</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> La idea en una frase</h3>
+<p class="text-neutral-300">Lo específico supera a lo genérico. Un coach basado en tus exámenes, genética y metas te da consejos <strong>consciente del mecanismo</strong> (sabe el «porqué» en tu cuerpo); un bot genérico da respuestas vacías. Todo el diseño de HealthOS fuerza esa especificidad.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Específico</div><p class="text-xs text-neutral-400">Respuesta basada en tus cifras, no en el promedio.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Memoria</div><p class="text-xs text-neutral-400">Recuerda el historial y detecta patrones a lo largo de las semanas.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Mecanismo</div><p class="text-xs text-neutral-400">Explica la causa en tu cuerpo, no solo la recomendación.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Tus datos</div><p class="text-xs text-neutral-400">Wearable + sangre + ADN + dieta, juntos.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-1-1#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">🫀 Qué es exactamente HealthOS</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-1-t2-p1">El HealthOS es un <strong class="text-emerald-400">blueprint completo</strong> (un proyecto modelo, listo para clonar) de un coach de salud personal que vive en un <strong class="text-emerald-400">bot de Telegram</strong>. Conversas con él por mensaje; por detrás, guarda todo en una base de datos solo tuya, lee tu wearable y responde siempre a partir de tu contexto actual.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 ¿Nuevo por aquí? Tres palabras antes de continuar</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>LLM</strong> — es el modelo de IA del tipo que funciona detrás de ChatGPT/Claude. Es el "cerebro" que lee tus datos y redacta la respuesta.</li>
+<li><strong>Coach (agente)</strong> — aquí no es solo un chat: es un <em>agente</em>, un programa que actúa por su cuenta (busca tus datos, escribe en la base de datos, activa la revisión de la mañana), además de conversar.</li>
+<li><strong>Consciente del mecanismo</strong> — «consciente del mecanismo»: en vez de solo decirte «toma menos café», conoce la razón fisiológica en TI (ej.: tu gen de la cafeína) y actúa en función de ella.</li>
+</ul>
+</div>
+<div class="bg-gradient-to-br from-emerald-900/30 to-dark-800 rounded-xl border border-emerald-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-emerald-400 mb-4 flex items-center"><span class="mr-2">📦</span> Qué incluye el paquete</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400 mt-1">•</span><span>Uno <strong>coach en Telegram</strong> basado en tus datos, no en consejos genéricos.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400 mt-1">•</span><span>Uno <strong>base de datos propia</strong> (Supabase) con comida, entrenamiento, peso, cafeína, suplementos, signos vitales, análisis, registros de seguimiento y metas, además de la memoria de los mensajes.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400 mt-1">•</span><span>Una <strong>conexión con el wearable</strong> (WHOOP en el ejemplo) de principio a fin: autorización, sincronización diaria y mapeo de los datos.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400 mt-1">•</span><span>Una <strong>revisión de la mañana guiada por la recuperación</strong> y un <strong>dashboard</strong> con las tendencias.</span></li>
+</ul>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🧭</span> Dónde se ejecuta</h3>
+<p class="text-neutral-300 text-sm">Tú indicas tu <strong>Claude Code</strong> o <strong>Codex</strong> al repositorio y construye el tuyo. El ejemplo usa WHOOP, pero sirve cualquier fuente (Apple Watch, Garmin o registro manual) — el coach trabaja con lo que llegue a la base de datos. El autor lo probó en vivo durante más de 15 días antes de publicarlo.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Blueprint</div><p class="text-xs text-neutral-400">Proyecto modelo listo para clonar y personalizar.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Telegram</div><p class="text-xs text-neutral-400">La interfaz: hablas por mensaje.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Base de datos propia</div><p class="text-xs text-neutral-400">Tus datos en un Supabase privado tuyo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Agente</div><p class="text-xs text-neutral-400">Actúa por su cuenta, no solo responde.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-1-1#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">🧩 Las 4 fuentes de datos</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-1-t3-p1">La fuerza del coach viene de <strong class="text-emerald-400">cruzar cuatro fuentes</strong> que normalmente están en apps separadas. Por sí sola, cada una es una pieza; juntas, se convierten en contexto. El diagrama de abajo muestra cómo las cuatro convergen en un único coach.</p>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Cuatro fuentes de datos —wearable, sangre, ADN y dieta— convergen en un solo coach que ofrece consejos personalizados" class="w-full h-auto" role="img" viewbox="0 0 1000 260">
+<defs>
+<lineargradient id="m11a-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+<filter height="180%" id="m11a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m11a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m11a-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m11a-grid)" height="260" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="13" font-weight="600">
+<g class="wf-a"><rect fill="#0e1b26" height="40" rx="10" stroke="#38bdf8" stroke-width="2" width="190" x="40" y="28"></rect><text fill="#bfe6ff" text-anchor="middle" x="135" y="53">⌚ Wearable (WHOOP)</text></g>
+<g class="wf-a"><rect fill="#0e1b26" height="40" rx="10" stroke="#38bdf8" stroke-width="2" width="190" x="40" y="88"></rect><text fill="#bfe6ff" text-anchor="middle" x="135" y="113">🩸 Análisis de sangre</text></g>
+<g class="wf-a"><rect fill="#0e1b26" height="40" rx="10" stroke="#38bdf8" stroke-width="2" width="190" x="40" y="148"></rect><text fill="#bfe6ff" text-anchor="middle" x="135" y="173">🧬 ADN (SNPs)</text></g>
+<g class="wf-a"><rect fill="#0e1b26" height="40" rx="10" stroke="#38bdf8" stroke-width="2" width="190" x="40" y="208"></rect><text fill="#bfe6ff" text-anchor="middle" x="135" y="233">🍽️ Dieta (foto)</text></g>
+</g>
+<g fill="none" opacity="0.5" stroke="#38bdf8" stroke-width="1.8">
+<path d="M230,48 C360,48 380,118 500,130" marker-end="url(#m11a-ah)"></path>
+<path d="M230,108 C360,108 380,124 500,130" marker-end="url(#m11a-ah)"></path>
+<path d="M230,168 C360,168 380,136 500,130" marker-end="url(#m11a-ah)"></path>
+<path d="M230,228 C360,228 380,142 500,130" marker-end="url(#m11a-ah)"></path>
+</g>
+<g filter="url(#m11a-glow)"><rect fill="#0e2018" height="64" rx="14" stroke="url(#m11a-grad)" stroke-width="2.5" width="180" x="500" y="98"></rect></g>
+<text fill="#34d399" font-family="Inter,sans-serif" font-size="18" font-weight="600" text-anchor="middle" x="590" y="125">Coach</text>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="590" y="146">cruza todo</text>
+<path d="M680,130 L760,130" fill="none" marker-end="url(#m11a-ah)" opacity="0.8" stroke="#34d399" stroke-width="2"></path>
+<g filter="url(#m11a-glow)"><rect fill="#0e2018" height="64" rx="14" stroke="url(#m11a-grad)" stroke-width="2.5" width="200" x="760" y="98"></rect></g>
+<text fill="#34d399" font-family="Inter,sans-serif" font-size="15" font-weight="600" text-anchor="middle" x="860" y="123">Consejo</text>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="860" y="144">personalizado para ti</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> las cuatro fuentes (cian, a la izquierda) entran en el coach, que las combina y devuelve un consejo específico (verde). Ninguna fuente por sí sola bastaría — el valor está en el cruce.</p>
+</div>
+<div class="space-y-4 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">⌚ Wearable</h4><p class="text-sm text-neutral-300">Recuperación, variabilidad cardíaca, frecuencia en reposo y horas de sueño. Es el "cómo despertó el cuerpo hoy".</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">🩸 Sangre</h4><p class="text-sm text-neutral-300">Marcadores como ApoB, HOMA-IR, vitamina D. La foto bioquímica de tu metabolismo y riesgo.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">🧬 ADN</h4><p class="text-sm text-neutral-300">SNP (variantes genéticas) que ajustan las dosis: cafeína, grasas saturadas, vitamina D, sal. Genes como botones.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">4</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">🍽️ Dieta</h4><p class="text-sm text-neutral-300">Foto de la comida → macros estimados mediante visión. Cierra el vínculo entre lo que comes y cómo te recuperas.</p></div>
+</div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Wearable</div><p class="text-xs text-neutral-400">Cómo amaneció el cuerpo hoy.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Sangre</div><p class="text-xs text-neutral-400">La bioquímica del metabolismo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">ADN</div><p class="text-xs text-neutral-400">Ajusta las dosis — genes como botones.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Cruce</div><p class="text-xs text-neutral-400">El valor está en combinar las cuatro.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-1-1#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">🏗️ La arquitectura a alto nivel</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-1-t4-p1">Cada vez que envías un mensaje, ocurre la misma secuencia: el agente lee un <strong class="text-emerald-400">snapshot</strong> (un resumen compacto de tu estado actual) de la base de datos, razona con el LLM fundamentado en tus datos y responde. Sigue el flujo en el diagrama.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Supabase</strong> — es una base de datos en la nube (PostgreSQL) con almacenamiento de archivos. Ahí están TODOS tus datos de salud, en un proyecto privado solo tuyo.</li>
+<li><strong>Snapshot de sesión</strong> — una imagen compacta del «ahora»: tendencia del peso, lo que comiste hoy, presión, la recuperación de ayer, el patrón de sueño de 7 días y tus metas. El agente la lee al comienzo de cada conversación para responder siempre con el contexto actual.</li>
+</ul>
+</div>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Flujo: el usuario envía un mensaje al agente por Telegram, que lee la instantánea de Supabase, razona con el LLM y devuelve la respuesta a Telegram" class="w-full h-auto" role="img" viewbox="0 0 1000 200">
+<defs>
+<lineargradient id="m11b-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+<filter height="180%" id="m11b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m11b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m11b-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#34d399"></path></marker>
+<marker id="m11b-ahc" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m11b-grid)" height="200" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="13" font-weight="600">
+<rect fill="#0e1b26" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="150" x="24" y="78"></rect><text fill="#bfe6ff" text-anchor="middle" x="99" y="100">💬 Telegram</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="99" y="116">tú</text>
+<g filter="url(#m11b-glow)"><rect fill="#0e2018" height="48" rx="12" stroke="url(#m11b-grad)" stroke-width="2.5" width="150" x="246" y="78"></rect></g><text fill="#34d399" text-anchor="middle" x="321" y="100">🤖 Agente</text><text fill="#9fe9cf" font-size="11" text-anchor="middle" x="321" y="116">coach</text>
+<rect fill="#0e1b26" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="150" x="468" y="78"></rect><text fill="#bfe6ff" text-anchor="middle" x="543" y="100">🗄️ Supabase</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="543" y="116">snapshot</text>
+<rect fill="#0e1b26" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="150" x="690" y="78"></rect><text fill="#bfe6ff" text-anchor="middle" x="765" y="100">🧠 LLM</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="765" y="116">razona</text>
+</g>
+<g fill="none" stroke-width="2">
+<path d="M174,102 L246,102" marker-end="url(#m11b-ah)" stroke="#34d399"></path>
+<path d="M396,102 L468,102" marker-end="url(#m11b-ahc)" stroke="#38bdf8"></path>
+<path d="M618,102 L690,102" marker-end="url(#m11b-ahc)" stroke="#38bdf8"></path>
+<path d="M765,126 C765,170 321,170 321,128" marker-end="url(#m11b-ah)" opacity="0.8" stroke="#34d399" stroke-dasharray="6 5"></path>
+</g>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="543" y="190">la respuesta vuelve a Telegram (línea discontinua)</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> de izquierda a derecha está el recorrido de la pregunta; la línea discontinua es la respuesta de vuelta. El agente nunca "adivina": siempre lee la instantánea de la base de datos antes de razonar.</p>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🧠</span> La memoria es el producto</h3>
+<p class="text-neutral-300 text-sm">Todo se escribe en líneas estructuradas en la base de datos. Por eso el coach conoce todo tu historial y detecta patrones a lo largo de las semanas; no solo reacciona al último mensaje. Guardamos estos módulos en detalle en la Ruta 1 (señales y memoria) y en la Ruta 2 (la base de datos).</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Snapshot</div><p class="text-xs text-neutral-400">Retrato compacto del "ahora", leído en cada turno.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Agente</div><p class="text-xs text-neutral-400">Orquesta: lee, razona, escribe, responde.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Supabase</div><p class="text-xs text-neutral-400">La base de datos privada donde se guarda todo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Memoria</div><p class="text-xs text-neutral-400">Líneas estructuradas = patrones a lo largo del tiempo.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-1-1#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">🌅 Un día en la vida del coach</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-1-t5-p1">Todo el día transcurre en Telegram. El ejemplo de abajo es <strong class="text-emerald-400">ilustrativo</strong> (números ficticios, no es un consejo): muestra cómo se cierra el ciclo: la elección de hoy se convierte en la recuperación de mañana.</p>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Ciclo: revisión de la mañana guiada por la recuperación, elecciones durante el día, registro y, a la mañana siguiente, la recuperación refleja las elecciones" class="w-full h-auto" role="img" viewbox="0 0 1000 220">
+<defs>
+<lineargradient id="m11c-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+<filter height="180%" id="m11c-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m11c-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m11c-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m11c-grid)" height="220" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<g filter="url(#m11c-glow)"><rect fill="#0e2018" height="52" rx="12" stroke="url(#m11c-grad)" stroke-width="2.5" width="180" x="40" y="84"></rect></g><text fill="#34d399" text-anchor="middle" x="130" y="106">🌅 07:00 mañana</text><text fill="#9fe9cf" font-size="11" text-anchor="middle" x="130" y="124">recovery 71% (verde)</text>
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="180" x="290" y="84"></rect><text fill="#bfe6ff" text-anchor="middle" x="380" y="106">☀️ durante el día</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="380" y="124">café, entrenamiento, cena</text>
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="180" x="540" y="84"></rect><text fill="#bfe6ff" text-anchor="middle" x="630" y="106">📝 registro</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="630" y="124">todo se convierte en una fila en la base de datos</text>
+<rect fill="#1f1010" height="52" rx="12" stroke="#fb7185" stroke-width="2" width="180" x="790" y="84"></rect><text fill="#fda4af" text-anchor="middle" x="880" y="106">🌙 mañana siguiente</text><text fill="#fecdd3" font-size="11" text-anchor="middle" x="880" y="124">recovery 48% (ámbar)</text>
+</g>
+<g fill="none" opacity="0.6" stroke="#38bdf8" stroke-width="2">
+<path d="M220,110 L290,110" marker-end="url(#m11c-ah)"></path>
+<path d="M470,110 L540,110" marker-end="url(#m11c-ah)"></path>
+<path d="M720,110 L790,110" marker-end="url(#m11c-ah)"></path>
+</g>
+<path d="M880,136 C880,190 130,190 130,138" fill="none" marker-end="url(#m11c-ah)" opacity="0.75" stroke="#34d399" stroke-dasharray="6 5" stroke-width="2"></path>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="505" y="206">el loop se cierra: la mañana siguiente se convierte en la nueva revisión guiada por la recuperación</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> la recuperación de hoy da inicio al día; las elecciones quedan registradas; la recuperación de mañana refleja esas elecciones. Este ciclo es la columna vertebral de HealthOS: te enseña cuáles son tus propios botones.</p>
+</div>
+<div class="space-y-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">07:00</span> <span class="text-neutral-300">"Recovery 71% (verde), dormiste 7h20, HRV 64. La proteína de ayer alcanzó la meta y el café fue temprano — por eso estás en verde. Hoy toca entrenar fuerte; consume carbohidratos cerca del entrenamiento."</span></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">08:30</span> <span class="text-neutral-300">Foto del desayuno → "~38g de proteína, bajo en grasas saturadas, registrado." (guarda una fila en <code class="font-mono text-xs bg-dark-700 px-1 rounded">food_log</code>)</span></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">13:00</span> <span class="text-neutral-300">"¿Café ahora?" → "Estás en verde y es temprano, puedes. Mantente por debajo de tu límite y deja el café a media tarde."</span></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">19:00</span> <span class="text-neutral-300">"Bife y una copa de vino" → registrado; el coach nota que el alcohol puede afectar la recuperación durante la noche.</span></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-red-500/30 text-sm"><span class="text-red-400 font-semibold">Día +1</span> <span class="text-neutral-300">"Recovery bajó a 48% (ámbar) — el vino y cenar tarde son la causa probable. Tómalo con calma hoy, apuesta por proteína, fibra e hidratación."</span></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Recovery abre el día</div><p class="text-xs text-neutral-400">El número de la mañana decide si esforzarte o descansar.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">El bucle se cierra</div><p class="text-xs text-neutral-400">La elección de hoy se convierte en la recuperación de mañana.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Todo registrado</div><p class="text-xs text-neutral-400">Cada elección se convierte en una fila en la base de datos.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Tus botones</div><p class="text-xs text-neutral-400">Aprendes qué influye en tu cuerpo.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-1-1#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">🔒 Privacidad y seguridad</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-1-t6-p1">Los datos de salud son sensibles. HealthOS es <strong class="text-emerald-400">bloqueado por defecto</strong>: proyecto privado, acceso desde el servidor, secretos fuera de git. Nada sale, excepto las llamadas al LLM que decidas hacer.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<p class="text-sm text-neutral-300"><strong>RLS (Row-Level Security)</strong> — «seguridad a nivel de fila». Es una función de la base de datos que decide quién puede leer cada fila. En HealthOS, la RLS permanece activada <em>sin ninguna política</em>: la clave pública (anon) no puede leer nada, y solo el servidor (con la clave service-role) tiene acceso. Resultado: nadie de afuera puede leer tus datos.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ Qué garantiza el diseño</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Proyecto Supabase <strong>privado</strong>, en tu cuenta.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>RLS activada, sin políticas: la clave anon no puede leer nada.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Secretos en <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> (tu home), nunca en git.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Lo que nunca debes versionar</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Tu <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> completado (perfil real).</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Los valores reales del seed y sus fotos.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>El archivo <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> con las claves.</span></li>
+</ul>
+</div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Privado</div><p class="text-xs text-neutral-400">La base de datos es tuya, en tu cuenta.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">RLS</div><p class="text-xs text-neutral-400">Nadie de fuera lee tus registros.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Secretos</div><p class="text-xs text-neutral-400">En ~/.env, fuera del control de versiones.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Envías</div><p class="text-xs text-neutral-400">No sale nada más que lo que tú eliges.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-1-1#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">⚠️ No es consejo médico · costo y requisitos previos</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-1-t7-p1">Antes de cualquier cosa técnica, la regla más importante de todo el curso: esto es una herramienta de <strong class="text-emerald-400">registro y razonamiento</strong>, no un médico.</p>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> No es consejo médico</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Es el ejemplo de <strong>una persona</strong>, que consultó a médicos en cada paso. No es una prescripción para ti.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span><strong>La IA puede alucinar.</strong> Trata toda sugerencia como una pregunta para consultar con el médico, nunca como una orden.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>El coach recibe instrucciones para <strong>no</strong> diagnosticar ni modificar la medicación; te deriva a un profesional clínico.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Las muestras de ADN enviadas por correo se degradan; el panel de la clínica y el de Ancestry pueden no coincidir.</span></li>
+</ul>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">💰</span> Cuánto cuesta ejecutarlo</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li><strong>Supabase</strong> — el plan gratuito alcanza para una persona.</li>
+<li><strong>LLM + embeddings</strong> — las llamadas que haces (centavos para embeddings; ~US$10-20/mes de uso típico).</li>
+<li><strong>Visión (Gemini)</strong> — centavos por foto.</li>
+<li><strong>WHOOP</strong> — la API es gratuita con la suscripción. ¿No tienes WHOOP? Usa otro wearable o un registro manual.</li>
+</ul>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">🧰</span> Qué vas a necesitar (visión general)</h3>
+<p class="text-neutral-300 text-sm">Python 3.9+, Node, una cuenta de Supabase, un bot de Telegram y claves de API (OpenAI, Gemini y, opcionalmente, WHOOP). No te preocupes por tenerlo todo ahora: la <strong>Ruta 2 (Paso a paso)</strong> arma cada pieza contigo, desde cero.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Médico en el circuito</div><p class="text-xs text-neutral-400">Verifica todo con un médico.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Barato</div><p class="text-xs text-neutral-400">Plan gratuito + ~US$10-20/mes.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">WHOOP opcional</div><p class="text-xs text-neutral-400">Cualquier fuente sirve.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">La Ruta 2 configura</div><p class="text-xs text-neutral-400">Los requisitos previos se indican en el paso a paso.</p></div>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-1-1#q1">
+<p class="font-medium mb-4">✅ Autoevaluación (opcional): ¿qué hace que HealthOS sea diferente de un chatbot común?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) Usa un modelo de IA más grande</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) Basa cada respuesta en tus datos (wearable, sangre, ADN, dieta) y recuerda el historial</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) Sustituye al médico</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-emerald-900/40 via-dark-800 to-dark-800 rounded-xl border border-emerald-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Resumen del módulo</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Lo específico prevalece sobre lo genérico</strong><span class="text-neutral-400"> — el coach piensa con tus datos, no con el promedio de internet.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Cuatro fuentes cruzadas</strong><span class="text-neutral-400"> — wearable, sangre, ADN y dieta en un solo lugar.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Snapshot en cada turno</strong><span class="text-neutral-400"> — el agente siempre responde a partir de tu estado actual, y la memoria se convierte en un patrón.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">El ciclo de recuperación</strong><span class="text-neutral-400"> — la decisión de hoy se convierte en el número de mañana; es la columna vertebral del día.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Bloqueado y no médico</strong><span class="text-neutral-400"> — privado por defecto; siempre con un profesional clínico al tanto.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-emerald-400 mb-2">Próximo módulo:</h3>
+<p class="text-neutral-300 text-sm">1.2 — Las señales del cuerpo: recovery, HRV, RHR, sueño y los marcadores sanguíneos que lee el coach.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Volver a Fundamentos</a>
+<a class="flex-1 text-center px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-500 transition-colors" href="modulo-1-2.html">Próximo módulo →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — Curso INEMA · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Contenido educativo. No es consejo médico. Consulta con profesionales de la salud.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-1-1#q1', {
+        answer: 1,
+        explain: { 0: 'O modelo até ajuda, mas não é o diferencial.', 1: 'Isso. O diferencial é aterrar nos SEUS dados + memória do histórico.', 2: 'Não — ele explicitamente não substitui médico.' }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Módulo 2.2 — La base de datos (Supabase) | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento blue (T2) */
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37,99,235,0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37,99,235,0.08); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37,99,235,0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37,99,235,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha2/modulo-2-2.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha2/modulo-2-2.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha2/modulo-2-2.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha2/modulo-2-2.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="../../../en/curso/trilha2/modulo-2-2.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="modulo-2-2.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-blue-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Saltar al contenido</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html">
+<span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentos</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-blue-400 bg-blue-500/10" href="index.html">
+<span class="sm:hidden">T2</span><span class="hidden sm:inline">Paso a paso</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html">
+<span class="sm:hidden">T3</span><span class="hidden sm:inline">Cómo usar</span>
+</a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="Mi recorrido" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">Mi recorrido</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Apariencia" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Apariencia</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tema</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Oscuro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Claro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sepia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Enfoque</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">Alto contraste</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tamaño del texto</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Ancho · interlineado</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Estrecho</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Medio</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Ancho</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compacto</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Cómodo</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Fuente</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">Sistema</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Lectura</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Ruta de navegación" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-blue-400" href="../../index.html">Inicio</a><span>/</span>
+<a class="hover:text-blue-400" href="index.html">Paso a paso</a><span>/</span>
+<span class="text-blue-400">Módulo 2.2</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-blue-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="2-2" data-inema-track="2">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full mb-4">MÓDULO 2.2</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">🗄️ La base de datos (Supabase)</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">Sube el esquema: ejecuta las <strong class="text-blue-400">migrations</strong>, conocer las 14 tablas, conectar el <strong class="text-blue-400">pgvector</strong> (memoria), crear el bucket de fotos, protegerlo con <strong class="text-blue-400">RLS</strong> y probar la conexión. Al final de este módulo, la base de datos está lista y el coach ya tendría dónde guardar todo.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">7</div><div class="text-xs text-neutral-400">Temas</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">~35</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Intermedio</div><div class="text-xs text-neutral-400">Nivel</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Práctico</div><div class="text-xs text-neutral-400">Tipo</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:2-2">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Tu progreso en este módulo</span>
+<span class="text-blue-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 de 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-blue-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Índice de la página" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Sección <span class="inema-toc-pos">1</span> de <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-1">1. Ejecutar las migraciones</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-2">2. Las 14 tablas</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-3">3. pgvector (memoria)</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-4">4. Storage bucket</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-5">5. RLS (candado)</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-6">6. Probar la conexión</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-7">7. Seed y datos sensibles</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">🧱 Ejecutar las migrations</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t1-p1">Las <strong class="text-blue-400">migrations</strong> son archivos <code class="font-mono text-xs bg-dark-700 px-1 rounded">.sql</code> versionados en <code class="font-mono text-xs bg-dark-700 px-1 rounded">agent/supabase/migrations/</code> que describen toda la base de datos. Llevarlas a tu proyecto Supabase crea, de una vez, las <strong class="text-blue-400">14 tablas</strong> y activa la extensión <strong class="text-blue-400">pgvector</strong> — todo mediante la primera migración, la <code class="font-mono text-xs bg-dark-700 px-1 rounded">0001_init.sql</code>. No creas las tablas manualmente: el esquema ya viene listo en el blueprint.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Migration</strong> — un archivo SQL numerado que aplica un cambio en la base de datos. Ejecutarlos todos, en orden, reconstruye el esquema desde cero en cualquier proyecto.</li>
+<li><strong>Supabase CLI</strong> — la herramienta de línea de comandos de Supabase. Ella <em>conecta</em> tu carpeta local con tu proyecto en la nube y <em>impulsa</em> las migrations para allá.</li>
+</ul>
+</div>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Flujo de migration: los archivos SQL locales pasan por Supabase CLI con db push y llegan a Postgres en la nube, que incorpora las 14 tablas y la extensión pgvector" class="w-full h-auto" role="img" viewbox="0 0 1000 200">
+<defs>
+<lineargradient id="m22a-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m22a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m22a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m22a-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m22a-grid)" height="200" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="190" x="30" y="74"></rect><text fill="#bfe6ff" text-anchor="middle" x="125" y="96">📁 migrations/ (.sql)</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="125" y="114">0001_init · 0002_seed</text>
+<g filter="url(#m22a-glow)"><rect fill="#0e1622" height="52" rx="12" stroke="url(#m22a-grad)" stroke-width="2.5" width="180" x="300" y="74"></rect></g><text fill="#60a5fa" text-anchor="middle" x="390" y="96">⚙️ supabase CLI</text><text fill="#bcd6ff" font-size="11" text-anchor="middle" x="390" y="114">db push</text>
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="190" x="560" y="74"></rect><text fill="#bfe6ff" text-anchor="middle" x="655" y="96">☁️ Postgres (nube)</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="655" y="114">tu proyecto privado</text>
+<g filter="url(#m22a-glow)"><rect fill="#0e1622" height="52" rx="12" stroke="url(#m22a-grad)" stroke-width="2.5" width="180" x="790" y="74"></rect></g><text fill="#60a5fa" text-anchor="middle" x="880" y="96">🗄️ 14 tablas</text><text fill="#bcd6ff" font-size="11" text-anchor="middle" x="880" y="114">+ pgvector activado</text>
+</g>
+<g fill="none" opacity="0.6" stroke="#38bdf8" stroke-width="2">
+<path d="M220,100 L300,100" marker-end="url(#m22a-ah)"></path>
+<path d="M480,100 L560,100" marker-end="url(#m22a-ah)"></path>
+<path d="M750,100 L790,100" marker-end="url(#m22a-ah)"></path>
+</g>
+<text fill="#bcd6ff" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="500" y="170">un único `db push` reconstruye toda la base de datos: nunca creas tablas a mano</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> de izquierda a derecha, los archivos SQL se convierten en la base de datos real. Los cuadros azules con brillo son donde ocurre la acción (la CLI y el resultado); los cian son el origen y el destino. El secreto es que el esquema está en un archivo, no en tu memoria.</p>
+</div>
+<!-- COPY-RUN 1 -->
+<div class="rounded-xl border border-blue-500/30 bg-dark-800 overflow-hidden mb-6">
+<div class="px-4 py-3 bg-blue-500/10 border-b border-blue-500/30 text-sm"><span class="font-semibold text-blue-400">🎯 Objetivo:</span> <span class="text-neutral-300">conectar tu carpeta al proyecto Supabase y aplicar las migraciones (crea las 14 tablas + pgvector).</span></div>
+<pre class="p-4 overflow-x-auto text-sm bg-dark-900 leading-relaxed"><code class="font-mono text-neutral-100"># 1) na raiz do repo, ligue ao seu projeto (pede a senha do banco)
+supabase link --project-ref &lt;seu-project-ref&gt;
+
+# 2) empurre TODAS as migrations de agent/supabase/migrations/
+supabase db push</code></pre>
+<div class="px-4 py-3 bg-dark-700 border-t border-dark-600 text-xs text-neutral-300"><span class="font-semibold text-blue-400">✅ Cómo verificar:</span> la CLI muestra las migraciones aplicadas (incluyendo <code class="font-mono bg-dark-900 px-1 rounded">0001_init.sql</code>) sin errores. En el panel de Supabase, en <em>Table Editor</em>, aparecen las 14 tablas; en <em>Database → Extensions</em>, <code class="font-mono bg-dark-900 px-1 rounded">vector</code> está habilitada.</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> De dónde viene la contraseña</h3>
+<p class="text-neutral-300 text-sm">O <code class="font-mono text-xs bg-dark-700 px-1 rounded">supabase link</code> usa la <code class="font-mono text-xs bg-dark-700 px-1 rounded">SUPABASE_DB_PASSWORD</code> que guardaste en el <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> (Módulo 2.1). El <code class="font-mono text-xs bg-dark-700 px-1 rounded">&lt;seu-project-ref&gt;</code> es el identificador del proyecto —aparece en la URL <code class="font-mono text-xs bg-dark-700 px-1 rounded">https://&lt;ref&gt;.supabase.co</code> y en Settings.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Migration</div><p class="text-xs text-neutral-400">SQL numerado que reconstruye el esquema.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">0001_init.sql</div><p class="text-xs text-neutral-400">Crea las 14 tablas y activa pgvector.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">db push</div><p class="text-xs text-neutral-400">Un comando aplica todo en la nube.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Esquema en archivo</div><p class="text-xs text-neutral-400">Reproducible en cualquier proyecto.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">📋 Las 14 tablas — descripción general</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t2-p1">Cada cosa que registras se convierte en <strong class="text-blue-400">fila en una tabla</strong>. El esquema abarca las familias de datos de salud — comida, entrenamiento, peso, composición corporal, cafeína, suplementos, signos vitales, exámenes, check-ins, metas y contexto — además de la <strong class="text-blue-400">memoria semántica</strong> de los mensajes. El diagrama muestra cómo las fuentes alimentan las tablas y cómo el coach vuelve a leerlas.</p>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Modelo de datos: las fuentes (wearable, fotos, mensajes) escriben en las tablas de Supabase; el coach lee la instantánea de esas tablas para responder" class="w-full h-auto" role="img" viewbox="0 0 1000 320">
+<defs>
+<lineargradient id="m22b-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m22b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m22b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m22b-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+<marker id="m22b-ahb" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#60a5fa"></path></marker>
+</defs>
+<rect fill="url(#m22b-grid)" height="320" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12" font-weight="600">
+<g class="wf-a"><rect fill="#0e1b26" height="38" rx="9" stroke="#38bdf8" stroke-width="2" width="170" x="24" y="40"></rect><text fill="#bfe6ff" text-anchor="middle" x="109" y="64">⌚ wearable</text></g>
+<g class="wf-a"><rect fill="#0e1b26" height="38" rx="9" stroke="#38bdf8" stroke-width="2" width="170" x="24" y="138"></rect><text fill="#bfe6ff" text-anchor="middle" x="109" y="162">📷 fotos</text></g>
+<g class="wf-a"><rect fill="#0e1b26" height="38" rx="9" stroke="#38bdf8" stroke-width="2" width="170" x="24" y="236"></rect><text fill="#bfe6ff" text-anchor="middle" x="109" y="260">💬 mensajes</text></g>
+</g>
+<g fill="#bcd6ff" font-family="Inter,sans-serif" font-size="11" font-weight="600">
+<rect fill="#0e1622" height="30" rx="7" stroke="#3b82f6" stroke-width="1.6" width="150" x="360" y="26"></rect><text text-anchor="middle" x="435" y="46">vitals</text>
+<rect fill="#0e1622" height="30" rx="7" stroke="#3b82f6" stroke-width="1.6" width="150" x="360" y="64"></rect><text text-anchor="middle" x="435" y="84">food_log</text>
+<rect fill="#0e1622" height="30" rx="7" stroke="#3b82f6" stroke-width="1.6" width="150" x="360" y="102"></rect><text text-anchor="middle" x="435" y="122">workouts</text>
+<rect fill="#0e1622" height="30" rx="7" stroke="#3b82f6" stroke-width="1.6" width="150" x="360" y="140"></rect><text text-anchor="middle" x="435" y="160">weigh_ins</text>
+<rect fill="#0e1622" height="30" rx="7" stroke="#3b82f6" stroke-width="1.6" width="150" x="360" y="178"></rect><text text-anchor="middle" x="435" y="198">lab_results</text>
+<rect fill="#0e1622" height="30" rx="7" stroke="#3b82f6" stroke-width="1.6" width="150" x="360" y="216"></rect><text text-anchor="middle" x="435" y="236">goals · context</text>
+<rect fill="#10233f" height="30" rx="7" stroke="#60a5fa" stroke-width="1.8" width="150" x="360" y="254"></rect><text text-anchor="middle" x="435" y="274">messages (vector)</text>
+</g>
+<text fill="#9ad6ff" font-family="Inter,sans-serif" font-size="10.5" text-anchor="middle" x="435" y="306">…y más: body_comp, caffeine, supplements, checkins, coach_summary (14 en total)</text>
+<g fill="none" opacity="0.5" stroke="#38bdf8" stroke-width="1.7">
+<path d="M194,59 C280,59 290,70 360,75" marker-end="url(#m22b-ah)"></path>
+<path d="M194,157 C280,157 300,120 360,117" marker-end="url(#m22b-ah)"></path>
+<path d="M194,255 C280,255 300,270 360,269" marker-end="url(#m22b-ah)"></path>
+</g>
+<g filter="url(#m22b-glow)"><rect fill="#0e1622" height="64" rx="14" stroke="url(#m22b-grad)" stroke-width="2.5" width="170" x="620" y="120"></rect></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="16" font-weight="600" text-anchor="middle" x="705" y="148">🤖 Coach</text>
+<text fill="#bcd6ff" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="705" y="168">lee el snapshot</text>
+<path d="M510,152 C560,152 580,152 620,152" fill="none" marker-end="url(#m22b-ahb)" opacity="0.8" stroke="#60a5fa" stroke-width="2"></path>
+<g filter="url(#m22b-glow)"><rect fill="#0e1622" height="64" rx="14" stroke="url(#m22b-grad)" stroke-width="2.5" width="120" x="850" y="120"></rect></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="910" y="148">💬 respuesta</text>
+<text fill="#bcd6ff" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="910" y="167">con contexto</text>
+<path d="M790,152 L850,152" fill="none" marker-end="url(#m22b-ahb)" opacity="0.8" stroke="#60a5fa" stroke-width="2"></path>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> las fuentes (cian, a la izquierda) escriben en las tablas (centro); el coach (azul) lee la instantánea de esas tablas y responde. La tabla <code class="font-mono bg-dark-900 px-1 rounded">messages</code> se destaca porque es la única que guarda <em>vectores</em> (la memoria semántica — Tema 3).</p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">food_log</div><p class="text-xs text-neutral-400">Comida → macros + flags.</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">workouts</div><p class="text-xs text-neutral-400">Entrenamientos registrados.</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">weigh_ins</div><p class="text-xs text-neutral-400">Pesajes (tendencia).</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">body_comp</div><p class="text-xs text-neutral-400">Composición corporal.</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">caffeine</div><p class="text-xs text-neutral-400">Cafeína a lo largo del día.</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">supplements</div><p class="text-xs text-neutral-400">Suplementos y horarios.</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">vitals</div><p class="text-xs text-neutral-400">PA, recovery, HRV, RHR, sueño.</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">lab_results</div><p class="text-xs text-neutral-400">Marcadores de sangre.</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">checkins</div><p class="text-xs text-neutral-400">Registros diarios.</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">goals</div><p class="text-xs text-neutral-400">Tus metas.</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-dark-600"><div class="text-blue-400 font-mono text-xs font-bold mb-1">context</div><p class="text-xs text-neutral-400">Perfil y contexto fijo.</p></div>
+<div class="bg-dark-800 rounded-lg p-3 border border-blue-500/30"><div class="text-blue-400 font-mono text-xs font-bold mb-1">messages 🧲</div><p class="text-xs text-neutral-400">Memoria semántica (vector).</p></div>
+</div>
+<p class="text-xs text-neutral-500 mb-6">Estas 12 familias de datos + tablas de apoyo (como <code class="font-mono bg-dark-700 px-1 rounded">coach_summary</code>, que guarda la recuperación y su causa) completan las <strong class="text-blue-400">14 tablas</strong> que crea la migration.</p>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Todo es una línea</div><p class="text-xs text-neutral-400">Cada registro se convierte en una fila de una tabla.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Familias</div><p class="text-xs text-neutral-400">Una tabla por tipo de dato.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Snapshot</div><p class="text-xs text-neutral-400">El coach lee un resumen de esas tablas.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">messages</div><p class="text-xs text-neutral-400">La única con vectores (memoria).</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">🧲 pgvector — la memoria</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t3-p1">La migration <code class="font-mono text-xs bg-dark-700 px-1 rounded">0001_init.sql</code> conecta el <strong class="text-blue-400">pgvector</strong> antes de crear las tablas. Es lo que le da a la base de datos la capacidad de guardar la <strong class="text-blue-400">memoria semántica</strong> — buscar mensajes anteriores por significado, no por una palabra exacta.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí? Qué es pgvector</p>
+<p class="text-sm text-neutral-300"><strong>pgvector</strong> es una extensión de PostgreSQL que agrega un nuevo tipo de columna: <code class="font-mono text-xs bg-dark-700 px-1 rounded">vector</code>. Cada mensaje se convierte en un <strong>embedding</strong> (una lista de números que representa el <em>significado</em> del texto). pgvector compara estos vectores y encuentra lo que es <em>parecido en significado</em> — así el coach «recuerda» cuando hablaste del sueño, aunque no aparezca la palabra «sueño».</p>
+</div>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Memoria semántica: el texto se convierte en embedding, pgvector lo guarda como vector y la búsqueda por similitud trae los mensajes con un significado parecido" class="w-full h-auto" role="img" viewbox="0 0 1000 180">
+<defs>
+<lineargradient id="m22c-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m22c-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m22c-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m22c-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m22c-grid)" height="180" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="180" x="24" y="64"></rect><text fill="#bfe6ff" text-anchor="middle" x="114" y="86">📝 texto</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="114" y="104">"dormí mal de nuevo"</text>
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="180" x="280" y="64"></rect><text fill="#bfe6ff" text-anchor="middle" x="370" y="86">🔢 embedding</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="370" y="104">[0.12, -0.7, …]</text>
+<g filter="url(#m22c-glow)"><rect fill="#0e1622" height="52" rx="12" stroke="url(#m22c-grad)" stroke-width="2.5" width="180" x="536" y="64"></rect></g><text fill="#60a5fa" text-anchor="middle" x="626" y="86">🧲 pgvector</text><text fill="#bcd6ff" font-size="11" text-anchor="middle" x="626" y="104">guarda el vector</text>
+<g filter="url(#m22c-glow)"><rect fill="#0e1622" height="52" rx="12" stroke="url(#m22c-grad)" stroke-width="2.5" width="184" x="792" y="64"></rect></g><text fill="#60a5fa" text-anchor="middle" x="884" y="86">🔎 similitud</text><text fill="#bcd6ff" font-size="11" text-anchor="middle" x="884" y="104">encuentra el parecido</text>
+</g>
+<g fill="none" opacity="0.6" stroke="#38bdf8" stroke-width="2">
+<path d="M204,90 L280,90" marker-end="url(#m22c-ah)"></path>
+<path d="M460,90 L536,90" marker-end="url(#m22c-ah)"></path>
+<path d="M716,90 L792,90" marker-end="url(#m22c-ah)"></path>
+</g>
+<text fill="#bcd6ff" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="500" y="156">por eso el coach recuerda «mal sueño» incluso cuando usas otras palabras</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> el texto se convierte en números (embedding), pgvector los guarda y luego los compara por <em>distancia</em>. Cuanto más cerca están dos vectores, más parecido es su significado: así es como la memoria recupera el pasado relevante.</p>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🔌</span> No conectas manualmente</h3>
+<p class="text-neutral-300 text-sm">No necesitas ejecutar ningún comando extra: el <code class="font-mono text-xs bg-dark-700 px-1 rounded">create extension vector</code> ya está dentro de la <code class="font-mono text-xs bg-dark-700 px-1 rounded">0001_init.sql</code>. Cuando hiciste el <code class="font-mono text-xs bg-dark-700 px-1 rounded">db push</code> del Tema 1, pgvector ya quedó habilitado. Aquí solo tienes que entender <em>por qué</em> existe.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">pgvector</div><p class="text-xs text-neutral-400">Extensión que almacena vectores en Postgres.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Embedding</div><p class="text-xs text-neutral-400">Números que representan el significado.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Similitud</div><p class="text-xs text-neutral-400">Encuentra lo parecido por distancia.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Ya viene activado</div><p class="text-xs text-neutral-400">La 0001_init.sql hace eso por ti.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">🪣 El bucket de almacenamiento de fotos</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t4-p1">Las tablas guardan números y texto; las <strong class="text-blue-400">fotos</strong> (comida, análisis, cuerpo) van a un <strong class="text-blue-400">bucket</strong> de storage. HealthOS usa un bucket llamado <code class="font-mono text-xs bg-dark-700 px-1 rounded">health-assets</code>, creado con un solo comando —y él es <strong class="text-blue-400">privado</strong>.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<p class="text-sm text-neutral-300"><strong>Bucket</strong> — es una "carpeta" de almacenamiento de archivos en Supabase, separada de las tablas. <strong>Privado</strong> significa que nadie accede a un archivo mediante la URL pública; solo el servidor, con la clave correcta, genera un enlace temporal para leerlo.</p>
+</div>
+<!-- COPY-RUN 2 -->
+<div class="rounded-xl border border-blue-500/30 bg-dark-800 overflow-hidden mb-6">
+<div class="px-4 py-3 bg-blue-500/10 border-b border-blue-500/30 text-sm"><span class="font-semibold text-blue-400">🎯 Objetivo:</span> <span class="text-neutral-300">crear el bucket privado <code class="font-mono bg-dark-900 px-1 rounded">health-assets</code> dónde se guardarán las fotos.</span></div>
+<pre class="p-4 overflow-x-auto text-sm bg-dark-900 leading-relaxed"><code class="font-mono text-neutral-100"># um comando cria o bucket PRIVADO de fotos
+python3 agent/scripts/db.py mkbucket health-assets</code></pre>
+<div class="px-4 py-3 bg-dark-700 border-t border-dark-600 text-xs text-neutral-300"><span class="font-semibold text-blue-400">✅ Cómo verificar:</span> en el panel de Supabase, en <em>Almacenamiento</em>, el bucket <code class="font-mono bg-dark-900 px-1 rounded">health-assets</code> aparece marcado como <strong>Private</strong> (no público). Puedes volver a ejecutarlo sin problema: no duplica.</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ Bucket privado (el correcto)</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Las fotos de salud no se filtran mediante URL públicas.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>El servidor genera enlaces temporales cuando hace falta.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Es el patrón que el <code class="font-mono text-xs bg-dark-700 px-1 rounded">mkbucket</code> ya lo aplica.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Bucket público (no lo hagas)</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Cualquiera con la URL podría ver la foto de tu examen.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Datos de salud sensibles expuestos a internet.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>No se puede «despublicar» lo que ya se filtró.</span></li>
+</ul>
+</div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Bucket</div><p class="text-xs text-neutral-400">Almacenamiento de archivos, fuera de las tablas.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">health-assets</div><p class="text-xs text-neutral-400">El bucket de fotos de HealthOS.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Privado</div><p class="text-xs text-neutral-400">Sin URL pública; solo el servidor lo lee.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">mkbucket</div><p class="text-xs text-neutral-400">Un comando crea todo correctamente.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">🔒 RLS — bloquear la base de datos</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t5-p1">El esquema conecta el <strong class="text-blue-400">RLS (Row-Level Security)</strong> en cada tabla y <strong class="text-blue-400">no crea ninguna política</strong>. El efecto es radical y sencillo: la clave pública (<code class="font-mono text-xs bg-dark-700 px-1 rounded">anon</code>) no lee <em>nada</em>; solo el servidor, con la clave <code class="font-mono text-xs bg-dark-700 px-1 rounded">service-role</code>, atraviesa. Es el bloqueo estándar de HealthOS.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí? Dos claves, dos mundos</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>RLS</strong> — recurso de Postgres que decide, fila por fila, quién puede leer/escribir. Sin una política que lo permita, el comportamiento predeterminado es denegar.</li>
+<li><strong>service-role</strong> — la clave de <em>servidor</em>. Ella <strong>elude</strong> la RLS (la omite), así que el agente lee y escribe con normalidad. Solo vive en <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>, nunca en el navegador.</li>
+<li><strong>anon</strong> — la clave <em>pública</em>, segura de exponer. Con RLS activada y cero políticas, esta <strong>no lee nada</strong>.</li>
+</ul>
+</div>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="RLS: la clave anon está bloqueada al entrar a las tablas; la clave service-role del servidor pasa por encima de la RLS y accede a los datos" class="w-full h-auto" role="img" viewbox="0 0 1000 220">
+<defs>
+<lineargradient id="m22d-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m22d-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m22d-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m22d-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#34d399"></path></marker>
+</defs>
+<rect fill="url(#m22d-grid)" height="220" width="1000" x="0" y="0"></rect>
+<!-- service-role: passa -->
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<g filter="url(#m22d-glow)"><rect fill="#0e1622" height="48" rx="12" stroke="url(#m22d-grad)" stroke-width="2.5" width="200" x="40" y="36"></rect></g><text fill="#60a5fa" text-anchor="middle" x="140" y="58">🔑 service-role</text><text fill="#bcd6ff" font-size="11" text-anchor="middle" x="140" y="75">servidor (en el ~/.env)</text>
+<rect fill="#1f1010" height="48" rx="12" stroke="#fb7185" stroke-width="2" width="200" x="40" y="136"></rect><text fill="#fda4af" text-anchor="middle" x="140" y="158">🌐 anon (pública)</text><text fill="#fecdd3" font-size="11" text-anchor="middle" x="140" y="175">navegador / fuera</text>
+</g>
+<!-- RLS gate -->
+<g filter="url(#m22d-glow)"><rect fill="#0e1622" height="72" rx="14" stroke="url(#m22d-grad)" stroke-width="2.5" width="120" x="430" y="74"></rect></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="490" y="106">🔒 RLS</text>
+<text fill="#bcd6ff" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="490" y="126">sin políticas</text>
+<!-- tables -->
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<rect fill="#0e1b26" height="72" rx="14" stroke="#38bdf8" stroke-width="2" width="200" x="760" y="74"></rect><text fill="#bfe6ff" text-anchor="middle" x="860" y="106">🗄️ 14 tablas</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="860" y="126">tus datos</text>
+</g>
+<!-- arrows -->
+<path d="M240,60 C330,60 360,96 430,100" fill="none" marker-end="url(#m22d-ah)" stroke="#34d399" stroke-width="2.4"></path>
+<path d="M550,104 C620,104 690,108 760,108" fill="none" marker-end="url(#m22d-ah)" opacity="0.9" stroke="#34d399" stroke-width="2.4"></path>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="650" y="96">elude → pasa ✓</text>
+<!-- anon blocked -->
+<path d="M240,160 C320,160 380,150 422,132" fill="none" stroke="#fb7185" stroke-dasharray="6 5" stroke-width="2.2"></path>
+<g stroke="#fb7185" stroke-width="3"><line x1="455" x2="475" y1="160" y2="180"></line><line x1="475" x2="455" y1="160" y2="180"></line></g>
+<text fill="#fda4af" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="360" y="200">anon queda bloqueado por la RLS → no lee nada ✗</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> las dos claves llegan a la misma puerta (la RLS). La <code class="font-mono bg-dark-900 px-1 rounded">service-role</code> (verde) pasa por encima y llega a las tablas; la <code class="font-mono bg-dark-900 px-1 rounded">anon</code> (rojo, discontinuo) choca con la X y vuelve. Por eso es seguro exponer la clave pública.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ service-role (servidor)</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Lee y escribe en todas las tablas.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Omite la RLS (pasa por encima).</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Se limita a <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>, en el servidor.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ anon (pública)</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>No lee ninguna línea (RLS sin política).</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>No escribe nada.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Por eso es <strong>segura</strong> de exponer si hace falta.</span></li>
+</ul>
+</div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">RLS</div><p class="text-xs text-neutral-400">Activada para todo, sin políticas = deniega.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">service-role</div><p class="text-xs text-neutral-400">La clave del servidor omite la RLS.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">anon</div><p class="text-xs text-neutral-400">La clave pública no lee nada.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Bloqueo predeterminado</div><p class="text-xs text-neutral-400">Privado por diseño, sin necesidad de configurar nada.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">🔌 Probar la conexión</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t6-p1">Antes de seguir con el agente, comprueba que el servidor se comunica con la base de datos. El <code class="font-mono text-xs bg-dark-700 px-1 rounded">db.py</code> es la utilidad de base de datos de HealthOS; un <code class="font-mono text-xs bg-dark-700 px-1 rounded">select</code> simple confirma que las claves del <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> están correctas y que la RLS permite el acceso del servidor.</p>
+<!-- COPY-RUN 3 -->
+<div class="rounded-xl border border-blue-500/30 bg-dark-800 overflow-hidden mb-6">
+<div class="px-4 py-3 bg-blue-500/10 border-b border-blue-500/30 text-sm"><span class="font-semibold text-blue-400">🎯 Objetivo:</span> <span class="text-neutral-300">confirmar que el servidor se conecta y lee una tabla real (<code class="font-mono bg-dark-900 px-1 rounded">goals</code>).</span></div>
+<pre class="p-4 overflow-x-auto text-sm bg-dark-900 leading-relaxed"><code class="font-mono text-neutral-100"># lê as linhas da tabela goals usando a chave service-role do ~/.env
+python3 agent/scripts/db.py select goals</code></pre>
+<div class="px-4 py-3 bg-dark-700 border-t border-dark-600 text-xs text-neutral-300"><span class="font-semibold text-blue-400">✅ Cómo verificar:</span> imprime tus líneas de <code class="font-mono bg-dark-900 px-1 rounded">goals</code> (o una lista vacía <code class="font-mono bg-dark-900 px-1 rounded">[]</code> si todavía no cambiaste el seed de ejemplo). Sin errores de conexión/autenticación = claves y RLS OK. Cambia <code class="font-mono bg-dark-900 px-1 rounded">goals</code> por <code class="font-mono bg-dark-900 px-1 rounded">&lt;outra-tabela&gt;</code> para inspeccionar cualquiera de las 14.</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">🧪</span> Si da error</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-primary mt-1">•</span><span><strong>¿Falló la autenticación?</strong> A <code class="font-mono text-xs bg-dark-700 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> o la <code class="font-mono text-xs bg-dark-700 px-1 rounded">SUPABASE_URL</code> en el <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> está equivocada.</span></li>
+<li class="flex items-start space-x-2"><span class="text-primary mt-1">•</span><span><strong>¿No existe la tabla?</strong> O <code class="font-mono text-xs bg-dark-700 px-1 rounded">db push</code> del Tema 1 no se ejecutó por completo — repítelo.</span></li>
+<li class="flex items-start space-x-2"><span class="text-primary mt-1">•</span><span><strong>¿La lista está vacía?</strong> Esto es un éxito de conexión: solo falta el seed (Tema 7).</span></li>
+</ul>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-2-2#q1">
+<p class="font-medium mb-4">✅ Autoevaluación (opcional): por qué el <code class="font-mono text-xs bg-dark-700 px-1 rounded">db.py select goals</code> puede leer, si RLS está habilitada?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) La RLS solo se aplica a la escritura, no a la lectura</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) El script usa la clave service-role, que elude la RLS</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) La tabla goals es pública</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400 mt-8">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">db.py</div><p class="text-xs text-neutral-400">La utilidad de base de datos de HealthOS.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">select goals</div><p class="text-xs text-neutral-400">Prueba mínima de conexión.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Lee = OK</div><p class="text-xs text-neutral-400">Claves y RLS en funcionamiento.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">[] también está bien</div><p class="text-xs text-neutral-400">Conexión correcta, solo falta el seed.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">🌱 Seed y datos sensibles</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t7-p1">La migration <code class="font-mono text-xs bg-dark-700 px-1 rounded">0002_seed_example.sql</code> planta uno <strong class="text-blue-400">seed de ejemplo</strong> (genérico, sin datos reales), solo para que veas el formato. El último paso es reemplazar este ejemplo por tus <strong class="text-blue-400">tus metas y contexto</strong> — y conserva tu seed real y tu <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> <strong class="text-blue-400">fuera de git</strong>.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Seed</strong> — datos iniciales que «siembran» la base de datos. El ejemplo es genérico; el tuyo, el real, va en las tablas <code class="font-mono text-xs bg-dark-700 px-1 rounded">goals</code> e <code class="font-mono text-xs bg-dark-700 px-1 rounded">context</code>.</li>
+<li><strong>Fuera de Git</strong> — el repositorio es el plano <em>limpio</em>. Tus valores reales quedan solo en tu máquina/base de datos; se incluyen en el <code class="font-mono text-xs bg-dark-700 px-1 rounded">.gitignore</code> y nunca se versionan.</li>
+</ul>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ Puedes versionar</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Las migrations del esquema (<code class="font-mono text-xs bg-dark-700 px-1 rounded">0001_init.sql</code>).</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>O <code class="font-mono text-xs bg-dark-700 px-1 rounded">0002_seed_example.sql</code> <strong>genérico</strong>.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>O <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> modelo (en blanco).</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Nunca versionar</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Tu seed <strong>real</strong> (goals + context completados).</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Tu <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> con un perfil real.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>O <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> y tus fotos.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Los datos de salud son sensibles</h3>
+<p class="text-neutral-300 text-sm">Un seed real en un commit es una filtración permanente: el historial de git lo guarda todo. Antes de cualquier <code class="font-mono text-xs bg-dark-700 px-1 rounded">git add</code>, confirma que los goals/context reales, <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> completado y <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> están en el <code class="font-mono text-xs bg-dark-700 px-1 rounded">.gitignore</code>. El repositorio público debe conservarse como el blueprint scrubbed, sin información personal.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Seed</div><p class="text-xs text-neutral-400">Datos iniciales de la base de datos.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Ejemplo → el tuyo</div><p class="text-xs text-neutral-400">Reemplaza 0002 por tus metas+context.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Fuera de Git</div><p class="text-xs text-neutral-400">El Seed real y CLAUDE.md no se versionan.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Blueprint limpio</div><p class="text-xs text-neutral-400">El repo público no contiene datos personales.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-blue-900/40 via-dark-800 to-dark-800 rounded-xl border border-blue-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Resumen del módulo</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Migraciones con un comando</strong><span class="text-neutral-400"> — <code class="font-mono text-xs bg-dark-700 px-1 rounded">supabase db push</code> crea las 14 tablas y conecta pgvector (0001_init.sql).</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">14 tablas, una por familia</strong><span class="text-neutral-400"> — comida, entrenamiento, peso, signos vitales, análisis, metas, contexto… + la memoria semántica en messages.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">pgvector es la memoria</strong><span class="text-neutral-400"> — guarda embeddings y busca por significado; ya viene activado por la migration.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Bucket privado + RLS</strong><span class="text-neutral-400"> — fotos en health-assets cerrado; RLS activada sin políticas: solo pasa el service-role.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Conexión probada y seed tuyo</strong><span class="text-neutral-400"> — <code class="font-mono text-xs bg-dark-700 px-1 rounded">db.py select goals</code> confirma todo; el seed real y CLAUDE.md quedan fuera de git.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-blue-400 mb-2">Próximo módulo:</h3>
+<p class="text-neutral-300 text-sm">2.3 — El agente y el bot: darle vida al coach en Telegram, conectar el agente a la base de datos que acabas de configurar y responder al primer mensaje.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Volver a Paso a paso</a>
+<a class="flex-1 text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors" href="modulo-2-3.html">Próximo módulo →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — Curso INEMA · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Contenido educativo. No es consejo médico. Consulta con profesionales de la salud.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-2-2#q1', {
+        answer: 1,
+        explain: { 0: 'Não — a RLS vale para leitura e escrita.', 1: 'Isso. O service-role bypassa a RLS, por isso o servidor lê.', 2: 'Não — nenhuma tabela é pública; a RLS está ligada em todas.' }
+      });
+    }
+  </script>
+</body>
+</html>

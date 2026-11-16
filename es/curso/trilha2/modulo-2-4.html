@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Módulo 2.4 — Wearable y programación | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento blue (T2) */
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37,99,235,0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37,99,235,0.08); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37,99,235,0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37,99,235,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha2/modulo-2-4.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha2/modulo-2-4.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha2/modulo-2-4.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha2/modulo-2-4.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="../../../en/curso/trilha2/modulo-2-4.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="modulo-2-4.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-blue-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Saltar al contenido</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html"><span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentos</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-blue-400 bg-blue-500/10" href="index.html"><span class="sm:hidden">T2</span><span class="hidden sm:inline">Paso a paso</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html"><span class="sm:hidden">T3</span><span class="hidden sm:inline">Cómo usar</span></a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="Mi recorrido" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">Mi recorrido</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Apariencia" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Apariencia</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tema</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Oscuro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Claro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sepia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Enfoque</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">Alto contraste</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tamaño del texto</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Ancho · interlineado</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Estrecho</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Medio</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Ancho</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compacto</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Cómodo</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Fuente</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">Sistema</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Lectura</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Ruta de navegación" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-blue-400" href="../../index.html">Inicio</a><span>/</span>
+<a class="hover:text-blue-400" href="index.html">Paso a paso</a><span>/</span>
+<span class="text-blue-400">Módulo 2.4</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-blue-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="2-4" data-inema-track="2">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full mb-4">MÓDULO 2.4</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">⌚ Wearable y programación</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">Conecta WHOOP de punta a punta — OAuth, callback, sync diario p/ la tabla <code class="font-mono text-base bg-dark-700 px-1 rounded text-blue-400">vitals</code> — con los dos gotchas de producción, y programa la sincronización y el check-in de la mañana.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">7</div><div class="text-xs text-neutral-400">Temas</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">~35</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Intermedio</div><div class="text-xs text-neutral-400">Nivel</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Práctico</div><div class="text-xs text-neutral-400">Tipo</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:2-4">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Tu progreso en este módulo</span>
+<span class="text-blue-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 de 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-blue-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Índice de la página" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Sección <span class="inema-toc-pos">1</span> de <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-1">1. WHOOP OAuth</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-2">2. Autorización one-time</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-3">3. whoop-sync.py</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-4">4. Los 2 gotchas</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-5">5. Programar el sync</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-6">6. Check-in de la mañana</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-7">7. Otros wearables</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-2-4#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">🔗 WHOOP OAuth: crear la app</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-4-t1-p1">Para que el coach lea tu WHOOP, primero creas un <strong class="text-blue-400">app de desarrollador</strong> en el portal de WHOOP. Esta app le da una identidad a HealthOS (client id + secret) y dice exactamente adónde debe llevarte WHOOP después de que autorices. Tres decisiones lo definen todo: el <strong class="text-blue-400">redirect URI</strong>, los <strong class="text-blue-400">alcances</strong> e o <code class="font-mono text-xs bg-dark-700 px-1 rounded">offline</code>.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí? Qué es OAuth</p>
+<p class="text-sm text-neutral-300"><strong>OAuth</strong> es la forma estándar de «dar permiso sin entregar la contraseña». En vez de escribir tu usuario y contraseña de WHOOP en HealthOS, haces clic en <em>Autorizar</em> en el sitio de WHOOP y esta devuelve un <strong>token</strong> — una clave temporal que solo sirve para leer lo que autorizaste. El <strong>redirect URI</strong> es la dirección a la que WHOOP te devuelve con este token.</p>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed">En el portal para desarrolladores, tres pasos:</p>
+<div class="space-y-4 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Crear la app</h4><p class="text-sm text-neutral-300">En el portal para desarrolladores de WHOOP, crea una app. Recibes un <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_CLIENT_ID</code> y un <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_CLIENT_SECRET</code> — van a <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Registrar el redirect URI</h4><p class="text-sm text-neutral-300">Pega <strong>exactamente</strong> <code class="font-mono text-xs bg-dark-700 px-1 rounded">https://&lt;seu-host&gt;/whoop/callback</code>. Debe coincidir carácter por carácter con lo que usa tu callback; si no, WHOOP rechazará la autorización.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Habilitar los permisos</h4><p class="text-sm text-neutral-300">Marca <code class="font-mono text-xs bg-dark-700 px-1 rounded">read:recovery read:sleep read:cycles offline</code>. Los tres <code class="font-mono text-xs bg-dark-700 px-1 rounded">read:</code> liberan los datos; el <code class="font-mono text-xs bg-dark-700 px-1 rounded">offline</code> libera el <strong>refresh token</strong> (sync sin que estés presente).</p></div>
+</div>
+</div>
+<!-- COPY-RUN (config) -->
+<div class="bg-dark-900 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-blue-500/10 border-b border-blue-500/30"><p class="text-sm font-semibold text-blue-400">📋 Pega en el panel · objetivo: los dos campos exactos de la app WHOOP</p></div>
+<pre class="p-5 text-sm overflow-x-auto font-mono text-neutral-300 bg-dark-900"><code>Redirect URI:  https://&lt;seu-host&gt;/whoop/callback
+Scopes:        read:recovery read:sleep read:cycles offline</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 bg-dark-800/50"><p class="text-xs text-neutral-400"><strong class="text-blue-400">Cómo verificar:</strong> el panel guarda sin quejarse y el <code class="font-mono bg-dark-700 px-1 rounded">offline</code> aparece marcado. Sin el <code class="font-mono bg-dark-700 px-1 rounded">offline</code> tendrías que volver a autorizar todos los días; la sincronización automática no se ejecutaría.</p></div>
+</div>
+<!-- SVG 1: pipeline OAuth -->
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Pipeline OAuth de WHOOP: la app autoriza en el callback, que guarda el refresh token en .env; whoop-sync usa el token y escribe en la tabla vitals; el sync también rota el token en cada ejecución" class="w-full h-auto" role="img" viewbox="0 0 1000 210">
+<defs>
+<lineargradient id="m24a-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m24a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m24a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m24a-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+<marker id="m24a-ahb" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#60a5fa"></path></marker>
+</defs>
+<rect fill="url(#m24a-grid)" height="210" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<g class="wf-a"><rect fill="#0e1622" height="56" rx="12" stroke="#38bdf8" stroke-width="2" width="168" x="16" y="62"></rect><text fill="#bfd9ff" text-anchor="middle" x="100" y="86">🔗 App WHOOP</text><text fill="#9ac2ff" font-size="11" text-anchor="middle" x="100" y="104">id + alcances</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="56" rx="12" stroke="#38bdf8" stroke-width="2" width="168" x="214" y="62"></rect><text fill="#bfd9ff" text-anchor="middle" x="298" y="86">↩️ /whoop/callback</text><text fill="#9ac2ff" font-size="11" text-anchor="middle" x="298" y="104">tú autorizas 1×</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="56" rx="12" stroke="#38bdf8" stroke-width="2" width="168" x="412" y="62"></rect><text fill="#bfd9ff" text-anchor="middle" x="496" y="86">🔑 refresh token</text><text fill="#9ac2ff" font-size="11" text-anchor="middle" x="496" y="104">guarda en ~/.env</text></g>
+<g filter="url(#m24a-glow)"><rect fill="#0e1c2c" height="56" rx="12" stroke="url(#m24a-grad)" stroke-width="2.5" width="168" x="610" y="62"></rect></g><text fill="#60a5fa" text-anchor="middle" x="694" y="86">🔄 whoop-sync.py</text><text fill="#bcd8ff" font-size="11" text-anchor="middle" x="694" y="104">cron diario</text>
+<g filter="url(#m24a-glow)"><rect fill="#0e1c2c" height="56" rx="12" stroke="url(#m24a-grad)" stroke-width="2.5" width="176" x="808" y="62"></rect></g><text fill="#60a5fa" text-anchor="middle" x="896" y="86">🗄️ vitals</text><text fill="#bcd8ff" font-size="11" text-anchor="middle" x="896" y="104">recovery, hrv, rhr, sueño</text>
+</g>
+<g fill="none" stroke-width="2">
+<path d="M184,90 L214,90" marker-end="url(#m24a-ah)" stroke="#38bdf8"></path>
+<path d="M382,90 L412,90" marker-end="url(#m24a-ah)" stroke="#38bdf8"></path>
+<path d="M580,90 L610,90" marker-end="url(#m24a-ah)" stroke="#38bdf8"></path>
+<path d="M778,90 L808,90" marker-end="url(#m24a-ahb)" stroke="#60a5fa"></path>
+</g>
+<path d="M694,118 C694,170 560,170 514,124" fill="none" marker-end="url(#m24a-ahb)" opacity="0.8" stroke="#60a5fa" stroke-dasharray="6 5" stroke-width="2"></path>
+<text fill="#bcd8ff" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="600" y="192">en cada ejecución, la sincronización guarda un nuevo refresh token sobre el anterior (rotación)</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> de izquierda a derecha está el recorrido del permiso hasta el dato: la app autoriza en el callback, el callback guarda el token, la sincronización usa el token y escribe en <code class="font-mono bg-dark-700 px-1 rounded">vitals</code>. La línea de vuelta discontinua es la <strong>rotación</strong> del token (gotcha 1 del tema 4): en cada ejecución, el token se cambia por el siguiente.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">App WHOOP</div><p class="text-xs text-neutral-400">Le da id + secret a HealthOS.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Redirect URI</div><p class="text-xs text-neutral-400">.../whoop/callback, exacto.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Alcances</div><p class="text-xs text-neutral-400">recovery + sleep + cycles.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">offline</div><p class="text-xs text-neutral-400">Libera el refresh token.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-2-4#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">✅ Autorización de una sola vez</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-4-t2-p1">Autorizas a WHOOP <strong class="text-blue-400">una sola vez</strong>. Con esta autorización, tu callback recibe el código, lo intercambia por tokens y guarda el <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_REFRESH_TOKEN</code> en el <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>. A partir de ahí, la sincronización diaria funciona sola con ese refresh token: no necesitas volver a abrir el navegador.</p>
+<div class="space-y-4 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Haces clic en «Autorizar»</h4><p class="text-sm text-neutral-300">Abre la pantalla de consentimiento de WHOOP con los permisos que marcaste. Aceptas.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">WHOOP redirige</h4><p class="text-sm text-neutral-300">Te lleva a <code class="font-mono text-xs bg-dark-700 px-1 rounded">https://&lt;seu-host&gt;/whoop/callback</code> con un código de un solo uso.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">El callback guarda el token</h4><p class="text-sm text-neutral-300">El callback intercambia el código por tokens y escribe el <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_REFRESH_TOKEN</code> en el <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>. Listo: el one-time terminó.</p></div>
+</div>
+</div>
+<!-- COPY-RUN: verificar token -->
+<div class="bg-dark-900 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-blue-500/10 border-b border-blue-500/30"><p class="text-sm font-semibold text-blue-400">▶ Ejecútalo tú mismo · objetivo: comprobar que se guardó el refresh token</p></div>
+<pre class="p-5 text-sm overflow-x-auto font-mono text-neutral-300 bg-dark-900"><code>grep WHOOP_REFRESH_TOKEN ~/.env</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 bg-dark-800/50"><p class="text-xs text-neutral-400"><strong class="text-blue-400">Cómo verificar:</strong> aparece una línea <code class="font-mono bg-dark-700 px-1 rounded">WHOOP_REFRESH_TOKEN=...</code> con un valor largo (no vacío). Si viene vacío, la autorización no se completó: vuelve a hacer el paso de "Autorizar".</p></div>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">💾</span> Lo que quedó en el ~/.env</h3>
+<p class="text-neutral-300 text-sm">Después del one-time, tu <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> tiene los tres: <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_CLIENT_ID</code>, <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_CLIENT_SECRET</code> (de la app, en el tema 1) y ahora el <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_REFRESH_TOKEN</code> (guardado por el callback, rotado en cada sincronización). Este archivo está en tu directorio personal y <strong>nunca</strong> va a git.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">One-time</div><p class="text-xs text-neutral-400">Autorízalo una sola vez.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Callback</div><p class="text-xs text-neutral-400">Cambia código por tokens.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Refresh token</div><p class="text-xs text-neutral-400">Guardado en ~/.env.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Sin navegador</div><p class="text-xs text-neutral-400">Después, el sync se encarga solo.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-2-4#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">🔄 whoop-sync.py</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-4-t3-p1">O <code class="font-mono text-xs bg-dark-700 px-1 rounded">agent/scripts/whoop-sync.py</code> es el corazón de la conexión. Cada vez que se ejecuta, obtiene la recuperación y el sueño de WHOOP y guarda cuatro campos en la tabla <code class="font-mono text-xs bg-dark-700 px-1 rounded">vitals</code>: <strong class="text-blue-400">recovery_pct, hrv_ms, resting_hr, sleep_hours</strong>. Es <strong class="text-blue-400">determinista</strong> (mismo día, mismo resultado) y <strong class="text-blue-400">idempotente</strong> (volver a ejecutarlo no crea una línea duplicada: actualiza la de ese día).</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Determinista</strong> — no hay IA ni aleatoriedad de por medio: con los mismos datos del día en WHOOP, la salida siempre es la misma. Puedes confiar en ella y volver a ejecutarla.</li>
+<li><strong>Idempotente</strong> — ejecutarlo 1× o 5× deja la base de datos en el mismo estado: una fila por día en <code class="font-mono text-xs bg-dark-700 px-1 rounded">vitals</code>, no cinco. Por eso es seguro programar repeticiones.</li>
+</ul>
+</div>
+<!-- box de dados (blue) -->
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-4 flex items-center"><span class="mr-2">🗄️</span> Los 4 campos que caen en <code class="font-mono text-base bg-dark-700 px-1 rounded ml-1">vitals</code></h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="font-mono text-blue-400 text-sm mb-1">recovery_pct</div><p class="text-xs text-neutral-400">% de recuperación de la noche.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="font-mono text-blue-400 text-sm mb-1">hrv_ms</div><p class="text-xs text-neutral-400">Variabilidad cardíaca (ms).</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="font-mono text-blue-400 text-sm mb-1">resting_hr</div><p class="text-xs text-neutral-400">Frecuencia en reposo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="font-mono text-blue-400 text-sm mb-1">sleep_hours</div><p class="text-xs text-neutral-400">Horas de sueño de la noche.</p></div>
+</div>
+</div>
+<!-- COPY-RUN: rodar o sync + verificar -->
+<div class="bg-dark-900 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-blue-500/10 border-b border-blue-500/30"><p class="text-sm font-semibold text-blue-400">▶ Ejecútalo tú mismo · objetivo: sincronizar ahora y ver los 4 campos en vitals</p></div>
+<pre class="p-5 text-sm overflow-x-auto font-mono text-neutral-300 bg-dark-900"><code>python3 agent/scripts/whoop-sync.py
+python3 agent/scripts/db.py select vitals</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 bg-dark-800/50"><p class="text-xs text-neutral-400"><strong class="text-blue-400">Cómo verificar:</strong> la línea de hoy en <code class="font-mono bg-dark-700 px-1 rounded">vitals</code> trae <code class="font-mono bg-dark-700 px-1 rounded">recovery_pct</code>, <code class="font-mono bg-dark-700 px-1 rounded">hrv_ms</code>, <code class="font-mono bg-dark-700 px-1 rounded">resting_hr</code> e <code class="font-mono bg-dark-700 px-1 rounded">sleep_hours</code> completados. Vuelve a ejecutar los dos comandos: sigue <strong>una</strong> fila para el día (idempotente), no dos.</p></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Extrae recovery + sueño</div><p class="text-xs text-neutral-400">La noche que WHOOP puntuó.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Guarda en vitals</div><p class="text-xs text-neutral-400">4 campos por día.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Determinista</div><p class="text-xs text-neutral-400">El mismo día, el mismo resultado.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Idempotente</div><p class="text-xs text-neutral-400">Volver a ejecutar no duplica.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-2-4#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">🛡️ Los 2 gotchas de producción</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-4-t4-p1">Dos detalles hacen fallar la sincronización si no los resuelves, y ambos solo aparecen <strong class="text-blue-400">en producción</strong>, después de que la primera sync ya haya funcionado. El <code class="font-mono text-xs bg-dark-700 px-1 rounded">whoop-sync.py</code> ya se encarga de ambos; entiende por qué para no tropezar al reescribirlo.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Si lo ignoras</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span><strong>(a)</strong> Reutilizar el mismo refresh token → en la 2.ª ejecución, WHOOP responde <code class="font-mono text-xs bg-dark-700 px-1 rounded">invalid_grant</code> y la sincronización falla.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span><strong>(b)</strong> Usar el user-agent predeterminado de Python → Cloudflare de WHOOP te bloquea con <strong>error 1010</strong>.</span></li>
+</ul>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6">
+<h4 class="font-bold text-blue-400 mb-4">✓ Qué hace la sincronización</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span><strong>(a)</strong> En cada run, guarda el <strong>nuevo</strong> refresh token que WHOOP devuelve sobre el anterior (rotación).</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span><strong>(b)</strong> Envía un <strong>user-agent de browser</strong> en las solicitudes, así que Cloudflare las deja pasar.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Cómo aparece cada fallo</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span><strong>Gotcha (a) — rotación:</strong> el refresh token es de <em>uso único</em>. Cuando lo usas, WHOOP devuelve uno nuevo e invalida el anterior. Si no guardas el nuevo, la siguiente ejecución usa un token ya consumido → <code class="font-mono text-xs bg-dark-700 px-1 rounded">invalid_grant</code>. Verifica ejecutando el sync <strong>dos veces</strong>: la 2.ª aún debería tener éxito.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span><strong>Gotcha (b) — user-agent:</strong> Cloudflare, delante de la API, bloquea a los clientes «robóticos». El user-agent predeterminado del <code class="font-mono text-xs bg-dark-700 px-1 rounded">requests</code>/<code class="font-mono text-xs bg-dark-700 px-1 rounded">urllib</code> entrega el juego → <strong>1010</strong>. Enviar un header de browser lo resuelve.</span></li>
+</ul>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Rotación</div><p class="text-xs text-neutral-400">Guardar el token nuevo en cada ejecución.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-red-400 font-bold text-sm mb-1">invalid_grant</div><p class="text-xs text-neutral-400">Síntoma de token no rotado.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">User-agent</div><p class="text-xs text-neutral-400">Simular un navegador supera Cloudflare.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-red-400 font-bold text-sm mb-1">Error 1010</div><p class="text-xs text-neutral-400">Cloudflare bloqueó al cliente.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-2-4#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">⏰ Programar la sincronización</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-4-t5-p1">WHOOP no puntúa tu noche a una hora fija: a veces a las 7h, a veces más tarde. Por eso la sincronización se ejecuta <strong class="text-blue-400">tres veces por la mañana (7h, 10h, 13h)</strong>: alguna de estas ejecuciones detecta la recuperación en cuanto esté lista. Como la sincronización es idempotente, repetirla es gratis y seguro.</p>
+<!-- SVG 2: agendamento -->
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Programación de la mañana: cron ejecuta whoop-sync a las 7h, 10h y 13h y escribe en la tabla vitals; también ejecuta el prompt de check-in a las 7h, que lee la recuperación y genera la revisión en Telegram" class="w-full h-auto" role="img" viewbox="0 0 1000 250">
+<defs>
+<lineargradient id="m24b-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m24b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m24b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m24b-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+<marker id="m24b-ahb" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#60a5fa"></path></marker>
+</defs>
+<rect fill="url(#m24b-grid)" height="250" width="1000" x="0" y="0"></rect>
+<g filter="url(#m24b-glow)"><rect fill="#0e1c2c" height="58" rx="13" stroke="url(#m24b-grad)" stroke-width="2.5" width="150" x="24" y="96"></rect></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="99" y="121">⏰ cron</text>
+<text fill="#bcd8ff" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="99" y="140">scheduler</text>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<g class="wf-a"><rect fill="#0e1622" height="46" rx="11" stroke="#38bdf8" stroke-width="2" width="200" x="300" y="20"></rect><text fill="#bfd9ff" text-anchor="middle" x="400" y="42">🔄 sync · 07:00</text><text fill="#9ac2ff" font-size="10.5" text-anchor="middle" x="400" y="58">whoop-sync.py</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="46" rx="11" stroke="#38bdf8" stroke-width="2" width="200" x="300" y="78"></rect><text fill="#bfd9ff" text-anchor="middle" x="400" y="100">🔄 sync · 10:00</text><text fill="#9ac2ff" font-size="10.5" text-anchor="middle" x="400" y="116">whoop-sync.py</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="46" rx="11" stroke="#38bdf8" stroke-width="2" width="200" x="300" y="136"></rect><text fill="#bfd9ff" text-anchor="middle" x="400" y="158">🔄 sync · 13:00</text><text fill="#9ac2ff" font-size="10.5" text-anchor="middle" x="400" y="174">whoop-sync.py</text></g>
+<g><rect fill="#1a1407" height="46" rx="11" stroke="#fbbf24" stroke-width="2" width="200" x="300" y="196"></rect><text fill="#fcd34d" text-anchor="middle" x="400" y="218">🌅 /checkin · 07:00</text><text fill="#fde68a" font-size="10.5" text-anchor="middle" x="400" y="234">turno del agente</text></g>
+</g>
+<g fill="none" opacity="0.6" stroke="#38bdf8" stroke-width="1.8">
+<path d="M174,116 C240,116 250,43 300,43" marker-end="url(#m24b-ah)"></path>
+<path d="M174,123 C240,123 250,101 300,101" marker-end="url(#m24b-ah)"></path>
+<path d="M174,130 C240,130 250,159 300,159" marker-end="url(#m24b-ah)"></path>
+</g>
+<path d="M174,140 C240,150 250,219 300,219" fill="none" marker-end="url(#m24b-ah)" opacity="0.6" stroke="#fbbf24" stroke-width="1.8"></path>
+<g filter="url(#m24b-glow)"><rect fill="#0e1c2c" height="46" rx="11" stroke="url(#m24b-grad)" stroke-width="2.5" width="160" x="610" y="78"></rect></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="690" y="106">🗄️ vitals</text>
+<rect fill="#0e1622" height="46" rx="11" stroke="#38bdf8" stroke-width="2" width="170" x="800" y="196"></rect><text fill="#bfd9ff" font-family="Inter,sans-serif" font-size="12.5" font-weight="600" text-anchor="middle" x="885" y="218">🤖 revisión en Telegram</text><text fill="#9ac2ff" font-family="Inter,sans-serif" font-size="10.5" text-anchor="middle" x="885" y="234">lee la recuperación</text>
+<g fill="none" opacity="0.75" stroke="#60a5fa" stroke-width="2">
+<path d="M500,43 C560,43 560,90 610,96" marker-end="url(#m24b-ahb)"></path>
+<path d="M500,101 L610,101" marker-end="url(#m24b-ahb)"></path>
+<path d="M500,159 C560,159 560,112 610,108" marker-end="url(#m24b-ahb)"></path>
+</g>
+<path d="M690,124 C690,170 760,196 800,210" fill="none" marker-end="url(#m24b-ahb)" opacity="0.7" stroke="#60a5fa" stroke-dasharray="6 5" stroke-width="2"></path>
+<path d="M500,219 L800,219" fill="none" marker-end="url(#m24b-ah)" opacity="0.55" stroke="#fbbf24" stroke-width="2"></path>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> a la izquierda, el <strong>cron</strong> activa cuatro cosas por la mañana: tres sincronizaciones (azul: 7h/10h/13h) que escriben en <code class="font-mono bg-dark-700 px-1 rounded">vitals</code>, e o <strong>/checkin</strong> (ámbar, tema 6) que lee la recuperación y envía el análisis a Telegram. Las tres horas garantizan detectar la recovery en cuanto WHOOP le asigne una puntuación.</p>
+</div>
+<!-- COPY-RUN: crontab -->
+<div class="bg-dark-900 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-blue-500/10 border-b border-blue-500/30"><p class="text-sm font-semibold text-blue-400">▶ Ejecútalo tú mismo · objetivo: programar la sincronización 3× por la mañana (Linux/cron)</p></div>
+<pre class="p-5 text-sm overflow-x-auto font-mono text-neutral-300 bg-dark-900"><code># abra o crontab:  crontab -e
+# sync às 7h, 10h e 13h (idempotente, repetir é seguro)
+0 7,10,13 * * * cd ~/&lt;sua-pasta&gt;/agent &amp;&amp; /usr/bin/python3 scripts/whoop-sync.py &gt;&gt; ~/whoop-sync.log 2&gt;&amp;1</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 bg-dark-800/50"><p class="text-xs text-neutral-400"><strong class="text-blue-400">macOS:</strong> en lugar del cron, usa <code class="font-mono bg-dark-700 px-1 rounded">agent/setup/whoop-sync.plist.example</code> (launchd). <strong class="text-blue-400">Cómo verificar:</strong> mañana por la mañana la tabla <code class="font-mono bg-dark-700 px-1 rounded">vitals</code> gana la línea del día y <code class="font-mono bg-dark-700 px-1 rounded">~/whoop-sync.log</code> muestra ejecuciones sin errores (sin <code class="font-mono bg-dark-700 px-1 rounded">invalid_grant</code>, sin 1010).</p></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">7 / 10 / 13</div><p class="text-xs text-neutral-400">Obtén la recovery cuando esté disponible.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">crontab (Linux)</div><p class="text-xs text-neutral-400">Una línea programa los 3 horarios.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">launchd (macOS)</div><p class="text-xs text-neutral-400">.plist.example listo en el repo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Repetir es gratis</div><p class="text-xs text-neutral-400">La idempotencia protege.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-2-4#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">🌅 Programar el check-in de la mañana</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-4-t6-p1">El sync solo <em>llena</em> la tabla; quien te entrega la revisión es el <strong class="text-blue-400">check-in de la mañana</strong>. A diferencia del sync (que es solo un script que lee la API), el check-in <strong class="text-blue-400">activa un turno del agente</strong> — una llamada al LLM que lee la recuperación de la noche y escribe la revisión en Telegram. Por eso se programa por separado: envías el prompt <code class="font-mono text-xs bg-dark-700 px-1 rounded">/checkin</code> cada mañana mediante tu scheduler.</p>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> Sincronización ≠ registro</h3>
+<p class="text-neutral-300 text-sm">O <strong>sincronización</strong> es mecánico y barato: lee la WHOOP y guarda 4 números. El <strong>check-in</strong> es un <strong>turno del agente</strong> (cuesta una llamada al LLM): lee estos números + el resto de tu snapshot y <em>conversación</em> contigo. Programa el sync para que se ejecute <strong>antes</strong> del check-in, para que la revisión ya encuentre la recuperación del día lista.</p>
+</div>
+<!-- COPY-RUN: agendar /checkin -->
+<div class="bg-dark-900 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-blue-500/10 border-b border-blue-500/30"><p class="text-sm font-semibold text-blue-400">▶ Ejecútalo tú mismo · objetivo: activar el /checkin cada mañana (un turno del agente)</p></div>
+<pre class="p-5 text-sm overflow-x-auto font-mono text-neutral-300 bg-dark-900"><code># crontab -e — dispara /checkin às 7h05 (logo após o 1º sync)
+5 7 * * * cd ~/&lt;sua-pasta&gt;/agent &amp;&amp; /usr/bin/python3 &lt;seu-disparador&gt; "/checkin" &gt;&gt; ~/checkin.log 2&gt;&amp;1</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 bg-dark-800/50"><p class="text-xs text-neutral-400"><strong class="text-blue-400">Atajo:</strong> las plataformas de agentes con scheduler integrado (p. ej., ClaudeClaw) activan el <code class="font-mono bg-dark-700 px-1 rounded">/checkin</code> directamente, sin cron. <strong class="text-blue-400">Cómo verificar:</strong> a las 7 h recibes en Telegram la revisión de la mañana <em>abriendo</em> con la recuperación de la noche y vinculándola con las decisiones de ayer.</p></div>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🔁</span> El orden de la mañana</h3>
+<p class="text-neutral-300 text-sm"><strong>1)</strong> 07:00 el sync escribe la recovery en <code class="font-mono text-xs bg-dark-700 px-1 rounded">vitals</code>. <strong>2)</strong> 07:05 o <code class="font-mono text-xs bg-dark-700 px-1 rounded">/checkin</code> activa el agente, que lee esa recuperación y te envía la revisión. Las sincronizaciones de las 10h y 13h son la red de seguridad por si WHOOP puntúa la noche más tarde.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">/checkin</div><p class="text-xs text-neutral-400">El prompt de la revisión de la mañana.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Turno del agente</div><p class="text-xs text-neutral-400">Una llamada a un LLM, no un script.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Sincronización previa</div><p class="text-xs text-neutral-400">Recovery en la mesa cuando se activa.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Scheduler</div><p class="text-xs text-neutral-400">Cron o el de tu agente.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-2-4#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">🔁 Otros wearables</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-4-t7-p1">WHOOP es solo el <strong class="text-blue-400">ejemplo resuelto</strong>. El mismo patrón — <strong class="text-blue-400">OAuth una vez + sync diario que escribe en <code class="font-mono text-base bg-dark-700 px-1 rounded">vitals</code></strong> — sirve para Oura, Garmin, Fitbit o incluso para un registro manual. Al coach y al dashboard no les importa ni saben de dónde viene el número: trabajan con lo que llegue a la tabla <code class="font-mono text-xs bg-dark-700 px-1 rounded">vitals</code>.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6">
+<h4 class="font-bold text-blue-400 mb-4">✓ Reutiliza el patrón</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span><strong>Oura / Garmin / Fitbit</strong> — cambiar la app OAuth y el mapeo JSON→<code class="font-mono text-xs bg-dark-700 px-1 rounded">vitals</code>; el resto queda igual.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span><strong>Registro manual</strong> — un mensaje en Telegram ("dormí 7 h, buena recuperación") ya se convierte en una fila en <code class="font-mono text-xs bg-dark-700 px-1 rounded">vitals</code>.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>O <code class="font-mono text-xs bg-dark-700 px-1 rounded">/checkin</code>, el snapshot y el dashboard siguen idénticos.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Lo que no cambia</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>No reescribas el coach según la fuente — lee <code class="font-mono text-xs bg-dark-700 px-1 rounded">vitals</code>, no la API del wearable.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>No te saltes los 2 gotchas: <em>cualquiera</em> OAuth tiene rotación de token y protección antibot al frente.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>No necesitas WHOOP para empezar — el curso funciona con registro manual.</span></li>
+</ul>
+</div>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-2-4#q1">
+<p class="font-medium mb-4">✅ Autoevaluación (opcional): por qué el <code class="font-mono text-sm bg-dark-700 px-1 rounded">whoop-sync.py</code> ¿necesitaba enviar un user-agent de browser?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) Para que la sincronización sea más rápida</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) Si no, el Cloudflare de WHOOP bloquea al cliente Python estándar con el error 1010</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) Para ahorrar tokens de LLM</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400 mt-8">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Patrón reutilizable</div><p class="text-xs text-neutral-400">OAuth + sync diario.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">vitals es el contrato</div><p class="text-xs text-neutral-400">El coach lee la tabla, no la API.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">El manual sirve</div><p class="text-xs text-neutral-400">El mensaje se convierte en una fila.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Gotchas universales</div><p class="text-xs text-neutral-400">Rotación + antibot en cada fuente.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-blue-900/40 via-dark-800 to-dark-800 rounded-xl border border-blue-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Resumen del módulo</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">App + redirect + escopos</strong><span class="text-neutral-400"> — crea la app, registra <code class="font-mono text-xs bg-dark-700 px-1 rounded">.../whoop/callback</code> exacto y marca <code class="font-mono text-xs bg-dark-700 px-1 rounded">read:recovery read:sleep read:cycles offline</code>.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Autoriza una vez</strong><span class="text-neutral-400"> — el callback guarda el <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_REFRESH_TOKEN</code> en el <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">whoop-sync.py → vitals</strong><span class="text-neutral-400"> — determinista e idempotente, guarda recovery_pct, hrv_ms, resting_hr, sleep_hours.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Los 2 gotchas</strong><span class="text-neutral-400"> — rota el refresh token (si no, <code class="font-mono text-xs bg-dark-700 px-1 rounded">invalid_grant</code>) y envía un user-agent de navegador (si no, Cloudflare 1010).</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Programa sync + check-in</strong><span class="text-neutral-400"> — sync a las 7/10/13 y <code class="font-mono text-xs bg-dark-700 px-1 rounded">/checkin</code> de la mañana; el patrón sirve para cualquier wearable.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-blue-400 mb-2">Próximo módulo:</h3>
+<p class="text-neutral-300 text-sm">Ruta 3 — Cómo usar: la rutina diaria, comida y entrenamiento por foto, memoria/patrones y el dashboard. El paso a paso terminó; ahora toca vivir el coach en el día a día.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Volver a Paso a paso</a>
+<a class="flex-1 text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors" href="../trilha3/index.html">Ruta 3 — Cómo usar →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — Curso INEMA · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Contenido educativo. No es consejo médico. Consulta con profesionales de la salud.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-2-4#q1', {
+        answer: 1,
+        explain: { 0: 'Velocidade não é o ponto.', 1: 'Isso. O Cloudflare bane o user-agent padrão do Python com 1010; um header de browser passa.', 2: 'Não tem relação com tokens de LLM — o sync nem chama LLM.' }
+      });
+    }
+  </script>
+</body>
+</html>

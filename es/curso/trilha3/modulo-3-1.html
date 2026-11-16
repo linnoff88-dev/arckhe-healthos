@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Módulo 3.1 — La rutina diaria | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento purple (T3) */
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124,58,237,0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124,58,237,0.08); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124,58,237,0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124,58,237,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .text-amber-400 { color: #b45309; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha3/modulo-3-1.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha3/modulo-3-1.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha3/modulo-3-1.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha3/modulo-3-1.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="../../../en/curso/trilha3/modulo-3-1.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="modulo-3-1.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-purple-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Saltar al contenido</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html"><span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentos</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html"><span class="sm:hidden">T2</span><span class="hidden sm:inline">Paso a paso</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-purple-400 bg-purple-500/10" href="index.html"><span class="sm:hidden">T3</span><span class="hidden sm:inline">Cómo usar</span></a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="Mi recorrido" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">Mi recorrido</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Apariencia" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Apariencia</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tema</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Oscuro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Claro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sepia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Enfoque</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">Alto contraste</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tamaño del texto</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Ancho · interlineado</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Estrecho</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Medio</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Ancho</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compacto</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Cómodo</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Fuente</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">Sistema</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Lectura</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Ruta de navegación" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-purple-400" href="../../index.html">Inicio</a><span>/</span>
+<a class="hover:text-purple-400" href="index.html">Cómo usar</a><span>/</span>
+<span class="text-purple-400">Módulo 3.1</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-purple-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="3-1" data-inema-track="3">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-semibold rounded-full mb-4">MÓDULO 3.1</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">🌅 La rutina diaria</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">El corazón del uso: la revisión matutina guiada por la <strong class="text-purple-400">recuperación</strong>, la lógica de <strong class="text-purple-400">gating</strong> (verde/ámbar/rojo), los slash commands del día y cómo la elección de ayer se convierte en el número de hoy.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">7</div><div class="text-xs text-neutral-400">Temas</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">~35</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">Práctico</div><div class="text-xs text-neutral-400">Nivel</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">Uso</div><div class="text-xs text-neutral-400">Tipo</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:3-1">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Tu progreso en este módulo</span>
+<span class="text-purple-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 de 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-purple-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Índice de la página" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Sección <span class="inema-toc-pos">1</span> de <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-1">1. El check-in de la mañana</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-2">2. La lógica de gating</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-3">3. Los slash commands</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-4">4. Ayer → hoy</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-5">5. «¿Café ahora?»</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-6">6. Cerrar el día</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-7">7. Buenas prácticas</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-3-1#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">🌅 El morning check-in centrado en la recuperación</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-1-t1-p1">Cada día empieza de la misma manera: a las 07:00 el coach activa la <strong class="text-purple-400">revisión de la mañana</strong> y lo primero que te muestra es cómo <strong class="text-purple-400">te recuperaste</strong> la noche anterior. «Recovery-led» quiere decir exactamente eso: el número de recuperación va primero y el plan del día se ajusta a él, no al revés. Y no se queda en el número: conecta la recuperación de hoy con las <strong class="text-purple-400">elecciones de ayer</strong> (comida, cafeína, entrenamiento, alcohol).</p>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-purple-400 mb-2">🟣 Tres palabras antes de continuar</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Recovery</strong> — la puntuación de recuperación del wearable (0–100%), una lectura de qué tan preparado está el cuerpo hoy. Proviene del sueño + la variabilidad cardíaca de la noche.</li>
+<li><strong>HRV</strong> — variabilidad de la frecuencia cardíaca; sube cuando estás descansado y baja con el estrés, el alcohol o dormir mal.</li>
+<li><strong>Recovery-led</strong> — «guiado por la recuperación»: el día empieza con el número de recuperación, y todo (entrenamiento, café, comida) se decide a partir de él.</li>
+</ul>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-1-t1-p2">El ciclo del día se completa: la mañana empieza con la recuperación, tú tomas decisiones, todo queda registrado y, a la mañana siguiente, la recuperación refleja esas decisiones. Ese loop es lo que enseña a conocer tus propios botones. Los números de abajo son <strong class="text-purple-400">ilustrativos</strong> (ficticios): no es un consejo.</p>
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Ciclo del día: la mañana empieza con la recuperación, siguen las elecciones durante el día y el registro de todo, y la mañana siguiente llega con la nueva recuperación que refleja las elecciones" class="w-full h-auto" role="img" viewbox="0 0 1000 220">
+<defs>
+<lineargradient id="m31a-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#c084fc"></stop><stop offset="1" stop-color="#a855f7"></stop></lineargradient>
+<filter height="180%" id="m31a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m31a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#a855f7" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m31a-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m31a-grid)" height="220" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<g filter="url(#m31a-glow)"><rect fill="#1a1230" height="52" rx="12" stroke="url(#m31a-grad)" stroke-width="2.5" width="180" x="40" y="84"></rect></g><text fill="#c084fc" text-anchor="middle" x="130" y="106">🌅 mañana (07:00)</text><text fill="#d8b4fe" font-size="11" text-anchor="middle" x="130" y="124">recovery abre el día</text>
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="180" x="290" y="84"></rect><text fill="#bfe6ff" text-anchor="middle" x="380" y="106">☀️ elecciones</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="380" y="124">café, entrenamiento, comida</text>
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="180" x="540" y="84"></rect><text fill="#bfe6ff" text-anchor="middle" x="630" y="106">📝 registro</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="630" y="124">todo se convierte en una fila en la base de datos</text>
+<g filter="url(#m31a-glow)"><rect fill="#1a1230" height="52" rx="12" stroke="url(#m31a-grad)" stroke-width="2.5" width="180" x="790" y="84"></rect></g><text fill="#c084fc" text-anchor="middle" x="880" y="106">🌄 mañana +1</text><text fill="#d8b4fe" font-size="11" text-anchor="middle" x="880" y="124">recovery refleja el día de ayer</text>
+</g>
+<g fill="none" opacity="0.6" stroke="#38bdf8" stroke-width="2">
+<path d="M220,110 L290,110" marker-end="url(#m31a-ah)"></path>
+<path d="M470,110 L540,110" marker-end="url(#m31a-ah)"></path>
+<path d="M720,110 L790,110" marker-end="url(#m31a-ah)"></path>
+</g>
+<path d="M880,136 C880,190 130,190 130,138" fill="none" marker-end="url(#m31a-ah)" opacity="0.8" stroke="#c084fc" stroke-dasharray="6 5" stroke-width="2"></path>
+<text fill="#d8b4fe" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="505" y="206">el loop se cierra: la mañana +1 se convierte en la nueva revisión guiada por la recuperación</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> sigue de izquierda a derecha — la recuperación abre el día (morado), las elecciones y el registro ocurren en el medio (cian), y la línea discontinua cierra el ciclo: la mañana siguiente ya es la nueva revisión. Ese círculo es lo que transforma una elección en aprendizaje.</p>
+</div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm mb-6"><span class="text-purple-400 font-semibold">Ejemplo · 07:00</span> <span class="text-neutral-300">"Recovery 71% (verde), dormiste 7h20, HRV 64, RHR 52. La proteína de ayer alcanzó la meta y el café fue temprano y moderado — esa noche sin excesos es la razón por la que estás en verde. Hoy toca entrenar fuerte; consume carbohidratos cerca del entrenamiento. ¿Peso de la mañana? ¿Alguna presión?" <em class="text-neutral-500">(números ilustrativos)</em></span></div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Recuperación 1.º</div><p class="text-xs text-neutral-400">El número de la noche da inicio al día.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Conecta con ayer</div><p class="text-xs text-neutral-400">Explica por qué el número de hoy es así.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Bucle diario</div><p class="text-xs text-neutral-400">Mañana → elecciones → registro → mañana +1.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">07:00</div><p class="text-xs text-neutral-400">El check-in se activa según una programación.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-3-1#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">🚦 La lógica de gating</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-1-t2-p1"><strong class="text-purple-400">Gating</strong> es «dejar pasar según una puerta». El plan del día queda <em>gated</em> en el número de recuperación: la misma pregunta («¿entrenamiento intenso hoy?») recibe respuestas distintas según el color. Verde da luz verde, ámbar pide cautela, rojo lo detiene. Los umbrales de abajo son <strong class="text-purple-400">ilustrativos</strong> — tu coach usa tus propios rangos.</p>
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Flujo de decisión del gating: el valor de recuperación se ingresa y se clasifica en verde (exigirse), ámbar (bajar el ritmo) o rojo (descansar); cada color lleva a una acción" class="w-full h-auto" role="img" viewbox="0 0 1000 300">
+<defs>
+<lineargradient id="m31b-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#c084fc"></stop><stop offset="1" stop-color="#a855f7"></stop></lineargradient>
+<filter height="180%" id="m31b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m31b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#a855f7" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m31b-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m31b-grid)" height="300" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="13" font-weight="600">
+<g filter="url(#m31b-glow)"><rect fill="#1a1230" height="52" rx="12" stroke="url(#m31b-grad)" stroke-width="2.5" width="180" x="30" y="124"></rect></g><text fill="#c084fc" text-anchor="middle" x="120" y="146">recovery del día</text><text fill="#d8b4fe" font-size="11" text-anchor="middle" x="120" y="164">el portón decide</text>
+<rect fill="#0e2018" height="56" rx="12" stroke="#34d399" stroke-width="2" width="240" x="430" y="30"></rect><text fill="#6ee7b7" text-anchor="middle" x="550" y="52">🟢 verde · ~67%+</text><text fill="#a7f3d0" font-size="11" text-anchor="middle" x="550" y="72">subir la intensidad — entrenamiento fuerte, carbohidratos durante el entrenamiento</text>
+<rect fill="#2a2008" height="56" rx="12" stroke="#fbbf24" stroke-width="2" width="240" x="430" y="122"></rect><text fill="#fcd34d" text-anchor="middle" x="550" y="144">🟡 ámbar · ~34–66%</text><text fill="#fde68a" font-size="11" text-anchor="middle" x="550" y="164">bajar el ritmo — menos volumen, proteína/fibra</text>
+<rect fill="#1f1010" height="56" rx="12" stroke="#fb7185" stroke-width="2" width="240" x="430" y="214"></rect><text fill="#fda4af" text-anchor="middle" x="550" y="236">🔴 rojo · &lt;~34%</text><text fill="#fecdd3" font-size="11" text-anchor="middle" x="550" y="256">descansar — movilidad, hidratarte, dormir</text>
+<rect fill="#0e1b26" height="56" rx="12" stroke="#38bdf8" stroke-width="2" width="210" x="760" y="122"></rect><text fill="#bfe6ff" text-anchor="middle" x="865" y="144">plan del día</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="865" y="164">gated en el número</text>
+</g>
+<g fill="none" opacity="0.7" stroke-width="2">
+<path d="M210,150 C320,150 330,58 430,58" marker-end="url(#m31b-ah)" stroke="#34d399"></path>
+<path d="M210,150 L430,150" marker-end="url(#m31b-ah)" stroke="#fbbf24"></path>
+<path d="M210,150 C320,150 330,242 430,242" marker-end="url(#m31b-ah)" stroke="#fb7185"></path>
+<path d="M670,58 C720,58 730,150 760,150" marker-end="url(#m31b-ah)" stroke="#38bdf8"></path>
+<path d="M670,150 L760,150" marker-end="url(#m31b-ah)" stroke="#38bdf8"></path>
+<path d="M670,242 C720,242 730,150 760,150" marker-end="url(#m31b-ah)" stroke="#38bdf8"></path>
+</g>
+<text fill="#d8b4fe" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="500" y="292">rangos ilustrativos — el coach usa los tuyos y nunca te empuja a entrenar cuando la recuperación no lo recomienda</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> el número de recuperación (morado) entra por la izquierda y se dirige a uno de los tres colores según el rango; cada color ya lleva asociada la acción (exigirte / tomártelo con calma / descansar), y los tres conducen al mismo plan del día — solo que con distinta intensidad. Es el "portón" en acción.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-5"><h4 class="font-bold text-emerald-400 mb-2">🟢 Verde — activar</h4><p class="text-sm text-neutral-300">Cuerpo listo. Día de entrenamiento intenso, intensidad y carbohidratos cerca de la sesión. El coach da luz verde, pero recuerda el límite.</p></div>
+<div class="bg-amber-900/20 rounded-xl border border-amber-500/30 p-5"><h4 class="font-bold text-amber-400 mb-2">🟡 Ámbar — bajar el ritmo</h4><p class="text-sm text-neutral-300">Recuperación parcial. Reduce el volumen, enfócate en la técnica, prioriza las proteínas, la fibra y la hidratación.</p></div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-5"><h4 class="font-bold text-red-400 mb-2">🔴 Rojo — descansar</h4><p class="text-sm text-neutral-300">El cuerpo pasa factura. Movilidad ligera, hidratación y a dormir temprano. El coach pisa el freno, no el acelerador.</p></div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> Por qué gated es mejor que «promedio»</h3>
+<p class="text-neutral-300 text-sm">Una app genérica te manda el mismo entrenamiento todos los días. HealthOS adapta el plan a tu estado real: te exige más cuando tienes margen y baja el ritmo cuando no. Así evita que acumules fatiga y te enseña que la recuperación no es cuestión de suerte, sino una consecuencia de tus decisiones.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Gating</div><p class="text-xs text-neutral-400">El plan pasa por el filtro del número.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Tres colores</div><p class="text-xs text-neutral-400">El verde atrae, el ámbar retiene y el rojo descansa.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Tus rangos</div><p class="text-xs text-neutral-400">Los umbrales son personales, no fijos.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Sin brechas</div><p class="text-xs text-neutral-400">Retroceder a tiempo evita acumular fatiga.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-3-1#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">⌨️ /checkin /today /sofar /newday</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-1-t3-p1">Cuatro comandos cubren todo el día. Aparecen en el menú "/" de Telegram (junto con <code class="font-mono text-xs bg-dark-700 px-1 rounded">/supplements</code> e <code class="font-mono text-xs bg-dark-700 px-1 rounded">/advice</code>). Cada uno es un atajo que activa un turno del agente con un enfoque específico.</p>
+<div class="space-y-4 mb-8">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center"><span class="text-purple-400">🌅</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1"><code class="font-mono text-purple-400">/checkin</code> — la revisión de la mañana</h4><p class="text-sm text-neutral-300">Ejecuta la revisión recovery-led en el momento: trae la recuperación de la noche, la vincula con las decisiones de ayer y propone el tono del día. Es el mismo turno que activa la programación a las 07:00 — útil para ejecutarlo de nuevo cuando el wearable se sincroniza tarde.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center"><span class="text-purple-400">📋</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1"><code class="font-mono text-purple-400">/today</code> — el plan del día</h4><p class="text-sm text-neutral-300">Muestra el plan <strong>gated en la recuperación</strong>: entrenamiento, comida y enfoque del día ya ajustados al color (verde = exigirte, rojo = bajar el ritmo). Es el "qué hago hoy" condicionado por tu número.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center"><span class="text-purple-400">📊</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1"><code class="font-mono text-purple-400">/sofar</code> — lo que ya pasó hoy</h4><p class="text-sm text-neutral-300">Un resumen del día hasta ahora: qué comiste, cafeína, entrenamiento y cuánto te falta para alcanzar tus metas. Útil a media tarde para decidir la cena ("todavía necesito X de proteína").</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center"><span class="text-purple-400">🌙</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1"><code class="font-mono text-purple-400">/newday</code> — cerrar y pasar al día siguiente</h4><p class="text-sm text-neutral-300">Cierra el día: guarda el <code class="font-mono text-xs bg-dark-700 px-1 rounded">coach_summary</code> con la recuperación y la causa, y reinicia el contexto para el día siguiente. Eso es lo que hace que la historia se acumule (detallado en el tema 6).</p></div>
+</div>
+</div>
+<!-- COPY-RUN -->
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-purple-400 mb-1 flex items-center"><span class="mr-2">▶️</span> Copiar y ejecutar: ejecútalo en tu Telegram</h3>
+<p class="text-sm text-neutral-400 mb-5"><strong>Objetivo:</strong> ver los cuatro comandos en funcionamiento. Escribes la línea del bloque en el chat del bot; la respuesta esperada está justo debajo de cada uno. <span class="text-neutral-500">(Respuestas ilustrativas: números ficticios.)</span></p>
+<div class="space-y-5">
+<div>
+<p class="text-xs text-neutral-400 mb-1">1 · Activa la revisión de la mañana</p>
+<pre class="bg-dark-900 rounded-lg p-3 overflow-x-auto text-sm border border-dark-600"><code class="font-mono text-purple-300">/checkin</code></pre>
+<p class="text-xs text-neutral-400 mt-2"><strong class="text-purple-400">Cómo verificar:</strong> responde comenzando con la recuperación de la noche, algo como <em>"Recovery 71% (verde)... la proteína de ayer alcanzó la meta, café temprano: por eso estás en verde. Hoy toca entrenar fuerte."</em></p>
+</div>
+<div>
+<p class="text-xs text-neutral-400 mb-1">2 · Pide el plan del día (gated)</p>
+<pre class="bg-dark-900 rounded-lg p-3 overflow-x-auto text-sm border border-dark-600"><code class="font-mono text-purple-300">/today</code></pre>
+<p class="text-xs text-neutral-400 mt-2"><strong class="text-purple-400">Cómo verificar:</strong> el plan está visiblemente condicionado por el color — en verde, <em>"entrenamiento fuerte, carbohidratos durante el entrenamiento"</em>; en rojo, <em>"movilidad ligera, enfócate en dormir"</em>. Si cambia la recuperación, el <code class="font-mono text-xs bg-dark-700 px-1 rounded">/today</code> cambia junto.</p>
+</div>
+<div>
+<p class="text-xs text-neutral-400 mb-1">3 · Consulta el acumulado del día (cámbialo por tu contexto real)</p>
+<pre class="bg-dark-900 rounded-lg p-3 overflow-x-auto text-sm border border-dark-600"><code class="font-mono text-purple-300">/sofar
+&lt;ou descreva: "já comi ovos e frango, treinei pernas, 2 cafés"&gt;</code></pre>
+<p class="text-xs text-neutral-400 mt-2"><strong class="text-purple-400">Cómo verificar:</strong> suma lo que se registró hoy y dice qué falta — <em>"~120g de proteína hasta ahora, faltan ~40g para la meta; cafeína dentro del límite."</em></p>
+</div>
+<div>
+<p class="text-xs text-neutral-400 mb-1">4 · Cierra el día</p>
+<pre class="bg-dark-900 rounded-lg p-3 overflow-x-auto text-sm border border-dark-600"><code class="font-mono text-purple-300">/newday</code></pre>
+<p class="text-xs text-neutral-400 mt-2"><strong class="text-purple-400">Cómo verificar:</strong> confirma el cierre y guarda el resumen — <em>"Día cerrado. Recovery 71%, causa probable: noche sin excesos + proteína en la meta. Registrado."</em> En el siguiente <code class="font-mono text-xs bg-dark-700 px-1 rounded">/checkin</code> ya lo recuerda.</p>
+</div>
+</div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">/checkin</div><p class="text-xs text-neutral-400">Abre el día desde la recuperación.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">/today</div><p class="text-xs text-neutral-400">Plan gated según el color del día.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">/sofar</div><p class="text-xs text-neutral-400">El total acumulado y lo que falta.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">/newday</div><p class="text-xs text-neutral-400">Cierra el día y guarda el resumen.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-3-1#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">🔗 Ayer → hoy: la elección se convierte en un número</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-1-t4-p1">Lo que hace útil la mañana no es el número aislado, sino la <strong class="text-purple-400">vinculación</strong>: el coach lee la recuperación de hoy y la explica con lo que registraste ayer. Como todo se convirtió en una fila de la base de datos (comida, cafeína, entrenamiento, alcohol), puede decirte el <em>porqué</em> — no solo qué. Así aprendes cuáles son tus botones.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Número sin causa</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>"Recovery 48% hoy." — ¿y qué? No permite actuar.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Sin vincularlo con el día anterior, se convierte en una app de gráficos más.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>No aprendes qué influyó en el resultado.</span></li>
+</ul>
+</div>
+<div class="bg-purple-900/20 rounded-xl border border-purple-500/30 p-6">
+<h4 class="font-bold text-purple-400 mb-4">✓ Número con la causa vinculada</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>"48% (ámbar) — el vino y cenar tarde son la causa probable."</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>Lo relaciona con la línea de ayer: alcohol a las 21 h, comida a las 22:30.</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>Se convierte en una lección: «cenar tarde perjudica tu sueño».</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-purple-400 mb-3 flex items-center"><span class="mr-2">🧵</span> La conexión en tres pasos</h3>
+<ol class="space-y-2 text-sm text-neutral-300 list-decimal pl-5">
+<li><strong>Lee el día de hoy:</strong> la recuperación que el wearable midió anoche.</li>
+<li><strong>Cruza el día anterior:</strong> las entradas de comida, cafeína, entrenamiento y alcohol registradas el día anterior.</li>
+<li><strong>Atribuye la causa probable:</strong> "lo que probablemente hizo subir/bajar ese número" — siempre como hipótesis, no como certeza.</li>
+</ol>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">📈</span> Por qué se vuelve el estándar</h3>
+<p class="text-neutral-300 text-sm">Repetida durante semanas, la conexión deja de ser una suposición y se convierte en tendencia: "cada vez que cenas después de las 22h, la recuperación baja ~15%". Ese es el salto de la <strong>memoria</strong> de HealthOS — guardamos cómo funciona en el módulo 3.3.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Conexión</div><p class="text-xs text-neutral-400">Relaciona el número de hoy con el de ayer.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Causa probable</div><p class="text-xs text-neutral-400">Hipótesis, no certeza.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Se convierte en un patrón</div><p class="text-xs text-neutral-400">Semanas de datos = tendencia.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Tus botones</div><p class="text-xs text-neutral-400">Aprendes qué mueve tu cuerpo.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-3-1#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">☕ "¿Café ahora?"</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-1-t5-p1">La pregunta clásica muestra la especificidad en el formato más breve posible. Un bot genérico responde "evita después de las 14h". HealthOS cruza <strong class="text-purple-400">tres cosas</strong>: tu recuperación de hoy, la hora del día y tu <strong class="text-purple-400">gen de cafeína</strong>. La respuesta sale a tu medida.</p>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-purple-400 mb-2">🟣 El gen de la cafeína</p>
+<p class="text-sm text-neutral-300"><strong>CYP1A2</strong> es el gen que controla qué tan rápido tu hígado descompone la cafeína. Quienes la metabolizan rápido toleran el café más tarde; quienes la metabolizan despacio sienten el efecto durante más horas y deben dejarlo temprano. El coach usa tu variante para definir el límite y el horario —ejemplo ilustrativo, confírmalo con tu médico.</p>
+</div>
+<div class="bg-dark-900/40 rounded-xl border border-dark-600 p-5 mb-6 space-y-3">
+<div class="flex justify-end"><div class="bg-purple-500/20 border border-purple-500/30 rounded-2xl rounded-br-sm px-4 py-2 text-sm text-neutral-200 max-w-[80%]">¿Café ahora? ☕</div></div>
+<div class="flex justify-start"><div class="bg-dark-800 border border-dark-600 rounded-2xl rounded-bl-sm px-4 py-2 text-sm text-neutral-300 max-w-[85%]">Estás <strong class="text-emerald-400">verde</strong> y son las 13:00: puedes. Tu cuerpo metaboliza la cafeína <strong>rápido</strong> (CYP1A2), así que el café temprano te cae bien; solo mantente por debajo de tu límite y <strong>corte a media tarde</strong> para no perjudicar el sueño. <span class="text-neutral-500">(ilustrativo)</span></div></div>
+<div class="flex justify-end"><div class="bg-purple-500/20 border border-purple-500/30 rounded-2xl rounded-br-sm px-4 py-2 text-sm text-neutral-200 max-w-[80%]">¿Y si fueran las 17:00?</div></div>
+<div class="flex justify-start"><div class="bg-dark-800 border border-dark-600 rounded-2xl rounded-bl-sm px-4 py-2 text-sm text-neutral-300 max-w-[85%]">Yo lo dejaría. Aunque metabolices rápido, las 17:00 se acercan a la hora de dormir, y hoy quieres proteger la recuperación. Prefiere un té o agua. <span class="text-neutral-500">(ilustrativo)</span></div></div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> La misma pregunta, tres entradas</h3>
+<p class="text-neutral-300 text-sm">Recuperación (el estado de hoy) + hora del día (la ventana del sueño) + gen (tu velocidad de metabolizar) = una respuesta que cambia según el contexto. Cambió la hora, cambió la respuesta. Eso es "mecanism-aware" en el ejemplo más simple del curso.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Tres entradas</div><p class="text-xs text-neutral-400">Recuperación + hora + gen.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">CYP1A2</div><p class="text-xs text-neutral-400">Qué tan rápido metabolizas la cafeína.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Límite + horario</div><p class="text-xs text-neutral-400">Cuánto y hasta qué hora.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">El contexto manda</div><p class="text-xs text-neutral-400">Cambió la hora, cambió la respuesta.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-3-1#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">🌙 Cerrar el día (/newday)</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-1-t6-p1">O <code class="font-mono text-xs bg-dark-700 px-1 rounded">/newday</code> es lo que hace la <strong class="text-purple-400">historial acumulado</strong>. Al cerrar el día, el coach guarda un <code class="font-mono text-xs bg-dark-700 px-1 rounded">coach_summary</code>: la recuperación de ese día <strong>y la causa probable</strong>. Este resumen es breve a propósito: es lo que el agente vuelve a leer después para detectar patrones sin tener que cargar cada mensaje.</p>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-purple-400 mb-2">🟣 Qué es coach_summary</p>
+<p class="text-sm text-neutral-300">Una fila resumen del día en la base de datos: fecha, recuperación y la causa que atribuyó el coach (p. ej., "71%, noche tranquila + proteína en la meta"). Persiste aunque se borre el resto del contexto del día: es la memoria a largo plazo que, acumulada día tras día, se convierte en tendencia.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-purple-900/20 rounded-xl border border-purple-500/30 p-6">
+<h4 class="font-bold text-purple-400 mb-4">✓ Qué persiste</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>O <code class="font-mono text-xs bg-dark-700 px-1 rounded">coach_summary</code>: recuperación + causa del día.</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>Todas las filas ya registradas (comida, entrenamiento, signos vitales) quedan en la base de datos.</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>Las metas y tu perfil no cambian al comenzar el día.</span></li>
+</ul>
+</div>
+<div class="bg-dark-800 rounded-xl border border-dark-600 p-6">
+<h4 class="font-bold text-neutral-200 mb-4">↺ Qué se restablece</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-neutral-500">↺</span><span>El «contexto del día» (intake de hoy, enfoque del día) se reinicia.</span></li>
+<li class="flex items-start space-x-2"><span class="text-neutral-500">↺</span><span>El siguiente <code class="font-mono text-xs bg-dark-700 px-1 rounded">/checkin</code> empieza desde cero, pero recordando los resúmenes anteriores.</span></li>
+<li class="flex items-start space-x-2"><span class="text-neutral-500">↺</span><span>Nada se pierde: reiniciar el día no borra el historial.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-dark-800 rounded-lg p-4 border border-purple-500/30 text-sm mb-6"><span class="text-purple-400 font-semibold">Ejemplo · 23:00</span> <span class="text-neutral-300"><code class="font-mono text-xs bg-dark-700 px-1 rounded">/newday</code> → "Día cerrado. Recuperación 71%, causa probable: noche tranquila + proteína en la meta. Guardado en el historial. Que descanses — mañana empezaré el día con esto." <em class="text-neutral-500">(ilustrativo)</em></span></div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">coach_summary</div><p class="text-xs text-neutral-400">Recuperación + causa, en una línea.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Persiste</div><p class="text-xs text-neutral-400">La historia no desaparece al cambiar de día.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Reinicia el contexto</div><p class="text-xs text-neutral-400">El nuevo día empieza limpio.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Acumula</div><p class="text-xs text-neutral-400">Resumen + resumen = tendencia.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-3-1#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">💬 Buenas prácticas de conversación</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-1-t7-p1">El coach es tan bueno como lo que recibe. Tres hábitos marcan la diferencia entre un diario muerto y un sistema que te conoce: <strong class="text-purple-400">registrar de inmediato</strong>, <strong class="text-purple-400">ser específico</strong> e <strong class="text-purple-400">dejar que el coach te lo exija</strong>.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-purple-900/20 rounded-xl border border-purple-500/30 p-6">
+<h4 class="font-bold text-purple-400 mb-4">✓ Hazlo</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span><strong>Registra en el momento.</strong> Toma una foto de la comida al comer y del café al tomarlo: después la memoria falla y el número queda sin una causa.</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span><strong>Sé específico.</strong> "Bife 200g y una copa de vino a las 21h" vale más que "cené".</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span><strong>Deja que el coach sea "savage".</strong> Configurado para cobrar a propósito — los recordatorios amables no funcionan para todo el mundo.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Evita</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Registrar todo por la noche, de memoria — se pierden los horarios y las cantidades.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Mensajes vagos («comí bien hoy») — el coach no logra conectar nada.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Tratar la sugerencia como una orden médica — es una hipótesis para consultar con el médico.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-purple-400 mb-2">🟣 Qué es «savage»</p>
+<p class="text-sm text-neutral-300">Un tono de exigencia configurado a propósito: en lugar de "tal vez quieras registrarlo", el coach insiste ("¿dónde está el check-in? llevas 2 días sin aparecer"). El autor cuenta que cambió a este tono porque no respondía a los recordatorios amables. Es una <strong>opción de personalidad</strong> del prompt — ajústalo a lo que te funcione.</p>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Un recordatorio que sirve para todo</h3>
+<p class="text-neutral-300 text-sm">Todo aquí es <strong>educativo e ilustrativo</strong>, con números ficticios. No es consejo médico. El coach puede equivocarse; trata cada sugerencia como una pregunta para tu médico, nunca como una prescripción.</p>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-3-1#q1">
+<p class="font-medium mb-4">✅ Autoevaluación (opcional): en la lógica de gating, qué significa un día <strong>rojo</strong>?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) Día de esfuerzo: entrenamiento intenso y carbohidratos cerca de la sesión</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) Recuperación baja: descansar, hacer movilidad ligera y priorizar el sueño</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) Error de la app — ignora el número</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-purple-900/40 via-dark-800 to-dark-800 rounded-xl border border-purple-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Resumen del módulo</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">La mañana empieza con la recuperación</strong><span class="text-neutral-400"> — recovery-led: primero va el número de la noche y el día se ajusta a él.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">Gating en tres colores</strong><span class="text-neutral-400"> — el verde impulsa, el ámbar contiene, el rojo indica descanso; el plan está condicionado por el número.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">Cuatro comandos cubren el día</strong><span class="text-neutral-400"> — /checkin abre, /today planifica, /sofar muestra el acumulado, /newday cierra.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">Ayer explica el hoy</strong><span class="text-neutral-400"> — la decisión registrada se convierte en la causa probable del número de mañana.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">Cerrar acumula la historia</strong><span class="text-neutral-400"> — coach_summary conserva la recuperación + la causa; registrarlo pronto y ser específico alimenta todo.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-purple-400 mb-2">Próximo módulo:</h3>
+<p class="text-neutral-300 text-sm">3.2 — Comida y entrenamiento por foto: registrar comidas y sesiones enviando una imagen, y cómo la visión estima los macros.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Volver a Cómo usar</a>
+<a class="flex-1 text-center px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition-colors" href="modulo-3-2.html">Próximo módulo →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — Curso INEMA · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Contenido educativo. Cifras ilustrativas. No es consejo médico. Consulta con profesionales de la salud.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-3-1#q1', {
+        answer: 1,
+        explain: { 0: 'Isso é o dia verde — recuperação alta libera puxar.', 1: 'Isso. Vermelho = recuperação baixa: o coach fecha o portão e manda descansar.', 2: 'Não — o número é real e gated; vermelho pede recuo, não ser ignorado.' }
+      });
+    }
+  </script>
+</body>
+</html>

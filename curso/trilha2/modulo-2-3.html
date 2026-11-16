@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Módulo 2.3 — O agente e o bot | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento blue (T2) */
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37,99,235,0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37,99,235,0.08); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37,99,235,0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37,99,235,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha2/modulo-2-3.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha2/modulo-2-3.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha2/modulo-2-3.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="modulo-2-3.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">PT</a><a href="../../en/curso/trilha2/modulo-2-3.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="../../es/curso/trilha2/modulo-2-3.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-blue-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Pular para o conteúdo</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html"><span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentos</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-blue-400 bg-blue-500/10" href="index.html"><span class="sm:hidden">T2</span><span class="hidden sm:inline">Passo a passo</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html"><span class="sm:hidden">T3</span><span class="hidden sm:inline">Como usar</span></a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="Minha jornada" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">Minha jornada</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Aparência" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Aparência</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tema</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Escuro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Claro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sépia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Foco</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">Alto contraste</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tamanho do texto</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Largura · entrelinha</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Estreito</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Médio</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Largo</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compacto</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Confortável</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Fonte</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">Sistema</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Leitura</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Trilha de navegação" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-blue-400" href="../../index.html">Início</a><span>/</span>
+<a class="hover:text-blue-400" href="index.html">Passo a passo</a><span>/</span>
+<span class="text-blue-400">Módulo 2.3</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-blue-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="2-3" data-inema-track="2">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full mb-4">MÓDULO 2.3</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">🤖 O agente e o bot</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">Dê vida ao coach: configurar o <strong class="text-blue-400">agent.yaml</strong>, preencher o <strong class="text-blue-400">CLAUDE.md</strong> com o seu perfil, conhecer os slash commands, subir o bot e testar o snapshot e a memória.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">7</div><div class="text-xs text-neutral-400">Tópicos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">~35</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Intermediário</div><div class="text-xs text-neutral-400">Nível</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Prático</div><div class="text-xs text-neutral-400">Tipo</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:2-3">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Seu progresso neste módulo</span>
+<span class="text-blue-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 de 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-blue-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Índice da página" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Seção <span class="inema-toc-pos">1</span> de <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-1">1. agent.yaml</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-2">2. CLAUDE.md</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-3">3. Slash commands</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-4">4. Subir o bot</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-5">5. state.py</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-6">6. mem.py recall</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-7">7. A árvore do agent/</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-2-3#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">⚙️ agent.yaml — o token do bot e os comandos</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-3-t1-p1">O <strong class="text-blue-400">agent.yaml</strong> é o arquivo de configuração do coach: ele diz qual bot do Telegram usar e quais <strong class="text-blue-400">slash commands</strong> aparecem no menu. A pegadinha mais importante: o token <em>não</em> mora dentro dele. O arquivo guarda só o <strong>nome da variável de ambiente</strong> que aponta para o token — o segredo de verdade fica em <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>, fora do git.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 Novo aqui? Três termos antes de seguir</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>agent.yaml</strong> — o "painel de controle" do coach em texto. Você copia o <code class="font-mono text-xs bg-dark-700 px-1 rounded">agent.yaml.example</code> para <code class="font-mono text-xs bg-dark-700 px-1 rounded">agent.yaml</code> e edita.</li>
+<li><strong>telegram_bot_token_env</strong> — em vez do token cru, ele guarda o NOME da variável (ex.: <code class="font-mono text-xs bg-dark-700 px-1 rounded">HEALTH_BOT_TOKEN</code>) que o agente lê do seu <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>. Assim o segredo nunca cai no repositório.</li>
+<li><strong>Slash command</strong> — um atalho que começa com "/" no Telegram (ex.: <code class="font-mono text-xs bg-dark-700 px-1 rounded">/checkin</code>). Cada um dispara uma rotina do coach.</li>
+</ul>
+</div>
+<!-- COPY-RUN 1 -->
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 bg-blue-500/10">
+<p class="text-sm font-semibold text-blue-400">📋 Copie e adapte · <span class="text-neutral-300 font-normal">objetivo: registrar o bot e declarar os comandos do menu</span></p>
+</div>
+<pre class="p-5 text-xs sm:text-sm overflow-x-auto font-mono text-neutral-300 leading-relaxed bg-dark-900"><code># agent.yaml.example  →  copie para agent.yaml e edite
+name: health-coach
+
+# o bot NÃO guarda o token aqui — guarda o NOME da variável
+# de ambiente que o agente lê do seu ~/.env (segredo fora do git)
+telegram_bot_token_env: HEALTH_BOT_TOKEN
+
+slash_commands:
+  - command: checkin
+    description: Revisão da manhã guiada pela recuperação
+  - command: today
+    description: O plano de hoje (treino, comida, café)
+  - command: sofar
+    description: O que você já registrou hoje
+  - command: newday
+    description: Fecha o dia e começa um novo
+  - command: supplements
+    description: Sua agenda de suplementos
+  - command: advice
+    description: Conselho com citações, reconciliado aos seus dados</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 text-sm text-neutral-400">
+<strong class="text-blue-400">Como verificar:</strong> depois de subir o bot, abra a conversa no Telegram e digite "/". Os seis comandos devem aparecer no menu de autocomplete.
+          </div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">agent.yaml</div><p class="text-xs text-neutral-400">O painel de controle do coach.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Token por env</div><p class="text-xs text-neutral-400">Guarda o nome da variável, não o segredo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Slash commands</div><p class="text-xs text-neutral-400">Atalhos "/" declarados no arquivo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">~/.env</div><p class="text-xs text-neutral-400">Onde o token de fato vive.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-2-3#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">📝 CLAUDE.md — o cérebro do coach é o seu perfil</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-3-t2-p1">O <strong class="text-blue-400">CLAUDE.md</strong> é o documento que o coach lê para saber quem você é. É ali que o "conselho genérico" vira "conselho seu": meta, exames de sangue, variações genéticas, restrições, preferências de suplemento e — importante — o <strong class="text-blue-400">estilo</strong> com que você quer ser cobrado. O repositório traz um template; você o preenche com a sua realidade.</p>
+<!-- COPY-RUN 2 -->
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 bg-blue-500/10">
+<p class="text-sm font-semibold text-blue-400">📋 Copie e preencha · <span class="text-neutral-300 font-normal">objetivo: dar ao coach o seu perfil real para aterrar cada resposta</span></p>
+</div>
+<pre class="p-5 text-xs sm:text-sm overflow-x-auto font-mono text-neutral-300 leading-relaxed bg-dark-900"><code># CLAUDE.md — o cérebro do coach (preencha com o SEU perfil)
+
+## Meta (goal)
+&lt;ex.: recomposição — perder ~4 kg de gordura mantendo massa até dez&gt;
+
+## Exames (bloods)
+&lt;só os SEUS valores: ApoB 95, HOMA-IR 1.4, Vitamina D 28, ...&gt;
+
+## Genética (SNPs)
+&lt;ex.: CYP1A2 metabolizador rápido de cafeína; APOE e3/e3&gt;
+
+## Restrições
+&lt;ex.: sem lactose; joelho direito sensível; tendência a dormir tarde&gt;
+
+## Suplementos (preferências)
+&lt;ex.: creatina 5g/dia; magnésio à noite; evita pré-treino com cafeína&gt;
+
+## Estilo do coach
+Direto e cobrando — pode ser "savage on purpose":
+me chama no flanco quando eu furo um check-in, sem rodeios.</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 text-sm text-neutral-400">
+<strong class="text-blue-400">Como verificar:</strong> mande uma pergunta ao bot tipo "posso tomar café agora?" — a resposta deve citar algo do seu perfil (sua genética de cafeína, sua meta), não uma média genérica.
+          </div>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Nunca versione o CLAUDE.md preenchido</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>O template vem no repositório; o <strong>preenchido</strong> tem exames e genética reais — é informação de saúde sensível.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Mantenha-o fora do git (no <code class="font-mono text-xs bg-dark-700 px-1 rounded">.gitignore</code>), junto com seus valores de seed, fotos e o <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>O repo público é o blueprint <em>limpo</em> — não os registros de ninguém.</span></li>
+</ul>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> Por que o "estilo" importa</h3>
+<p class="text-neutral-300 text-sm">Um coach que você ignora não muda nada. Descrever o tom — gentil, técnico, ou <strong>"savage on purpose"</strong> cobrando check-ins — faz o LLM falar do jeito que <em>te</em> move. É parte do perfil tanto quanto o ApoB.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Perfil = cérebro</div><p class="text-xs text-neutral-400">O CLAUDE.md aterra cada resposta em você.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Estilo do coach</div><p class="text-xs text-neutral-400">O tom também é configuração.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Template vs real</div><p class="text-xs text-neutral-400">Copie o modelo, preencha o seu.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Fora do git</div><p class="text-xs text-neutral-400">O preenchido nunca é versionado.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-2-3#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">⌨️ Os slash commands, um a um</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-3-t3-p1">Cada slash command é um atalho que dispara uma rotina específica do coach. Você não <em>precisa</em> deles — pode só conversar normalmente — mas eles dão um botão rápido para as ações do dia. Os seis do menu vêm do <code class="font-mono text-xs bg-dark-700 px-1 rounded">agent.yaml</code>; há ainda o <code class="font-mono text-xs bg-dark-700 px-1 rounded">/healthdb</code>, que entrega um botão de link para o dashboard.</p>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="O menu de barra do Telegram abrindo em sete comandos: checkin, today, sofar, newday, supplements, advice e healthdb" class="w-full h-auto" role="img" viewbox="0 0 1000 260">
+<defs>
+<lineargradient id="m23c-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m23c-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m23c-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m23c-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m23c-grid)" height="260" width="1000" x="0" y="0"></rect>
+<g filter="url(#m23c-glow)"><rect fill="#0e1622" height="60" rx="14" stroke="url(#m23c-grad)" stroke-width="2.5" width="150" x="40" y="100"></rect></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="18" font-weight="600" text-anchor="middle" x="115" y="128">/</text>
+<text fill="#bcd6ff" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="115" y="148">menu do bot</text>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<g class="wf-a"><rect fill="#0e1622" height="32" rx="8" stroke="#38bdf8" stroke-width="1.6" width="200" x="320" y="14"></rect><text fill="#bfe6ff" x="335" y="35">/checkin</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="32" rx="8" stroke="#38bdf8" stroke-width="1.6" width="200" x="320" y="52"></rect><text fill="#bfe6ff" x="335" y="73">/today</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="32" rx="8" stroke="#38bdf8" stroke-width="1.6" width="200" x="320" y="90"></rect><text fill="#bfe6ff" x="335" y="111">/sofar</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="32" rx="8" stroke="#38bdf8" stroke-width="1.6" width="200" x="320" y="128"></rect><text fill="#bfe6ff" x="335" y="149">/newday</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="32" rx="8" stroke="#38bdf8" stroke-width="1.6" width="200" x="320" y="166"></rect><text fill="#bfe6ff" x="335" y="187">/supplements</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="32" rx="8" stroke="#38bdf8" stroke-width="1.6" width="200" x="320" y="204"></rect><text fill="#bfe6ff" x="335" y="225">/advice</text></g>
+</g>
+<g fill="none" opacity="0.5" stroke="#38bdf8" stroke-width="1.6">
+<path d="M190,118 C250,90 270,30 320,30" marker-end="url(#m23c-ah)"></path>
+<path d="M190,124 C250,110 270,68 320,68" marker-end="url(#m23c-ah)"></path>
+<path d="M190,130 C250,124 270,106 320,106" marker-end="url(#m23c-ah)"></path>
+<path d="M190,134 C250,140 270,144 320,144" marker-end="url(#m23c-ah)"></path>
+<path d="M190,140 C250,158 270,182 320,182" marker-end="url(#m23c-ah)"></path>
+<path d="M190,146 C250,176 270,220 320,220" marker-end="url(#m23c-ah)"></path>
+</g>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<rect fill="#1c1606" height="52" opacity="0.9" rx="12" stroke="#facc15" stroke-width="1.8" width="320" x="640" y="104"></rect>
+<text fill="#facc15" x="660" y="128">/healthdb</text>
+<text fill="#e7d9a8" font-size="11" x="660" y="146">extra: botão de link p/ o dashboard</text>
+</g>
+<path d="M520,182 C580,182 600,130 640,130" fill="none" marker-end="url(#m23c-ah)" opacity="0.7" stroke="#facc15" stroke-dasharray="5 4" stroke-width="1.6"></path>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> digitar "/" abre o menu (azul) que se ramifica nos seis comandos declarados (ciano). O <code class="font-mono">/healthdb</code> (âmbar, à direita) é um extra que manda um botão de deep-link para o dashboard.</p>
+</div>
+<div class="overflow-x-auto mb-6 rounded-xl border border-dark-600">
+<table class="w-full text-sm">
+<thead class="bg-dark-800 text-blue-400">
+<tr><th class="text-left font-semibold px-4 py-3">Comando</th><th class="text-left font-semibold px-4 py-3">O que faz</th></tr>
+</thead>
+<tbody class="divide-y divide-dark-600">
+<tr class="bg-dark-900"><td class="px-4 py-3 font-mono text-blue-400 whitespace-nowrap">/checkin</td><td class="px-4 py-3 text-neutral-300">A revisão da manhã guiada pela recuperação: abre com o recovery de ontem à noite e amarra suas escolhas ao número.</td></tr>
+<tr class="bg-dark-900"><td class="px-4 py-3 font-mono text-blue-400 whitespace-nowrap">/today</td><td class="px-4 py-3 text-neutral-300">O plano de hoje — treino, comida e café — visivelmente condicionado ao recovery (verde = puxar, vermelho = pegar leve).</td></tr>
+<tr class="bg-dark-900"><td class="px-4 py-3 font-mono text-blue-400 whitespace-nowrap">/sofar</td><td class="px-4 py-3 text-neutral-300">Mostra o que você já registrou hoje (comida, treino, peso, café) — o acumulado do dia até agora.</td></tr>
+<tr class="bg-dark-900"><td class="px-4 py-3 font-mono text-blue-400 whitespace-nowrap">/newday</td><td class="px-4 py-3 text-neutral-300">Fecha o dia e abre um novo — útil quando você vira a página antes da rotina automática rodar.</td></tr>
+<tr class="bg-dark-900"><td class="px-4 py-3 font-mono text-blue-400 whitespace-nowrap">/supplements</td><td class="px-4 py-3 text-neutral-300">Sua agenda de suplementos: o que tomar, quando, conforme o que está no banco.</td></tr>
+<tr class="bg-dark-900"><td class="px-4 py-3 font-mono text-blue-400 whitespace-nowrap">/advice</td><td class="px-4 py-3 text-neutral-300">Conselho com citações (RAG de fontes), reconciliado aos seus próprios dados antes de te entregar.</td></tr>
+<tr class="bg-dark-900"><td class="px-4 py-3 font-mono text-yellow-400 whitespace-nowrap">/healthdb</td><td class="px-4 py-3 text-neutral-300">Extra — manda um botão de deep-link para o dashboard, com o <code class="font-mono text-xs bg-dark-700 px-1 rounded">DASHBOARD_TOKEN</code> guardado num cookie HttpOnly.</td></tr>
+</tbody>
+</table>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">/checkin</div><p class="text-xs text-neutral-400">A âncora do dia: recovery → plano.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">/today · /sofar</div><p class="text-xs text-neutral-400">Plano de hoje e o que já entrou.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">/advice</div><p class="text-xs text-neutral-400">Conselho citado, batido com seus dados.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">/healthdb</div><p class="text-xs text-neutral-400">Atalho protegido para o dashboard.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-2-3#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">💬 Subir o bot e dar o primeiro "oi"</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-3-t4-p1">Com o token no <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> e o <code class="font-mono text-xs bg-dark-700 px-1 rounded">agent.yaml</code> pronto, você sobe o agente e manda uma <strong class="text-blue-400">mensagem comum</strong> — nem precisa de comando. O teste mínimo é exatamente este: o bot boota e responde a um "oi". Por trás desse "oi" acontece a sequência que você vê no diagrama: o agente lê o snapshot, raciocina no LLM e devolve a resposta ao Telegram.</p>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Fluxo de uma mensagem: você escreve no Telegram, o agente monta o snapshot via state.py, o LLM raciocina e a resposta volta ao Telegram" class="w-full h-auto" role="img" viewbox="0 0 1000 210">
+<defs>
+<lineargradient id="m23a-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m23a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m23a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m23a-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#60a5fa"></path></marker>
+<marker id="m23a-ahc" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m23a-grid)" height="210" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="13" font-weight="600">
+<rect fill="#0e1622" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="150" x="20" y="82"></rect><text fill="#bfe6ff" text-anchor="middle" x="95" y="104">💬 /checkin</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="95" y="120">você, no Telegram</text>
+<g filter="url(#m23a-glow)"><rect fill="#0e1622" height="48" rx="12" stroke="url(#m23a-grad)" stroke-width="2.5" width="150" x="240" y="82"></rect></g><text fill="#60a5fa" text-anchor="middle" x="315" y="104">🤖 Agente</text><text fill="#bcd6ff" font-size="11" text-anchor="middle" x="315" y="120">coach</text>
+<rect fill="#0e1622" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="150" x="460" y="82"></rect><text fill="#bfe6ff" text-anchor="middle" x="535" y="104">📸 state.py</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="535" y="120">snapshot</text>
+<rect fill="#0e1622" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="150" x="680" y="82"></rect><text fill="#bfe6ff" text-anchor="middle" x="755" y="104">🧠 LLM</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="755" y="120">raciocina</text>
+</g>
+<g fill="none" stroke-width="2">
+<path d="M170,106 L240,106" marker-end="url(#m23a-ah)" stroke="#60a5fa"></path>
+<path d="M390,106 L460,106" marker-end="url(#m23a-ahc)" stroke="#38bdf8"></path>
+<path d="M610,106 L680,106" marker-end="url(#m23a-ahc)" stroke="#38bdf8"></path>
+<path d="M755,130 C755,176 95,176 95,132" marker-end="url(#m23a-ah)" opacity="0.8" stroke="#60a5fa" stroke-dasharray="6 5"></path>
+</g>
+<text fill="#bcd6ff" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="500" y="198">a resposta volta ao Telegram (linha tracejada)</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> da esquerda pra direita é o caminho da sua mensagem; a linha tracejada é a resposta voltando. O agente sempre passa pelo <code class="font-mono">state.py</code> (snapshot) antes de raciocinar — é o que veremos rodar no próximo tópico.</p>
+</div>
+<div class="bg-dark-800 rounded-xl border border-dark-600 p-5 mb-6">
+<p class="text-xs font-semibold text-neutral-400 mb-3 uppercase tracking-wide">Conversa no Telegram (ilustrativa)</p>
+<div class="space-y-3">
+<div class="flex justify-end"><div class="bg-blue-600 text-white rounded-2xl rounded-br-sm px-4 py-2 text-sm max-w-xs">oi</div></div>
+<div class="flex justify-start"><div class="bg-dark-700 text-neutral-200 rounded-2xl rounded-bl-sm px-4 py-2 text-sm max-w-md">Bom te ver. 👋 Bootei e já li seu snapshot. Quer a revisão da manhã (/checkin) ou prefere só registrar algo?</div></div>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">✅</span> O teste que confirma esta etapa</h3>
+<p class="text-neutral-300 text-sm">Da checklist de validação: <em>"o agente boota e responde a uma mensagem comum no Telegram"</em> e <em>"os slash commands aparecem no menu '/'"</em>. Se um "oi" recebe resposta e os comandos surgem ao digitar "/", o bot está no ar.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Mensagem comum</div><p class="text-xs text-neutral-400">Não precisa de comando para conversar.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Boot</div><p class="text-xs text-neutral-400">Sobe lendo o token do ~/.env.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Snapshot primeiro</div><p class="text-xs text-neutral-400">Toda resposta começa pelo state.py.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Resposta volta</div><p class="text-xs text-neutral-400">O LLM responde no próprio Telegram.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-2-3#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">📸 state.py — como o snapshot é montado</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-3-t5-p1">O <strong class="text-blue-400">snapshot</strong> é o retrato compacto do "agora" que o agente lê no começo de cada turno: tendência de peso, o que você comeu hoje, pressão, a recuperação de ontem à noite, o padrão de sono de 7 dias e suas metas. O script <code class="font-mono text-xs bg-dark-700 px-1 rounded">state.py</code> monta esse retrato a partir do banco — e você pode rodá-lo no terminal para ver o que o coach vê.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 Novo aqui?</p>
+<p class="text-sm text-neutral-300"><strong>Snapshot de sessão</strong> — não é mágica nem IA: é só uma consulta determinística ao banco que junta as últimas linhas de cada tabela num resumo. Rodar o <code class="font-mono text-xs bg-dark-700 px-1 rounded">state.py</code> sozinho mostra exatamente o texto que entra no contexto do LLM antes de qualquer raciocínio.</p>
+</div>
+<!-- COPY-RUN 3 -->
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 bg-blue-500/10">
+<p class="text-sm font-semibold text-blue-400">📋 Rode no terminal · <span class="text-neutral-300 font-normal">objetivo: imprimir o snapshot (peso, intake e metas) que o coach lê a cada turno</span></p>
+</div>
+<pre class="p-5 text-xs sm:text-sm overflow-x-auto font-mono text-neutral-300 leading-relaxed bg-dark-900"><code># na raiz do repositório, com o ~/.env preenchido
+python3 agent/scripts/state.py</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 text-sm text-neutral-400">
+<strong class="text-blue-400">Como verificar:</strong> deve sair um bloco com a tendência de <strong>peso</strong>, o <strong>intake</strong> de hoje (calorias/proteína) e suas <strong>metas (goals)</strong>. Saída de exemplo abaixo (números fictícios):
+          </div>
+<pre class="px-5 pb-5 pt-3 text-xs overflow-x-auto font-mono text-neutral-400 leading-relaxed bg-dark-900"><code>=== SNAPSHOT (2026-06-30) ===
+weight:   82.4 kg  (7d: -0.6 kg ↓)
+today:    1 240 kcal · 96 g proteína · café 1×
+last night: recovery 71% · HRV 64 ms · sono 7h20
+7d sleep: média 6h54  (meta 7h30)
+goals:    recomposição — manter massa, -4 kg gordura</code></pre>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🔎</span> Por que rodar isso à parte</h3>
+<p class="text-neutral-300 text-sm">Se uma resposta do coach parece "fora do contexto", o <code class="font-mono text-xs bg-dark-700 px-1 rounded">state.py</code> é o primeiro lugar para olhar: se o snapshot está vazio ou desatualizado, o problema é dado faltando no banco — não o LLM. É a sua janela de depuração.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">state.py</div><p class="text-xs text-neutral-400">Monta o snapshot a partir do banco.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Determinístico</div><p class="text-xs text-neutral-400">Só consulta — sem IA no meio.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Peso · intake · metas</div><p class="text-xs text-neutral-400">O que precisa aparecer na saída.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Janela de debug</div><p class="text-xs text-neutral-400">Veja o que o coach realmente vê.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-2-3#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">🧲 mem.py recall — a memória semântica</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-3-t6-p1">O snapshot conta o "agora"; a <strong class="text-blue-400">memória semântica</strong> traz o passado relevante. Toda mensagem é guardada com um <em>embedding</em> (uma assinatura numérica do significado). Quando você pergunta algo, o <code class="font-mono text-xs bg-dark-700 px-1 rounded">mem.py recall</code> busca as mensagens passadas mais parecidas com a pergunta — mesmo que não usem as mesmas palavras — e as devolve para o coach.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 Novo aqui? Dois termos</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Embedding</strong> — um vetor de números que representa o <em>sentido</em> de um texto. Frases parecidas viram vetores próximos, então a busca acha por significado, não por palavra exata.</li>
+<li><strong>Recall semântico</strong> — "lembrar por significado": dada a sua pergunta, o sistema mede a proximidade entre os embeddings e traz as memórias mais próximas (via <code class="font-mono text-xs bg-dark-700 px-1 rounded">pgvector</code>, no Supabase).</li>
+</ul>
+</div>
+<!-- COPY-RUN 4 -->
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 bg-blue-500/10">
+<p class="text-sm font-semibold text-blue-400">📋 Rode no terminal · <span class="text-neutral-300 font-normal">objetivo: trazer mensagens passadas relevantes a uma consulta</span></p>
+</div>
+<pre class="p-5 text-xs sm:text-sm overflow-x-auto font-mono text-neutral-300 leading-relaxed bg-dark-900"><code># busca por significado nas suas mensagens já guardadas
+python3 agent/scripts/mem.py recall "&lt;o que você quer lembrar&gt;"
+
+# ex.: como o álcool costuma afetar o meu sono
+python3 agent/scripts/mem.py recall "vinho à noite e recuperação"</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 text-sm text-neutral-400">
+<strong class="text-blue-400">Como verificar:</strong> deve sair uma lista de mensagens passadas <strong>relevantes</strong> (com data e um score de similaridade), não a última mensagem qualquer. Saída de exemplo (fictícia):
+          </div>
+<pre class="px-5 pb-5 pt-3 text-xs overflow-x-auto font-mono text-neutral-400 leading-relaxed bg-dark-900"><code>recall "vinho à noite e recuperação"  →  3 hits
+0.89  2026-06-12  "bebi 2 taças no jantar, dormi mal"
+0.84  2026-05-28  "recovery caiu p/ 48% depois do churrasco c/ cerveja"
+0.79  2026-05-09  "noites sem álcool: HRV mais alto na manhã"</code></pre>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">🧠</span> Memória é o produto</h3>
+<p class="text-neutral-300 text-sm">É isto que separa o coach de um chatbot que esquece tudo: ele cruza a pergunta de hoje com o seu histórico e enxerga <strong>padrões</strong> ("toda vez que você janta tarde, o sono cai"). Da checklist: <em>"recall semântico (<code class="font-mono text-xs bg-dark-700 px-1 rounded">mem.py recall</code>) retorna mensagens passadas relevantes"</em>.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Embedding</div><p class="text-xs text-neutral-400">Assinatura numérica do significado.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">recall</div><p class="text-xs text-neutral-400">Busca por sentido, não por palavra.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">pgvector</div><p class="text-xs text-neutral-400">A busca por proximidade no Supabase.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Padrões</div><p class="text-xs text-neutral-400">O passado relevante vira insight.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-2-3#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">🌳 A árvore do agent/</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-3-t7-p1">Tudo o que você configurou vive na pasta <code class="font-mono text-xs bg-dark-700 px-1 rounded">agent/</code> — o agente sanitizado e auto-contido. Vale ter o mapa na cabeça: na raiz, o cérebro (<code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code>) e a config (<code class="font-mono text-xs bg-dark-700 px-1 rounded">agent.yaml.example</code>); aninhados, os scripts, as migrations do banco e o dashboard.</p>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Aninhamento de pastas do agent/: na raiz CLAUDE.md, agent.yaml.example e AGENTS.md; dentro, as pastas scripts/, supabase/migrations/ e dashboard/" class="w-full h-auto" role="img" viewbox="0 0 1000 360">
+<defs>
+<lineargradient id="m23b-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m23b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m23b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+</defs>
+<rect fill="url(#m23b-grid)" height="360" width="1000" x="0" y="0"></rect>
+<!-- raiz agent/ -->
+<g filter="url(#m23b-glow)"><rect fill="none" height="316" rx="16" stroke="url(#m23b-grad)" stroke-width="2.5" width="940" x="30" y="22"></rect></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="16" font-weight="700" x="52" y="50">📁 agent/</text>
+<!-- arquivos da raiz -->
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<rect fill="#0e1622" height="34" rx="9" stroke="#38bdf8" stroke-width="1.6" width="270" x="56" y="66"></rect><text fill="#bfe6ff" x="72" y="88">📄 CLAUDE.md — o cérebro</text>
+<rect fill="#0e1622" height="34" rx="9" stroke="#38bdf8" stroke-width="1.6" width="300" x="346" y="66"></rect><text fill="#bfe6ff" x="362" y="88">📄 agent.yaml.example — config + comandos</text>
+<rect fill="#0e1622" height="34" rx="9" stroke="#38bdf8" stroke-width="1.6" width="280" x="666" y="66"></rect><text fill="#bfe6ff" x="682" y="88">📄 AGENTS.md</text>
+</g>
+<!-- scripts/ -->
+<rect fill="#0b1320" height="118" opacity="0.85" rx="12" stroke="#3b82f6" stroke-width="1.8" width="888" x="56" y="116"></rect>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="14" font-weight="700" x="74" y="140">📁 scripts/</text>
+<g font-family="Inter,sans-serif" font-size="11.5" font-weight="600">
+<rect fill="#0e1622" height="30" rx="8" stroke="#38bdf8" stroke-width="1.4" width="180" x="74" y="152"></rect><text fill="#bfe6ff" x="88" y="172">state.py — snapshot</text>
+<rect fill="#0e1622" height="30" rx="8" stroke="#38bdf8" stroke-width="1.4" width="180" x="266" y="152"></rect><text fill="#bfe6ff" x="280" y="172">mem.py — memória</text>
+<rect fill="#0e1622" height="30" rx="8" stroke="#38bdf8" stroke-width="1.4" width="180" x="458" y="152"></rect><text fill="#bfe6ff" x="472" y="172">db.py — banco</text>
+<rect fill="#0e1622" height="30" rx="8" stroke="#38bdf8" stroke-width="1.4" width="280" x="650" y="152"></rect><text fill="#bfe6ff" x="664" y="172">whoop-sync.py — wearable</text>
+<rect fill="#0e1622" height="30" rx="8" stroke="#38bdf8" stroke-width="1.4" width="220" x="74" y="190"></rect><text fill="#bfe6ff" x="88" y="210">supplements.py — agenda</text>
+<rect fill="#0e1622" height="30" rx="8" stroke="#38bdf8" stroke-width="1.4" width="280" x="306" y="190"></rect><text fill="#bfe6ff" x="320" y="210">advice.py — RAG com citações</text>
+</g>
+<!-- supabase/migrations + dashboard -->
+<g font-family="Inter,sans-serif" font-size="13" font-weight="700">
+<rect fill="#0b1320" height="70" opacity="0.85" rx="12" stroke="#3b82f6" stroke-width="1.8" width="430" x="56" y="250"></rect>
+<text fill="#60a5fa" x="74" y="276">📁 supabase/migrations/</text>
+<text fill="#9ad6ff" font-family="Inter,sans-serif" font-size="11.5" font-weight="500" x="74" y="298">o schema completo (14 tabelas) + seed de exemplo</text>
+<rect fill="#0b1320" height="70" opacity="0.85" rx="12" stroke="#3b82f6" stroke-width="1.8" width="430" x="514" y="250"></rect>
+<text fill="#60a5fa" x="532" y="276">📁 dashboard/</text>
+<text fill="#9ad6ff" font-family="Inter,sans-serif" font-size="11.5" font-weight="500" x="532" y="298">página + camada de dados + rotas do painel web</text>
+</g>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> a borda externa é a pasta <code class="font-mono">agent/</code>. Na faixa de cima ficam os arquivos da raiz; abaixo, as três pastas aninhadas. Os scripts que você rodou neste módulo (<code class="font-mono">state.py</code>, <code class="font-mono">mem.py</code>) moram em <code class="font-mono">scripts/</code>.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+<div class="bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-blue-400 mb-1 font-mono text-sm">scripts/db.py</h4><p class="text-sm text-neutral-300">A porta do banco: <code class="font-mono text-xs bg-dark-700 px-1 rounded">select</code>, inserts e até criar o bucket de fotos (<code class="font-mono text-xs bg-dark-700 px-1 rounded">mkbucket</code>). Stdlib-only.</p></div>
+<div class="bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-blue-400 mb-1 font-mono text-sm">scripts/whoop-sync.py</h4><p class="text-sm text-neutral-300">Puxa recovery + sono da wearable para a tabela <code class="font-mono text-xs bg-dark-700 px-1 rounded">vitals</code>. Roda no cron da manhã (Trilha 2.4).</p></div>
+<div class="bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-blue-400 mb-1 font-mono text-sm">scripts/supplements.py</h4><p class="text-sm text-neutral-300">Constrói a agenda de suplementos que o <code class="font-mono text-xs bg-dark-700 px-1 rounded">/supplements</code> entrega.</p></div>
+<div class="bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-blue-400 mb-1 font-mono text-sm">scripts/advice.py</h4><p class="text-sm text-neutral-300">O RAG por trás do <code class="font-mono text-xs bg-dark-700 px-1 rounded">/advice</code>: conselho com citações, reconciliado aos seus dados. Único que precisa de <code class="font-mono text-xs bg-dark-700 px-1 rounded">requests</code>.</p></div>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-2-3#q1">
+<p class="font-medium mb-4">✅ Auto-checagem (opcional): onde mora o token do bot do Telegram?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) Direto no agent.yaml, no campo telegram_bot_token_env</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) No ~/.env; o agent.yaml guarda só o NOME da variável (HEALTH_BOT_TOKEN)</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) Dentro do CLAUDE.md, junto do perfil</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400 mt-8">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Raiz</div><p class="text-xs text-neutral-400">CLAUDE.md + agent.yaml.example + AGENTS.md.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">scripts/</div><p class="text-xs text-neutral-400">state, mem, db, whoop-sync, supplements, advice.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">migrations/</div><p class="text-xs text-neutral-400">O schema de 14 tabelas + seed.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">dashboard/</div><p class="text-xs text-neutral-400">O painel web que lê do Supabase.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-blue-900/40 via-dark-800 to-dark-800 rounded-xl border border-blue-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Resumo do módulo</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">agent.yaml</strong><span class="text-neutral-400"> — registra o bot por <code class="font-mono text-xs bg-dark-700 px-1 rounded">telegram_bot_token_env</code> e declara os slash commands; o token fica no ~/.env.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">CLAUDE.md</strong><span class="text-neutral-400"> — o seu perfil (meta, exames, genética, restrições, suplementos, estilo) é o cérebro do coach; nunca versione o preenchido.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Os comandos</strong><span class="text-neutral-400"> — /checkin, /today, /sofar, /newday, /supplements, /advice (+ /healthdb para o dashboard).</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Bot no ar</strong><span class="text-neutral-400"> — sobe e responde a um "oi"; por trás, lê o snapshot do state.py antes de raciocinar.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Snapshot + memória</strong><span class="text-neutral-400"> — <code class="font-mono text-xs bg-dark-700 px-1 rounded">state.py</code> imprime o "agora"; <code class="font-mono text-xs bg-dark-700 px-1 rounded">mem.py recall</code> traz o passado relevante.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-blue-400 mb-2">Próximo módulo:</h3>
+<p class="text-neutral-300 text-sm">2.4 — Wearable e agendamento: conectar o WHOOP (OAuth), agendar o <code class="font-mono text-xs bg-dark-700 px-1 rounded">whoop-sync.py</code> e disparar a revisão da manhã todo dia.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Voltar para Passo a passo</a>
+<a class="flex-1 text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors" href="modulo-2-4.html">Próximo módulo →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — Curso INEMA · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Conteúdo educacional. Não é conselho médico. Consulte profissionais de saúde.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-2-3#q1', {
+        answer: 1,
+        explain: { 0: 'Quase — o campo existe, mas ele guarda o NOME da variável, não o token cru.', 1: 'Isso. O token vive no ~/.env; o agent.yaml só aponta para a variável HEALTH_BOT_TOKEN.', 2: 'Não — o CLAUDE.md é o perfil de saúde; segredos nunca ficam lá.' }
+      });
+    }
+  </script>
+</body>
+</html>

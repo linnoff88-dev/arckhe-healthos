@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Módulo 1.4 — Como a IA vira coach | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento emerald (T1) */
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5,150,105,0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5,150,105,0.08); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5,150,105,0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5,150,105,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha1/modulo-1-4.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha1/modulo-1-4.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha1/modulo-1-4.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="modulo-1-4.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">PT</a><a href="../../en/curso/trilha1/modulo-1-4.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="../../es/curso/trilha1/modulo-1-4.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-emerald-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Pular para o conteúdo</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-emerald-400 bg-emerald-500/10" href="index.html">
+<span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentos</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html">
+<span class="sm:hidden">T2</span><span class="hidden sm:inline">Passo a passo</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html">
+<span class="sm:hidden">T3</span><span class="hidden sm:inline">Como usar</span>
+</a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="Minha jornada" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">Minha jornada</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Aparência" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Aparência</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tema</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Escuro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Claro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sépia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Foco</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">Alto contraste</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tamanho do texto</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Largura · entrelinha</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Estreito</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Médio</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Largo</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compacto</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Confortável</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Fonte</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">Sistema</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Leitura</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Trilha de navegação" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-emerald-400" href="../../index.html">Início</a><span>/</span>
+<a class="hover:text-emerald-400" href="index.html">Fundamentos</a><span>/</span>
+<span class="text-emerald-400">Módulo 1.4</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-emerald-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="1-4" data-inema-track="1">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full mb-4">MÓDULO 1.4</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">🧠 Como a IA vira coach</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">O cérebro (<strong class="text-emerald-400">CLAUDE.md</strong>), o snapshot, a memória semântica, o RAG de conselhos, as risk flags na prática e os limites — onde a IA ajuda e onde precisa do médico.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">7</div><div class="text-xs text-neutral-400">Tópicos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">~35</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">Básico</div><div class="text-xs text-neutral-400">Nível</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">Teoria</div><div class="text-xs text-neutral-400">Tipo</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:1-4">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Seu progresso neste módulo</span>
+<span class="text-emerald-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 de 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-emerald-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Índice da página" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Seção <span class="inema-toc-pos">1</span> de <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-1">1. O cérebro (CLAUDE.md)</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-2">2. Session snapshot</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-3">3. Memória semântica</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-4">4. RAG de conselhos</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-5">5. Risk flags na prática</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-6">6. Limites</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-7">7. Segurança</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-1-4#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">📜 O LLM e o cérebro (CLAUDE.md)</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-4-t1-p1">A "inteligência" do coach não está num código mágico — está num <strong class="text-emerald-400">prompt</strong>: um arquivo de texto chamado <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> que descreve <em>quem é você</em> e <em>como o coach deve falar</em>. É o cérebro carregado no começo de cada turno. Troque o conteúdo dele e você troca o coach.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 Novo aqui?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>LLM</strong> — "Large Language Model", o modelo de IA do tipo que roda atrás do ChatGPT/Claude. Ele não tem acesso à sua vida: só sabe o que você escreve no prompt. Por isso o <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> existe — é onde você conta a ele os seus dados.</li>
+<li><strong>Prompt do sistema</strong> — o texto fixo que vai junto de TODA mensagem, antes da sua pergunta. Define o papel ("você é um coach de saúde"), as regras e o contexto. O coach é, no fundo, um LLM com um prompt muito bem escrito.</li>
+</ul>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-4-t1-p2">O <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> vem como <strong class="text-emerald-400">modelo (template)</strong> no repositório, com lacunas para você preencher. Seis blocos compõem o cérebro: perfil, metas, exames, DNA, restrições e estilo. Abaixo, um trecho <strong>ilustrativo</strong> (não são valores reais — você nunca versiona o seu preenchido):</p>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-4 mb-6 overflow-x-auto">
+<p class="text-xs text-emerald-400 font-semibold mb-2">📄 CLAUDE.md — o cérebro do coach (trecho ilustrativo)</p>
+<pre class="text-xs sm:text-sm font-mono text-neutral-300 leading-relaxed"><code># Perfil
+Nome, idade, sexo, altura, peso atual e composição.
+
+# Metas
+- Baixar ApoB; ganhar massa magra; dormir melhor.
+
+# Exames (bloods)
+- ApoB, LDL-C, Lp(a), hs-CRP, HOMA-IR, Vitamina D...
+- (os SEUS valores reais ficam aqui — NÃO versionar)
+
+# Genética (SNPs)
+- CYP1A2: metabolizador rápido de cafeína
+- MTHFR: metilação reduzida -&gt; preferir folato metilado
+- VDR: resposta à vitamina D abaixo da média
+
+# Restrições
+- Sem amendoim. Álcool ocasional.
+- NUNCA mexer em medicação; encaminhar ao médico.
+
+# Estilo do coach
+- Direto, mecanismo-aware: cita o "porquê" no MEU corpo.
+- Não diagnostica. Marca o que for clínico para o médico.</code></pre>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> Por que isso importa</h3>
+<p class="text-neutral-300 text-sm">O LLM é genérico de fábrica. O que o torna <strong>o seu</strong> coach é o <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> + os dados do banco. Mesmo modelo, prompt diferente, conselho completamente diferente: é a especificidade que faz a mágica — "specific beats generic".</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">LLM</div><p class="text-xs text-neutral-400">O modelo de IA; só sabe o que está no prompt.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">CLAUDE.md</div><p class="text-xs text-neutral-400">O cérebro: perfil, metas, exames, DNA, regras, estilo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Template</div><p class="text-xs text-neutral-400">Vem com lacunas; você preenche o seu.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Especificidade</div><p class="text-xs text-neutral-400">Mesmo modelo, prompt seu = conselho seu.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-1-4#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">📸 Session snapshot</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-4-t2-p1">O <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> é estável (quem você é). Mas o coach também precisa do <strong class="text-emerald-400">agora</strong>: como você acordou, o que comeu hoje, sua pressão. Isso vem do <strong class="text-emerald-400">session snapshot</strong> — um retrato compacto montado pelo <code class="font-mono text-xs bg-dark-700 px-1 rounded">state.py</code> e lido a cada turno, direto do banco.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-4-t2-p2">O snapshot junta seis coisas: <strong>peso</strong> (tendência), <strong>intake de hoje</strong>, <strong>pressão</strong> (BP), a <strong>recovery de ontem</strong>, o <strong>padrão de sono de 7 dias</strong> e as <strong>metas</strong>. Por isso o coach nunca "adivinha": ele lê o estado atual antes de raciocinar. Abaixo, um exemplo ilustrativo do que o agente vê:</p>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-4 mb-6 overflow-x-auto">
+<p class="text-xs text-emerald-400 font-semibold mb-2">📸 SESSION SNAPSHOT (lido a cada turno — números ilustrativos)</p>
+<pre class="text-xs sm:text-sm font-mono text-neutral-300 leading-relaxed"><code>peso        82.1 kg   (tendência ▼ -0.4 / 7d)
+intake hoje 1180 kcal · 96 g proteína
+BP último   118 / 76
+recovery    71% (verde) · HRV 64 · RHR 52   [ontem]
+sono 7d     média 7h05 · ontem 7h20
+metas       ApoB ↓ · massa magra ↑</code></pre>
+</div>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Pipeline de um turno do agente: a mensagem entra, o state.py monta o snapshot lendo o banco, soma o CLAUDE.md, o LLM raciocina e a resposta volta ao Telegram; a memória semântica injeta padrões antigos no snapshot" class="w-full h-auto" role="img" viewbox="0 0 1000 240">
+<defs>
+<lineargradient id="m14a-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+<filter height="180%" id="m14a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m14a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m14a-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#34d399"></path></marker>
+<marker id="m14a-ahc" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m14a-grid)" height="240" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<rect fill="#0e1b26" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="140" x="24" y="96"></rect><text fill="#bfe6ff" text-anchor="middle" x="94" y="118">💬 mensagem</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="94" y="134">você no Telegram</text>
+<g filter="url(#m14a-glow)"><rect fill="#0e2018" height="48" rx="12" stroke="url(#m14a-grad)" stroke-width="2.5" width="150" x="208" y="96"></rect></g><text fill="#34d399" text-anchor="middle" x="283" y="118">⚙️ state.py</text><text fill="#9fe9cf" font-size="11" text-anchor="middle" x="283" y="134">monta o snapshot</text>
+<rect fill="#0e1b26" height="44" rx="12" stroke="#38bdf8" stroke-width="2" width="150" x="404" y="20"></rect><text fill="#bfe6ff" text-anchor="middle" x="479" y="40">🗄️ Supabase</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="479" y="56">linhas do banco</text>
+<rect fill="#0e1b26" height="44" rx="12" stroke="#38bdf8" stroke-width="2" width="150" x="404" y="176"></rect><text fill="#bfe6ff" text-anchor="middle" x="479" y="196">🧲 memória</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="479" y="212">padrão antigo</text>
+<rect fill="#0e1b26" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="150" x="600" y="96"></rect><text fill="#bfe6ff" text-anchor="middle" x="675" y="118">📸 snapshot</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="675" y="134">+ CLAUDE.md</text>
+<g filter="url(#m14a-glow)"><rect fill="#0e2018" height="48" rx="12" stroke="url(#m14a-grad)" stroke-width="2.5" width="170" x="800" y="96"></rect></g><text fill="#34d399" text-anchor="middle" x="885" y="118">🧠 LLM</text><text fill="#9fe9cf" font-size="11" text-anchor="middle" x="885" y="134">raciocina e responde</text>
+</g>
+<g fill="none" stroke-width="2">
+<path d="M164,120 L208,120" marker-end="url(#m14a-ah)" stroke="#34d399"></path>
+<path d="M358,116 C380,100 384,70 404,52" marker-end="url(#m14a-ahc)" stroke="#38bdf8"></path>
+<path d="M358,128 C380,160 384,180 404,196" marker-end="url(#m14a-ahc)" stroke="#38bdf8"></path>
+<path d="M554,52 C580,70 584,100 600,116" marker-end="url(#m14a-ahc)" stroke="#38bdf8"></path>
+<path d="M554,196 C580,180 584,150 600,128" marker-end="url(#m14a-ahc)" stroke="#38bdf8"></path>
+<path d="M750,120 L800,120" marker-end="url(#m14a-ah)" stroke="#34d399"></path>
+<path d="M885,144 C885,200 94,200 94,146" marker-end="url(#m14a-ah)" opacity="0.8" stroke="#34d399" stroke-dasharray="6 5"></path>
+</g>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="489" y="232">a resposta volta ao Telegram (linha tracejada)</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> a cada turno o <code class="font-mono">state.py</code> (verde) lê o banco E a memória (ciano), monta o snapshot junto do CLAUDE.md, e só então o LLM raciocina. A linha tracejada é a resposta voltando. O coach sempre parte do estado atual, nunca do nada.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Snapshot</div><p class="text-xs text-neutral-400">Retrato compacto do "agora", lido a cada turno.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">state.py</div><p class="text-xs text-neutral-400">O script que monta o snapshot do banco.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">6 sinais</div><p class="text-xs text-neutral-400">Peso, intake, BP, recovery, sono 7d, metas.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Contexto atual</div><p class="text-xs text-neutral-400">O coach nunca adivinha; lê o estado primeiro.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-1-4#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">🧲 Memória semântica</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-4-t3-p1">O snapshot mostra o <em>agora</em>. Mas o ouro do coach é lembrar de <strong class="text-emerald-400">semanas atrás</strong> — "da última vez que você bebeu vinho tarde, a recovery caiu pra 48%". Isso não é busca por palavra exata; é busca por <strong class="text-emerald-400">significado</strong>. Esse é o papel da memória semântica (<code class="font-mono text-xs bg-dark-700 px-1 rounded">mem.py recall</code>).</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 Novo aqui?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Embedding</strong> — transformar um texto num vetor de números que captura o seu <em>significado</em>. Frases parecidas viram vetores próximos. Assim "tomei uma taça de vinho ontem" fica perto de "bebi álcool à noite", mesmo sem palavra em comum. No HealthOS, os embeddings vêm da OpenAI.</li>
+<li><strong>pgvector</strong> — uma extensão do Postgres (o banco do Supabase) que guarda esses vetores e acha os mais <em>próximos</em> de uma busca. É o que permite "me lembre de mensagens parecidas com esta" em milissegundos.</li>
+</ul>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-4-t3-p2">O fluxo é simples: toda mensagem vira um embedding e é guardada. Quando você pergunta algo novo, a pergunta também vira embedding, e o <code class="font-mono text-xs bg-dark-700 px-1 rounded">pgvector</code> traz as memórias mais próximas em significado. É assim que o coach "surfa" o seu histórico e enxerga padrões.</p>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Memória semântica: a mensagem vira embedding, é guardada como vetor no pgvector; uma nova pergunta vira embedding, o pgvector busca os vetores mais próximos por significado e devolve o recall do padrão antigo" class="w-full h-auto" role="img" viewbox="0 0 1000 220">
+<defs>
+<lineargradient id="m14b-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+<filter height="180%" id="m14b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m14b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m14b-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#34d399"></path></marker>
+<marker id="m14b-ahc" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m14b-grid)" height="220" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<rect fill="#0e1b26" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="160" x="24" y="86"></rect><text fill="#bfe6ff" text-anchor="middle" x="104" y="108">💬 mensagem</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="104" y="124">texto livre</text>
+<g filter="url(#m14b-glow)"><rect fill="#0e2018" height="48" rx="12" stroke="url(#m14b-grad)" stroke-width="2.5" width="160" x="228" y="86"></rect></g><text fill="#34d399" text-anchor="middle" x="308" y="108">🔢 embedding</text><text fill="#9fe9cf" font-size="11" text-anchor="middle" x="308" y="124">vira vetor (OpenAI)</text>
+<rect fill="#0e1b26" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="170" x="432" y="86"></rect><text fill="#bfe6ff" text-anchor="middle" x="517" y="108">🧲 pgvector</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="517" y="124">guarda + busca vizinho</text>
+<g filter="url(#m14b-glow)"><rect fill="#0e2018" height="48" rx="12" stroke="url(#m14b-grad)" stroke-width="2.5" width="170" x="646" y="86"></rect></g><text fill="#34d399" text-anchor="middle" x="731" y="108">📌 recall</text><text fill="#9fe9cf" font-size="11" text-anchor="middle" x="731" y="124">padrão por significado</text>
+</g>
+<g fill="none" stroke-width="2">
+<path d="M184,110 L228,110" marker-end="url(#m14b-ah)" stroke="#34d399"></path>
+<path d="M388,110 L432,110" marker-end="url(#m14b-ahc)" stroke="#38bdf8"></path>
+<path d="M602,110 L646,110" marker-end="url(#m14b-ah)" stroke="#34d399"></path>
+</g>
+<g font-family="Inter,sans-serif" font-size="11">
+<rect fill="#0e2018" height="60" opacity="0.9" rx="10" stroke="#34d399" stroke-width="1.5" width="150" x="838" y="80"></rect>
+<text fill="#9fe9cf" text-anchor="middle" x="913" y="104">"vinho tarde -&gt;</text>
+<text fill="#9fe9cf" text-anchor="middle" x="913" y="122">recovery caiu"</text>
+</g>
+<path d="M816,110 L838,110" fill="none" marker-end="url(#m14b-ah)" opacity="0.85" stroke="#34d399" stroke-width="2"></path>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="500" y="180">busca por SIGNIFICADO, não por palavra exata — "taça de vinho" acha "bebi álcool à noite"</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> da esquerda pra direita — texto vira número (embedding), o número é guardado e comparado no pgvector, e o recall traz a memória mais parecida em significado. O coach não precisa que você use as mesmas palavras de antes.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Embedding</div><p class="text-xs text-neutral-400">Texto vira vetor que captura o significado.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">pgvector</div><p class="text-xs text-neutral-400">Extensão do Postgres que acha vetores próximos.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Recall</div><p class="text-xs text-neutral-400">Traz a memória parecida em sentido, não em palavra.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Padrões</div><p class="text-xs text-neutral-400">É como o coach enxerga semanas, não só a última msg.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-1-4#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">📚 RAG de conselhos</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-4-t4-p1">Você viu uma dica de um expert ou influencer ("jejum de 16h derrete gordura"). O comando <code class="font-mono text-xs bg-dark-700 px-1 rounded">/advice</code> faz o coach <strong class="text-emerald-400">reconciliar</strong> essa dica com os <strong>seus</strong> números — e devolve uma resposta <strong>citada</strong>, dizendo onde a dica encaixa em você e onde não. A regra de ouro: <strong class="text-emerald-400">o seu dado sempre vence</strong>.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 Novo aqui?</p>
+<p class="text-sm text-neutral-300"><strong>RAG (Retrieval-Augmented Generation)</strong> — "geração aumentada por recuperação". Em vez de o LLM responder só com o que "lembra", ele primeiro <em>busca</em> material relevante (aqui: a dica externa + os seus exames/metas) e <em>gera</em> a resposta em cima desse material, citando a fonte. Resultado: menos invenção, mais ancoragem no que é seu e no que foi dito.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Dica solta (sem RAG)</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>"Jejum de 16h pra todo mundo" — sem olhar a sua HOMA-IR nem o seu sono.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Repete o que o influencer disse, sem fonte e sem o seu contexto.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Some na próxima conversa; não vira padrão seu.</span></li>
+</ul>
+</div>
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ /advice (com RAG)</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>"A ideia faz sentido pra resistência à insulina; a SUA HOMA-IR já está boa, então o ganho é pequeno."</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Cita a dica E os seus marcadores; mostra de onde tirou cada parte.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Conflito entre dica e seus dados? <strong>Os seus dados vencem.</strong></span></li>
+</ul>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">⚖️</span> Quem ganha o desempate</h3>
+<p class="text-neutral-300 text-sm">Uma dica de internet é uma média; os seus exames são você. Quando os dois discordam, o <code class="font-mono text-xs bg-dark-700 px-1 rounded">/advice</code> é instruído a priorizar o <strong>seu</strong> número e a dizer claramente onde a dica não se aplica. Continua não sendo conselho médico — é material para levar ao seu clínico.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">RAG</div><p class="text-xs text-neutral-400">Busca material, depois gera citando a fonte.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">/advice</div><p class="text-xs text-neutral-400">O comando que reconcilia a dica com você.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Citado</div><p class="text-xs text-neutral-400">Mostra de onde veio cada parte da resposta.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Seu dado vence</div><p class="text-xs text-neutral-400">No conflito, o seu número manda.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-1-4#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">🚩 Risk flags na prática</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-4-t5-p1">Cada marcador de sangue e cada SNP de DNA do painel mapeia para uma <strong class="text-emerald-400">risk flag</strong> — uma regra que liga o "porquê" no seu corpo a uma <strong>ação</strong>: um suplemento no stack, um alvo, ou um alerta. É isso que transforma exames parados num conselho mecanismo-aware. Siga o caminho regra → ação no diagrama.</p>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Risk flags: a combinação de um SNP de DNA com um marcador de sangue dispara uma flag, que por sua vez ajusta o stack de suplemento ou levanta um alerta para o médico" class="w-full h-auto" role="img" viewbox="0 0 1000 250">
+<defs>
+<lineargradient id="m14c-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+<filter height="180%" id="m14c-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m14c-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m14c-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#34d399"></path></marker>
+<marker id="m14c-ahc" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+<marker id="m14c-ahr" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#fb7185"></path></marker>
+</defs>
+<rect fill="url(#m14c-grid)" height="250" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<rect fill="#0e1b26" height="44" rx="11" stroke="#38bdf8" stroke-width="2" width="180" x="30" y="56"></rect><text fill="#bfe6ff" text-anchor="middle" x="120" y="76">🧬 SNP: MTHFR</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="120" y="92">metilação reduzida</text>
+<rect fill="#0e1b26" height="44" rx="11" stroke="#38bdf8" stroke-width="2" width="180" x="30" y="150"></rect><text fill="#bfe6ff" text-anchor="middle" x="120" y="170">🩸 Homocisteína</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="120" y="186">acima do alvo</text>
+<g filter="url(#m14c-glow)"><rect fill="#0e2018" height="50" rx="13" stroke="url(#m14c-grad)" stroke-width="2.5" width="190" x="400" y="100"></rect></g><text fill="#34d399" text-anchor="middle" x="495" y="122">🚩 risk flag</text><text fill="#9fe9cf" font-size="11" text-anchor="middle" x="495" y="139">regra DNA + exame</text>
+<rect fill="#0e2018" height="50" rx="13" stroke="#34d399" stroke-width="2" width="200" x="770" y="44"></rect><text fill="#34d399" text-anchor="middle" x="870" y="66">💊 stack de suplemento</text><text fill="#9fe9cf" font-size="11" text-anchor="middle" x="870" y="83">ex.: folato metilado</text>
+<rect fill="#1f1010" height="50" rx="13" stroke="#fb7185" stroke-width="2" width="200" x="770" y="156"></rect><text fill="#fda4af" text-anchor="middle" x="870" y="178">⚠️ alerta p/ o médico</text><text fill="#fecdd3" font-size="11" text-anchor="middle" x="870" y="195">leve o número ao clínico</text>
+</g>
+<g fill="none" stroke-width="2">
+<path d="M210,82 C300,90 320,110 400,118" marker-end="url(#m14c-ahc)" stroke="#38bdf8"></path>
+<path d="M210,168 C300,160 320,140 400,132" marker-end="url(#m14c-ahc)" stroke="#38bdf8"></path>
+<path d="M590,116 C660,100 690,84 770,72" marker-end="url(#m14c-ah)" stroke="#34d399"></path>
+<path d="M590,134 C660,150 690,168 770,180" marker-end="url(#m14c-ahr)" stroke="#fb7185"></path>
+</g>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="500" y="232">DNA + exame juntos disparam a flag; a flag decide a ação — suplemento (verde) ou alerta (vermelho)</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> as entradas ciano (SNP + marcador) se combinam na flag (verde). A flag bifurca em duas ações: ajustar o stack de suplemento (verde) ou levantar um alerta para o médico (vermelho). Nenhuma entrada sozinha vira ação — é a combinação que conta.</p>
+</div>
+<div class="space-y-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">CYP1A2 + café tarde</span> <span class="text-neutral-300">→ flag "metabolizador rápido": o coach sugere cortar cafeína cedo para não roubar o sono.</span></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">MTHFR + homocisteína alta</span> <span class="text-neutral-300">→ flag de metilação: stack inclina para folato metilado; o número vai para o médico.</span></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">VDR + vitamina D baixa</span> <span class="text-neutral-300">→ flag de vitamina D: alvo de reposição ajustado à sua resposta genética.</span></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-red-500/30 text-sm"><span class="text-red-400 font-semibold">ApoB / Lp(a) elevados</span> <span class="text-neutral-300">→ flag cardiometabólica: alerta forte para acompanhamento clínico — o coach não medica.</span></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Risk flag</div><p class="text-xs text-neutral-400">Regra que liga DNA + exame a uma ação.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Mapeamento</div><p class="text-xs text-neutral-400">Cada marcador/SNP aponta para flag, alvo ou suplemento.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Stack</div><p class="text-xs text-neutral-400">As flags moldam o conjunto de suplementos.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Alerta</div><p class="text-xs text-neutral-400">O clínico, não o coach, decide o que é clínico.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-1-4#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">⚠️ Limites — onde a IA para</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-4-t6-p1">Quanto melhor a IA fica, mais perigoso é esquecer o que ela <strong class="text-emerald-400">não</strong> é. O coach é uma ferramenta de registro e raciocínio — não um médico. Dois limites técnicos e uma regra de ouro fecham este módulo.</p>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Os dois limites técnicos</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span><strong>Alucinação</strong> — o LLM pode inventar um número, um mecanismo ou uma citação com total confiança. Ele soa certo mesmo quando está errado.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span><strong>Contexto perdido</strong> — se algo não estiver no snapshot nem no recall daquele turno, o coach simplesmente não sabe. Ele raciocina sobre o que foi carregado, não sobre tudo.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Amostras de DNA enviadas pelo correio degradam — o painel da clínica e o do Ancestry podem não bater.</span></li>
+</ul>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">🩺</span> A regra de ouro</h3>
+<p class="text-neutral-300 text-sm">Trate <strong>toda</strong> sugestão do coach como uma <strong>pergunta para levar ao médico</strong>, nunca como uma ordem para seguir. O coach é explicitamente instruído a <strong>não diagnosticar</strong> e a <strong>não mexer em medicação</strong> — ele sinaliza preocupações clínicas e encaminha para um clínico. Onde a IA ajuda: organizar, lembrar, cruzar e propor hipóteses. Onde ela para: qualquer decisão clínica.</p>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-1-4#q1">
+<p class="font-medium mb-4">✅ Auto-checagem (opcional): o coach sugere começar um suplemento novo. Qual é a atitude certa?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) Começar na hora — a IA cruzou meus dados, então está validado</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) Tratar como pergunta para levar ao médico, antes de qualquer mudança</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) Ignorar — a IA sempre alucina mesmo</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 mt-8 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Alucinação</div><p class="text-xs text-neutral-400">Pode estar confiante e errado ao mesmo tempo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Contexto</div><p class="text-xs text-neutral-400">Só sabe o que foi carregado naquele turno.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Não diagnostica</div><p class="text-xs text-neutral-400">Não medica; encaminha ao clínico.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Pergunta, não ordem</div><p class="text-xs text-neutral-400">Toda sugestão vai ao médico.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-1-4#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">🔐 Segurança</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-4-t7-p1">Dado de saúde é sensível, e o cérebro do coach (o seu <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> preenchido) é o mais sensível de todos. O HealthOS é <strong class="text-emerald-400">trancado por padrão</strong>: banco privado, acesso só pelo servidor, RLS sem políticas e segredos fora do git.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 Novo aqui?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>RLS (Row-Level Security)</strong> — "segurança em nível de linha": recurso do Postgres que decide quem pode ler cada linha. No HealthOS ela fica ligada <em>sem nenhuma política</em> — ou seja, a chave pública (anon) não lê nada. Trava por omissão.</li>
+<li><strong>Chave service-role</strong> — a chave administrativa do Supabase que <em>contorna</em> a RLS. Só o servidor a usa, e ela vive no <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>, nunca no navegador nem no git. É ela que dá ao coach acesso aos seus dados; vazá-la abre tudo.</li>
+</ul>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ O que o desenho garante</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Projeto Supabase <strong>privado</strong>, na sua conta.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>RLS ligada, sem políticas: a chave anon não lê nada.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>service-role só no <strong>servidor</strong>; segredos em <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>, fora do git.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ O que nunca versionar</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>O seu <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> preenchido (perfil + exames reais).</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>A chave <code class="font-mono text-xs bg-dark-700 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> e as outras chaves.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>O arquivo <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> e os valores reais do seed.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🔑</span> Duas chaves, dois mundos</h3>
+<p class="text-neutral-300 text-sm">A <strong>anon</strong> é pública e inofensiva (com RLS sem políticas, lê nada). A <strong>service-role</strong> é o rei: abre tudo, então fica só no servidor, no <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>. Nada sai do seu projeto além das chamadas de LLM e embedding que você escolhe fazer.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">RLS</div><p class="text-xs text-neutral-400">Ligada sem políticas: ninguém de fora lê.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">service-role</div><p class="text-xs text-neutral-400">Chave-rei, só no servidor, no ~/.env.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Privado</div><p class="text-xs text-neutral-400">O banco é seu, na sua conta.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Fora do git</div><p class="text-xs text-neutral-400">CLAUDE.md preenchido + segredos nunca versionados.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-emerald-900/40 via-dark-800 to-dark-800 rounded-xl border border-emerald-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Resumo do módulo</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">O cérebro é um prompt</strong><span class="text-neutral-400"> — o CLAUDE.md (perfil, metas, exames, DNA, restrições, estilo) é o que torna o LLM o SEU coach.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Snapshot + memória</strong><span class="text-neutral-400"> — o state.py lê o "agora"; a memória semântica (embeddings + pgvector) traz o padrão de semanas atrás.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">RAG e o seu dado vence</strong><span class="text-neutral-400"> — o /advice reconcilia dica externa com os seus números, citado; no conflito, você manda.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Risk flags viram ação</strong><span class="text-neutral-400"> — DNA + exame disparam flags que moldam o stack de suplemento ou levantam um alerta.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Limites e segurança</strong><span class="text-neutral-400"> — a IA alucina e perde contexto; trate sugestão como pergunta ao médico; banco trancado, segredos fora do git.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-emerald-400 mb-2">Próximo:</h3>
+<p class="text-neutral-300 text-sm">Trilha 2 — Passo a passo: do zero ao coach no ar — contas, banco Supabase, o agente e o bot, wearable e agendamento.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Voltar para Fundamentos</a>
+<a class="flex-1 text-center px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-500 transition-colors" href="../trilha2/index.html">Trilha 2 — Passo a passo →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — Curso INEMA · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Conteúdo educacional. Não é conselho médico. Consulte profissionais de saúde.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-1-4#q1', {
+        answer: 1,
+        explain: { 0: 'Não — mesmo cruzando seus dados, a IA pode errar; nada de mudar sem o médico.', 1: 'Isso. Toda sugestão é uma pergunta para levar ao clínico, nunca uma ordem.', 2: 'Ignorar é exagero — a sugestão é útil como hipótese; só não vire ação sem o médico.' }
+      });
+    }
+  </script>
+</body>
+</html>

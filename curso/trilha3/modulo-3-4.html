@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Módulo 3.4 — Dashboard e acompanhamento | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento purple (T3) */
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124,58,237,0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124,58,237,0.08); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124,58,237,0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124,58,237,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha3/modulo-3-4.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha3/modulo-3-4.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha3/modulo-3-4.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="modulo-3-4.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">PT</a><a href="../../en/curso/trilha3/modulo-3-4.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="../../es/curso/trilha3/modulo-3-4.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-purple-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Pular para o conteúdo</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html"><span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentos</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html"><span class="sm:hidden">T2</span><span class="hidden sm:inline">Passo a passo</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-purple-400 bg-purple-500/10" href="index.html"><span class="sm:hidden">T3</span><span class="hidden sm:inline">Como usar</span></a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="Minha jornada" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">Minha jornada</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Aparência" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Aparência</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tema</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Escuro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Claro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sépia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Foco</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">Alto contraste</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tamanho do texto</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Largura · entrelinha</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Estreito</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Médio</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Largo</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compacto</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Confortável</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Fonte</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">Sistema</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Leitura</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Trilha de navegação" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-purple-400" href="../../index.html">Início</a><span>/</span>
+<a class="hover:text-purple-400" href="index.html">Como usar</a><span>/</span>
+<span class="text-purple-400">Módulo 3.4</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-purple-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="3-4" data-inema-track="3">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-semibold rounded-full mb-4">MÓDULO 3.4</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">📊 Dashboard e acompanhamento</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">Ver a história nos números: o <strong class="text-purple-400">dashboard ao vivo</strong> (<code class="font-mono text-base bg-dark-700 px-1.5 rounded">/healthdb</code>), o card Sleep &amp; Recovery, as tendências de peso/intake/vitals, e o ciclo <strong class="text-purple-400">dado → ajuste → resultado</strong>. Este é o módulo que fecha o curso.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">7</div><div class="text-xs text-neutral-400">Tópicos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">~35</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">Prático</div><div class="text-xs text-neutral-400">Nível</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">Uso</div><div class="text-xs text-neutral-400">Tipo</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:3-4">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Seu progresso neste módulo</span>
+<span class="text-purple-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 de 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-purple-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Índice da página" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Seção <span class="inema-toc-pos">1</span> de <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-1">1. O link /healthdb</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-2">2. Card Sleep &amp; Recovery</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-3">3. Tendências</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-4">4. Ler como história</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-5">5. Segurança do dashboard</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-6">6. Revisar toda semana</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-7">7. Dado → ajuste → resultado</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-3-4#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">🔗 O link /healthdb: o painel ao vivo</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-4-t1-p1">O coach mora no Telegram, mas às vezes você quer <strong class="text-purple-400">ver tudo de uma vez</strong> — sono da semana, peso caindo, pressão, intake. Pra isso existe o comando <code class="font-mono text-sm bg-dark-700 px-1 rounded">/healthdb</code>: ele te manda um botão de <strong class="text-purple-400">deep-link</strong> que abre o dashboard ao vivo, lendo direto do seu Supabase. É a mesma verdade do bot, só que num painel visual.</p>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-purple-400 mb-2">🟣 Novo aqui?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Dashboard</strong> — uma página web (em <code class="font-mono text-xs bg-dark-700 px-1 rounded">agent/dashboard/</code>) que lê o seu Supabase e desenha cards e gráficos. Mesmo banco do coach, outra janela.</li>
+<li><strong>Deep-link</strong> — um link que já abre direto no lugar certo e <em>autenticado</em>. Aqui ele carrega o seu token de uma vez só, sem você digitar senha.</li>
+<li><strong>Cookie HttpOnly</strong> — um cookie que o navegador guarda mas o JavaScript da página <em>não</em> consegue ler. Serve pra esconder o token de scripts maliciosos.</li>
+</ul>
+</div>
+<!-- MOCK do dashboard (recriação ilustrativa) -->
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<div class="rounded-xl overflow-hidden border border-dark-600 bg-dark-800 shadow-lg">
+<!-- barra de título -->
+<div class="flex items-center gap-2 px-4 py-2.5 bg-dark-700 border-b border-dark-600">
+<span class="w-3 h-3 rounded-full" style="background:#fb7185"></span>
+<span class="w-3 h-3 rounded-full" style="background:#facc15"></span>
+<span class="w-3 h-3 rounded-full" style="background:#34d399"></span>
+<span class="ml-3 text-xs text-neutral-400 font-mono">healthdb · HealthOS</span>
+<span class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 font-semibold">● ao vivo</span>
+</div>
+<!-- corpo: cards -->
+<div class="p-4 grid grid-cols-2 md:grid-cols-3 gap-3">
+<div class="bg-dark-900 rounded-lg p-3 border border-dark-600">
+<div class="text-[11px] text-neutral-400 mb-1">😴 Sleep &amp; Recovery</div>
+<div class="text-lg font-bold text-purple-400">71%</div>
+<div class="flex items-end gap-1 h-8 mt-2">
+<span class="flex-1 rounded-sm" style="height:55%;background:#a855f7"></span>
+<span class="flex-1 rounded-sm" style="height:70%;background:#a855f7"></span>
+<span class="flex-1 rounded-sm" style="height:48%;background:#fb7185"></span>
+<span class="flex-1 rounded-sm" style="height:62%;background:#a855f7"></span>
+<span class="flex-1 rounded-sm" style="height:80%;background:#a855f7"></span>
+<span class="flex-1 rounded-sm" style="height:58%;background:#a855f7"></span>
+<span class="flex-1 rounded-sm" style="height:71%;background:#c084fc"></span>
+</div>
+</div>
+<div class="bg-dark-900 rounded-lg p-3 border border-dark-600">
+<div class="text-[11px] text-neutral-400 mb-1">⚖️ Peso (14 d)</div>
+<div class="text-lg font-bold text-emerald-400">75,0 kg</div>
+<div class="text-[11px] text-emerald-400 mt-1">▼ 3,5 kg no sprint</div>
+<div class="flex items-end gap-1 h-8 mt-1">
+<span class="flex-1 rounded-sm" style="height:95%;background:#38bdf8"></span>
+<span class="flex-1 rounded-sm" style="height:88%;background:#38bdf8"></span>
+<span class="flex-1 rounded-sm" style="height:78%;background:#38bdf8"></span>
+<span class="flex-1 rounded-sm" style="height:66%;background:#38bdf8"></span>
+<span class="flex-1 rounded-sm" style="height:52%;background:#38bdf8"></span>
+</div>
+</div>
+<div class="bg-dark-900 rounded-lg p-3 border border-dark-600">
+<div class="text-[11px] text-neutral-400 mb-1">🍽️ Intake hoje</div>
+<div class="text-lg font-bold text-purple-400">1.840 kcal</div>
+<div class="text-[11px] text-neutral-400 mt-1">P 142g · C 160g · G 58g</div>
+<div class="h-2 rounded-full bg-dark-700 mt-2 overflow-hidden"><span class="block h-full" style="width:74%;background:#c084fc"></span></div>
+</div>
+<div class="bg-dark-900 rounded-lg p-3 border border-dark-600">
+<div class="text-[11px] text-neutral-400 mb-1">🩺 Pressão</div>
+<div class="text-lg font-bold text-emerald-400">118/76</div>
+<div class="text-[11px] text-neutral-400 mt-1">média 7 d · estável</div>
+</div>
+<div class="bg-dark-900 rounded-lg p-3 border border-dark-600">
+<div class="text-[11px] text-neutral-400 mb-1">💓 HRV / RHR</div>
+<div class="text-lg font-bold text-purple-400">64 ms / 52</div>
+<div class="text-[11px] text-neutral-400 mt-1">subindo na semana</div>
+</div>
+<div class="bg-dark-900 rounded-lg p-3 border border-dark-600">
+<div class="text-[11px] text-neutral-400 mb-1">💊 Suplementos</div>
+<div class="text-lg font-bold text-emerald-400">6/6 ✓</div>
+<div class="text-[11px] text-neutral-400 mt-1">aderência hoje</div>
+</div>
+</div>
+</div>
+<p class="text-[11px] text-neutral-500 mt-2 px-1 italic">🎛️ Recriação ilustrativa do dashboard — <strong>não é screenshot real</strong>. Números fictícios, só para mostrar o leiaute.</p>
+</div>
+<p class="text-xs text-neutral-400 mb-6 px-1">📊 <strong>Como ler:</strong> a janela tem a barra de título (3 bolinhas) e cards independentes. Cada card é uma fonte: sono, peso, intake, pressão, HRV. As mini-barras mostram a <em>tendência</em>, não só o número de hoje — é isso que o painel acrescenta ao chat.</p>
+<!-- COPY-RUN: o deep-link -->
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 flex items-center justify-between">
+<span class="text-sm font-semibold text-purple-400">▶ Copie e use — o deep-link do dashboard</span>
+<span class="text-xs text-neutral-500 font-mono">URL</span>
+</div>
+<div class="p-5">
+<p class="text-xs text-neutral-400 mb-3"><strong class="text-purple-400">Objetivo:</strong> abrir o dashboard ao vivo autenticado. No Telegram você só manda <code class="font-mono bg-dark-700 px-1 rounded">/healthdb</code> e o coach devolve este botão; o link em si é assim:</p>
+<pre class="bg-dark-900 rounded-lg p-4 overflow-x-auto text-sm border border-dark-700"><code class="font-mono text-neutral-300">https://&lt;seu-host&gt;/healthdb?token=&lt;DASHBOARD_TOKEN&gt;</code></pre>
+<p class="text-xs text-neutral-400 mt-3"><strong class="text-emerald-400">Como verificar:</strong> ao abrir, o painel carrega; recarregue a página e repare que o <code class="font-mono bg-dark-700 px-1 rounded">?token=...</code> <strong>some da URL</strong> — ele migrou para um cookie HttpOnly no 1º load. Se o painel continuar aberto sem o token na barra, deu certo.</p>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> Por que um link, e não uma senha</h3>
+<p class="text-neutral-300 text-sm">O token vai <strong>uma vez</strong> na URL e na sequência some — fica só no cookie HttpOnly. Você não digita nada, e o segredo não fica pendurado no histórico do navegador depois do 1º load. É conveniência sem deixar a porta destrancada.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">/healthdb</div><p class="text-xs text-neutral-400">O comando que gera o botão do painel.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Deep-link</div><p class="text-xs text-neutral-400">Abre direto e já autenticado.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Token → cookie</div><p class="text-xs text-neutral-400">Some da URL no 1º load.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Mesma verdade</div><p class="text-xs text-neutral-400">Lê o mesmo Supabase do coach.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-3-4#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">😴 O card Sleep &amp; Recovery</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-4-t2-p1">O card mais importante do painel é o <strong class="text-purple-400">Sleep &amp; Recovery</strong>: os últimos 7 dias de sono e recuperação, lado a lado. Um número isolado mente; sete dias <strong class="text-purple-400">mostram o padrão</strong> — se você está acumulando dívida de sono ou se recuperou. É o mesmo dado que entra no snapshot do coach, agora desenhado.</p>
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="Sete dias de sono e recuperação: barras de horas de sono com a porcentagem de recuperação marcada acima de cada dia, mostrando uma noite ruim no meio e recuperação no fim da semana" class="w-full h-auto" role="img" viewbox="0 0 1000 280">
+<defs>
+<lineargradient id="m34a-grad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c084fc"></stop><stop offset="1" stop-color="#a855f7"></stop></lineargradient>
+<filter height="180%" id="m34a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m34a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#a855f7" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m34a-dot" markerheight="8" markerwidth="8" refx="4" refy="4"><circle cx="4" cy="4" fill="#38bdf8" r="3"></circle></marker>
+</defs>
+<rect fill="url(#m34a-grid)" height="280" width="1000" x="0" y="0"></rect>
+<!-- eixo base -->
+<line stroke="#374151" stroke-width="1.5" x1="60" x2="960" y1="210" y2="210"></line>
+<!-- barras de sono (7 dias) -->
+<g font-family="Inter,sans-serif" font-size="12" text-anchor="middle">
+<g class="wf-a"><rect fill="url(#m34a-grad)" height="90" rx="6" width="70" x="78" y="120"></rect><text fill="#9ca3af" x="113" y="232">Seg</text><text fill="#c4b5fd" font-weight="600" x="113" y="110">7h10</text></g>
+<g class="wf-a"><rect fill="url(#m34a-grad)" height="114" rx="6" width="70" x="206" y="96"></rect><text fill="#9ca3af" x="241" y="232">Ter</text><text fill="#c4b5fd" font-weight="600" x="241" y="86">7h45</text></g>
+<g class="wf-a"><rect fill="#fb7185" height="60" rx="6" width="70" x="334" y="150"></rect><text fill="#9ca3af" x="369" y="232">Qua</text><text fill="#fda4af" font-weight="600" x="369" y="140">5h30</text></g>
+<g class="wf-a"><rect fill="url(#m34a-grad)" height="82" rx="6" width="70" x="462" y="128"></rect><text fill="#9ca3af" x="497" y="232">Qui</text><text fill="#c4b5fd" font-weight="600" x="497" y="118">6h55</text></g>
+<g class="wf-a"><rect fill="url(#m34a-grad)" height="126" rx="6" width="70" x="590" y="84"></rect><text fill="#9ca3af" x="625" y="232">Sex</text><text fill="#c4b5fd" font-weight="600" x="625" y="74">8h05</text></g>
+<g class="wf-a"><rect fill="url(#m34a-grad)" height="94" rx="6" width="70" x="718" y="116"></rect><text fill="#9ca3af" x="753" y="232">Sáb</text><text fill="#c4b5fd" font-weight="600" x="753" y="106">7h20</text></g>
+<g class="wf-a"><g filter="url(#m34a-glow)"><rect fill="url(#m34a-grad)" height="106" rx="6" stroke="#c084fc" stroke-width="2" width="70" x="846" y="104"></rect></g><text fill="#c4b5fd" font-weight="700" x="881" y="232">Hoje</text><text fill="#e9d5ff" font-weight="700" x="881" y="94">7h40</text></g>
+</g>
+<!-- linha de recovery % (ciano) por cima -->
+<polyline fill="none" marker-end="url(#m34a-dot)" marker-mid="url(#m34a-dot)" marker-start="url(#m34a-dot)" points="113,168 241,150 369,196 497,176 625,140 753,162 881,150" stroke="#38bdf8" stroke-width="2.5"></polyline>
+<g fill="#7dd3fc" font-family="Inter,sans-serif" font-size="11" text-anchor="middle">
+<text x="113" y="158">62%</text><text x="241" y="140">70%</text><text fill="#fda4af" x="369" y="186">48%</text><text x="497" y="166">58%</text><text x="625" y="130">80%</text><text x="753" y="152">66%</text><text x="881" y="140">71%</text>
+</g>
+<text fill="#c084fc" font-family="Inter,sans-serif" font-size="14" font-weight="600" x="60" y="40">Sono (barra roxa) × Recuperação % (linha ciano) · 7 dias</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> a barra roxa é quanto você <em>dormiu</em>; a linha ciano é como você <em>recuperou</em>. Note a quarta-feira (barra vermelha, 5h30 → recovery 48%): noite curta puxa a recuperação pra baixo. A sexta dormiu mais e recuperou a 80%. O painel mostra a relação, não números soltos.</p>
+</div>
+<div class="bg-purple-900/20 rounded-xl border border-purple-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-purple-400 mb-3 flex items-center"><span class="mr-2">🔎</span> O que olhar nesse card</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-purple-400 mt-1">•</span><span>A <strong>tendência</strong> da semana, não o dia: 7 dias dizem se você está pagando ou acumulando dívida de sono.</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400 mt-1">•</span><span>Os <strong>vales</strong> (dias vermelhos) e o que veio antes: jantar tarde, álcool, treino pesado à noite.</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400 mt-1">•</span><span>Se a recuperação <strong>sobe depois</strong> de uma boa noite — confirma que o sono é a sua maior alavanca.</span></li>
+</ul>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">7 dias</div><p class="text-xs text-neutral-400">A janela que revela o padrão.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Sono × recovery</div><p class="text-xs text-neutral-400">Barra e linha contam a mesma história.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Vales</div><p class="text-xs text-neutral-400">O dia ruim aponta a causa do dia anterior.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Mesmo dado</div><p class="text-xs text-neutral-400">É o que o coach usa no snapshot.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-3-4#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">📉 Tendências: peso, intake e vitals</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-4-t3-p1">Peso, intake (o que você comeu) e vitals (pressão, HRV, frequência de repouso) só fazem sentido <strong class="text-purple-400">ao longo do tempo</strong>. O peso de hoje pode ser água; a <strong class="text-purple-400">linha</strong> de duas semanas é a verdade. O dashboard plota essas tendências pra você ver a inclinação, não o ruído do dia.</p>
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="Tendência de peso ao longo de duas semanas, caindo de 78,5 kg para 75,0 kg numa linha descendente suave, com a faixa de meta marcada" class="w-full h-auto" role="img" viewbox="0 0 1000 260">
+<defs>
+<lineargradient id="m34b-area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#a855f7" stop-opacity="0.45"></stop><stop offset="1" stop-color="#a855f7" stop-opacity="0"></stop></lineargradient>
+<filter height="180%" id="m34b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.6"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m34b-grid" patternunits="userSpaceOnUse" width="40"><path d="M40 0 H0 V32" fill="none" opacity="0.12" stroke="#a855f7" stroke-width="0.5"></path></pattern>
+<marker id="m34b-dot" markerheight="10" markerwidth="10" refx="5" refy="5"><circle cx="5" cy="5" fill="#0e0a18" r="3.4" stroke="#c084fc" stroke-width="2"></circle></marker>
+</defs>
+<rect fill="url(#m34b-grid)" height="260" width="1000" x="0" y="0"></rect>
+<!-- faixa de meta -->
+<rect fill="#38bdf8" height="34" opacity="0.08" width="900" x="60" y="176"></rect>
+<text fill="#7dd3fc" font-family="Inter,sans-serif" font-size="11" text-anchor="end" x="950" y="170">faixa de meta (~75 kg)</text>
+<!-- eixo y rótulos -->
+<g fill="#9ca3af" font-family="Inter,sans-serif" font-size="11" text-anchor="end">
+<text x="52" y="64">79 kg</text><text x="52" y="124">77 kg</text><text x="52" y="184">75 kg</text>
+</g>
+<!-- área sob a linha -->
+<path d="M90,70 L235,84 L380,104 L525,128 L670,150 L815,170 L905,186 L905,210 L90,210 Z" fill="url(#m34b-area)"></path>
+<!-- linha de peso -->
+<path d="M90,70 L235,84 L380,104 L525,128 L670,150 L815,170 L905,186" fill="none" filter="url(#m34b-glow)" marker-end="url(#m34b-dot)" marker-mid="url(#m34b-dot)" marker-start="url(#m34b-dot)" stroke="#c084fc" stroke-width="3"></path>
+<!-- rótulos extremos -->
+<text fill="#e9d5ff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="90" y="54">78,5</text>
+<text fill="#86efac" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="905" y="204">75,0</text>
+<g fill="#9ca3af" font-family="Inter,sans-serif" font-size="11" text-anchor="middle">
+<text x="90" y="232">D1</text><text x="380" y="232">D5</text><text x="670" y="232">D10</text><text x="905" y="232">D14</text>
+</g>
+<text fill="#c084fc" font-family="Inter,sans-serif" font-size="14" font-weight="600" x="60" y="34">Peso · 14 dias · −3,5 kg</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> ignore se um ponto sobe um pouco (água, sal). O que importa é a <em>inclinação</em>: a linha desce de 78,5 para 75,0 kg e entra na faixa de meta (ciano). Tendência descendente suave &gt; obsessão com o número diário.</p>
+</div>
+<!-- COPY-RUN: conferir a tendência no banco -->
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 flex items-center justify-between">
+<span class="text-sm font-semibold text-purple-400">▶ Copie e rode — conferir a tendência no banco</span>
+<span class="text-xs text-neutral-500 font-mono">terminal</span>
+</div>
+<div class="p-5">
+<p class="text-xs text-neutral-400 mb-3"><strong class="text-purple-400">Objetivo:</strong> ver os mesmos pontos que o dashboard plota, direto do Supabase, sem abrir o navegador.</p>
+<pre class="bg-dark-900 rounded-lg p-4 overflow-x-auto text-sm border border-dark-700"><code class="font-mono text-neutral-300">python3 agent/scripts/db.py query \
+  "select date, weight_kg from vitals \
+   where weight_kg is not null \
+   order by date desc limit 14"</code></pre>
+<p class="text-xs text-neutral-400 mt-3"><strong class="text-emerald-400">Como verificar:</strong> sai uma tabela de 14 linhas com data e peso. Confira que os valores batem com a linha do card de peso no <code class="font-mono bg-dark-700 px-1 rounded">/healthdb</code> — painel e banco contam a mesma história.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ Ler tendência</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Olhar a inclinação de 7–14 dias.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Cruzar peso ↓ com intake e sono da semana.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Esperar a linha antes de mudar a estratégia.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Reagir ao ruído</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Surtar porque subiu 0,4 kg num dia.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Cortar comida vendo um único pico.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Pesar em horários diferentes e comparar.</span></li>
+</ul>
+</div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Inclinação</div><p class="text-xs text-neutral-400">A direção da linha &gt; o ponto de hoje.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Ruído</div><p class="text-xs text-neutral-400">Água e sal mexem no dia, não na semana.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Intake</div><p class="text-xs text-neutral-400">O que entrou: calorias e macros.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Vitals</div><p class="text-xs text-neutral-400">Pressão, HRV, RHR ao longo do tempo.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-3-4#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">📖 Ler como história, não como número solto</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-4-t4-p1">Um número sozinho — "recovery 48%" — não ensina nada. A <strong class="text-purple-400">história</strong> ensina: <em>por que</em> caiu, <em>o que</em> mudou, <em>o que</em> fazer. O dashboard mostra os números; você (e o coach) os transforma em narrativa. Ler o painel é perguntar "qual é a história desta semana?".</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Número solto</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>"Recovery 48%." E daí? Não diz a causa nem o próximo passo.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>"Peso 75,4." Subiu ou desceu? Em relação a quê?</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Olhar um dado, sentir culpa, fechar o painel.</span></li>
+</ul>
+</div>
+<div class="bg-purple-900/20 rounded-xl border border-purple-500/30 p-6">
+<h4 class="font-bold text-purple-400 mb-4">✓ Como história</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>"Caiu pra 48% <strong>porque</strong> jantei tarde + vinho; <strong>amanhã</strong> janto cedo."</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>"Peso desce há 10 dias; o que mudou foi parar de comer às 19h."</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>Olhar a semana, entender a causa, ajustar uma coisa.</span></li>
+</ul>
+</div>
+</div>
+<!-- timeline: a narrativa de uma semana -->
+<div class="space-y-4 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center"><span class="text-purple-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Vê o vale</h4><p class="text-sm text-neutral-300">A recuperação despencou na quarta. O número sozinho só assusta.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center"><span class="text-purple-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Busca a causa</h4><p class="text-sm text-neutral-300">Olha o dia anterior no card de intake: jantar às 21h30 + duas taças de vinho.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center"><span class="text-purple-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Tira a lição</h4><p class="text-sm text-neutral-300">"Jantar tarde + álcool = recovery baixa pra mim." Vira um padrão conhecido.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">4</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-emerald-500/30"><h4 class="font-semibold mb-1 text-emerald-400">Ajusta e confirma</h4><p class="text-sm text-neutral-300">Janta cedo na quinta; sexta a recuperação volta a 80%. A história fechou — e ensinou um botão seu.</p></div>
+</div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Por quê</div><p class="text-xs text-neutral-400">A causa por trás do número.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">O que mudou</div><p class="text-xs text-neutral-400">A variável que moveu a linha.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Narrativa</div><p class="text-xs text-neutral-400">Número → causa → próximo passo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Sem culpa</div><p class="text-xs text-neutral-400">Dado é informação, não julgamento.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-3-4#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">🔐 Segurança do dashboard</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-4-t5-p1">O painel mostra dado de saúde — sensível. Quem protege é o <strong class="text-purple-400">DASHBOARD_TOKEN</strong>: uma chave secreta no seu <code class="font-mono text-sm bg-dark-700 px-1 rounded">~/.env</code> que <em>destranca</em> o dashboard. Sem o token certo, a página não abre. E o token nunca fica exposto: depois do 1º load ele vive só no <strong class="text-purple-400">cookie HttpOnly</strong>.</p>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-purple-400 mb-2">🟣 Novo aqui?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>DASHBOARD_TOKEN</strong> — uma das chaves do <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> (a tabela do README diz: "Gates the web dashboard"). É o segredo que libera o painel.</li>
+<li><strong>~/.env</strong> — arquivo na sua home onde ficam os segredos. Fora do git, nunca versionado.</li>
+<li><strong>HttpOnly</strong> — o cookie existe para o servidor, mas o JavaScript da página não lê. Reduz o risco se algum script malicioso rodar na aba.</li>
+</ul>
+</div>
+<!-- SVG: token -> cookie -->
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="O token sai do arquivo de segredos, entra uma vez na URL do deep-link, e no primeiro load migra para um cookie HttpOnly enquanto some da barra de endereço" class="w-full h-auto" role="img" viewbox="0 0 1000 200">
+<defs>
+<lineargradient id="m34c-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#c084fc"></stop><stop offset="1" stop-color="#a855f7"></stop></lineargradient>
+<filter height="180%" id="m34c-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m34c-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#a855f7" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m34c-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m34c-grid)" height="200" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="13" font-weight="600">
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="170" x="24" y="76"></rect><text fill="#bfe6ff" text-anchor="middle" x="109" y="100">🔑 ~/.env</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="109" y="117">DASHBOARD_TOKEN</text>
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="200" x="266" y="76"></rect><text fill="#bfe6ff" text-anchor="middle" x="366" y="100">🔗 URL (1ª vez)</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="366" y="117">?token=…</text>
+<g filter="url(#m34c-glow)"><rect fill="#1a1230" height="60" rx="14" stroke="url(#m34c-grad)" stroke-width="2.5" width="200" x="538" y="72"></rect></g><text fill="#c084fc" text-anchor="middle" x="638" y="98">🍪 Cookie HttpOnly</text><text fill="#d8b4fe" font-size="11" text-anchor="middle" x="638" y="117">token guardado</text>
+<rect fill="#101a14" height="52" rx="12" stroke="#34d399" stroke-width="2" width="170" x="806" y="76"></rect><text fill="#86efac" text-anchor="middle" x="891" y="100">✅ URL limpa</text><text fill="#bbf7d0" font-size="11" text-anchor="middle" x="891" y="117">token some</text>
+</g>
+<g fill="none" opacity="0.65" stroke="#38bdf8" stroke-width="2">
+<path d="M194,102 L266,102" marker-end="url(#m34c-ah)"></path>
+<path d="M466,102 L538,102" marker-end="url(#m34c-ah)"></path>
+<path d="M738,102 L806,102" marker-end="url(#m34c-ah)"></path>
+</g>
+<text fill="#d8b4fe" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="500" y="178">o segredo aparece uma única vez na URL e some assim que vira cookie</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> da esquerda pra direita é o caminho do token: nasce no <code class="font-mono">~/.env</code>, vai uma vez na URL, é guardado no cookie HttpOnly (caixa roxa) e a URL fica limpa (caixa verde). Depois disso, o segredo não está mais visível na barra de endereço.</p>
+</div>
+<!-- COPY-RUN: gerar um token forte -->
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 flex items-center justify-between">
+<span class="text-sm font-semibold text-purple-400">▶ Copie e rode — gerar o DASHBOARD_TOKEN</span>
+<span class="text-xs text-neutral-500 font-mono">terminal</span>
+</div>
+<div class="p-5">
+<p class="text-xs text-neutral-400 mb-3"><strong class="text-purple-400">Objetivo:</strong> criar um token longo e aleatório e gravá-lo no seu <code class="font-mono bg-dark-700 px-1 rounded">~/.env</code> (nunca um valor fácil de adivinhar).</p>
+<pre class="bg-dark-900 rounded-lg p-4 overflow-x-auto text-sm border border-dark-700"><code class="font-mono text-neutral-300">python3 -c "import secrets; print('DASHBOARD_TOKEN=' + secrets.token_urlsafe(32))" \
+  &gt;&gt; ~/.env</code></pre>
+<p class="text-xs text-neutral-400 mt-3"><strong class="text-emerald-400">Como verificar:</strong> rode <code class="font-mono bg-dark-700 px-1 rounded">grep DASHBOARD_TOKEN ~/.env</code> e veja uma linha com ~43 caracteres aleatórios. Reinicie o servidor do dashboard e o <code class="font-mono bg-dark-700 px-1 rounded">/healthdb</code> passa a abrir só com esse token.</p>
+</div>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Nunca faça isto com o token</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Colar o link <code class="font-mono text-xs bg-dark-700 px-1 rounded">?token=...</code> num grupo, print ou rede social — é a chave do seu painel.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Commitar o <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> ou o token no git.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Usar um valor curto/óbvio (ex.: <code class="font-mono text-xs bg-dark-700 px-1 rounded">123456</code>). Se vazar, gere outro e troque no <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>.</span></li>
+</ul>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">DASHBOARD_TOKEN</div><p class="text-xs text-neutral-400">A chave que destranca o painel.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">HttpOnly</div><p class="text-xs text-neutral-400">Cookie que o JS não lê.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">~/.env</div><p class="text-xs text-neutral-400">Segredo fora do git.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Vazou? Troca</div><p class="text-xs text-neutral-400">Gere outro token e atualize.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-3-4#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">🗓️ Revisar toda semana</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-4-t6-p1">O coach faz a revisão da <strong class="text-purple-400">manhã</strong> (diária). O dashboard é pra revisão da <strong class="text-purple-400">semana</strong>: uma vez por semana, abra o <code class="font-mono text-sm bg-dark-700 px-1 rounded">/healthdb</code> com calma e leia as quatro tendências como um relatório. Cinco minutos transformam dados acumulados em decisão.</p>
+<div class="bg-purple-900/20 rounded-xl border border-purple-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-purple-400 mb-4 flex items-center"><span class="mr-2">✅</span> Checklist da revisão semanal</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+<div class="flex items-start space-x-2"><span class="text-purple-400 mt-0.5">①</span><span class="text-neutral-300"><strong>Sono &amp; recovery</strong> — a média subiu ou desceu? Onde foi o vale e por quê?</span></div>
+<div class="flex items-start space-x-2"><span class="text-purple-400 mt-0.5">②</span><span class="text-neutral-300"><strong>Peso</strong> — a inclinação de 14 dias segue na direção da meta?</span></div>
+<div class="flex items-start space-x-2"><span class="text-purple-400 mt-0.5">③</span><span class="text-neutral-300"><strong>Intake</strong> — proteína batendo? Janta cedo na maioria dos dias?</span></div>
+<div class="flex items-start space-x-2"><span class="text-purple-400 mt-0.5">④</span><span class="text-neutral-300"><strong>Vitals</strong> — pressão estável? HRV/RHR melhorando?</span></div>
+<div class="flex items-start space-x-2"><span class="text-purple-400 mt-0.5">⑤</span><span class="text-neutral-300"><strong>Suplementos</strong> — aderência da semana ok?</span></div>
+<div class="flex items-start space-x-2"><span class="text-purple-400 mt-0.5">⑥</span><span class="text-neutral-300"><strong>1 ajuste</strong> — escolha UMA mudança pra próxima semana, não dez.</span></div>
+</div>
+</div>
+<!-- COPY-RUN: atualizar vitals antes da revisão -->
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 flex items-center justify-between">
+<span class="text-sm font-semibold text-purple-400">▶ Copie e rode — atualizar os vitals antes de revisar</span>
+<span class="text-xs text-neutral-500 font-mono">terminal</span>
+</div>
+<div class="p-5">
+<p class="text-xs text-neutral-400 mb-3"><strong class="text-purple-400">Objetivo:</strong> garantir que a recuperação e o sono da semana inteira já estão no banco antes de você abrir o painel.</p>
+<pre class="bg-dark-900 rounded-lg p-4 overflow-x-auto text-sm border border-dark-700"><code class="font-mono text-neutral-300">python3 agent/scripts/whoop-sync.py</code></pre>
+<p class="text-xs text-neutral-400 mt-3"><strong class="text-emerald-400">Como verificar:</strong> o script escreve <code class="font-mono bg-dark-700 px-1 rounded">recovery_pct</code>, <code class="font-mono bg-dark-700 px-1 rounded">hrv_ms</code>, <code class="font-mono bg-dark-700 px-1 rounded">resting_hr</code> e <code class="font-mono bg-dark-700 px-1 rounded">sleep_hours</code> na tabela <code class="font-mono bg-dark-700 px-1 rounded">vitals</code>. Rodar de novo é idempotente (não duplica). Depois, o card Sleep &amp; Recovery do <code class="font-mono bg-dark-700 px-1 rounded">/healthdb</code> mostra a semana completa.</p>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> Um ajuste por vez</h3>
+<p class="text-neutral-300 text-sm">A revisão semanal não é pra mudar tudo. Escolha <strong>um</strong> botão (jantar mais cedo, cortar café à tarde, dormir 30 min antes) e teste por sete dias. Na próxima revisão, a tendência confirma — ou não. É assim que você aprende os <em>seus</em> botões sem virar uma planilha de culpa.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Ritmo semanal</div><p class="text-xs text-neutral-400">Manhã = coach; semana = painel.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">4 tendências</div><p class="text-xs text-neutral-400">Sono, peso, intake, vitals.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">1 ajuste</div><p class="text-xs text-neutral-400">Uma mudança por semana, testável.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Idempotente</div><p class="text-xs text-neutral-400">Re-rodar o sync não duplica.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-3-4#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">🔁 Dado → ajuste → resultado</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-4-t7-p1">Tudo no curso converge para um único ciclo: você <strong class="text-purple-400">vê o dado</strong> no painel, faz <strong class="text-purple-400">um ajuste</strong>, e a próxima semana mostra o <strong class="text-purple-400">resultado</strong> — que vira o novo dado. Foi esse loop que levou o autor a <strong class="text-purple-400">−3,5 kg no sprint, sem passar fome</strong>: dormindo cheio e parando de comer por volta das 19h.</p>
+<!-- SVG futurista: o ciclo que fecha o curso -->
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="Ciclo de melhoria contínua: ver o dado no painel leva a fazer um ajuste, que produz um resultado, que vira o novo dado, fechando o loop" class="w-full h-auto" role="img" viewbox="0 0 1000 320">
+<defs>
+<lineargradient id="m34d-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#c084fc"></stop><stop offset="1" stop-color="#a855f7"></stop></lineargradient>
+<filter height="200%" id="m34d-glow" width="200%" x="-50%" y="-50%"><fegaussianblur result="b" stddeviation="2.2"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="34" id="m34d-grid" patternunits="userSpaceOnUse" width="34"><circle cx="1.4" cy="1.4" fill="#a855f7" opacity="0.12" r="1.4"></circle></pattern>
+<marker id="m34d-ah" markerheight="10" markerwidth="10" orient="auto" refx="7" refy="5"><path d="M0,0 L9,5 L0,10 L2.6,5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m34d-grid)" height="320" width="1000" x="0" y="0"></rect>
+<!-- três nós do ciclo -->
+<g font-family="Inter,sans-serif" font-size="14" font-weight="600" text-anchor="middle">
+<g class="wf-a"><g filter="url(#m34d-glow)"><rect fill="#1a1230" height="80" rx="16" stroke="url(#m34d-grad)" stroke-width="2.5" width="200" x="120" y="120"></rect></g><text fill="#c084fc" x="220" y="152">📊 Dado</text><text fill="#d8b4fe" font-size="11.5" x="220" y="174">painel: sono, peso, vitals</text></g>
+<g class="wf-a"><g filter="url(#m34d-glow)"><rect fill="#1a1230" height="80" rx="16" stroke="url(#m34d-grad)" stroke-width="2.5" width="200" x="400" y="60"></rect></g><text fill="#c084fc" x="500" y="92">🛠️ Ajuste</text><text fill="#d8b4fe" font-size="11.5" x="500" y="114">jantar 19h · dormir cheio</text></g>
+<g class="wf-a"><g filter="url(#m34d-glow)"><rect fill="#101a14" height="80" rx="16" stroke="#34d399" stroke-width="2.5" width="200" x="680" y="120"></rect></g><text fill="#86efac" x="780" y="152">🎯 Resultado</text><text fill="#bbf7d0" font-size="11.5" x="780" y="174">−3,5 kg, sem fome</text></g>
+</g>
+<!-- setas do ciclo -->
+<g fill="none" opacity="0.7" stroke="#38bdf8" stroke-width="2.4">
+<path d="M300,128 C350,92 370,86 400,96" marker-end="url(#m34d-ah)"></path>
+<path d="M600,96 C640,86 660,96 700,128" marker-end="url(#m34d-ah)"></path>
+<path d="M700,196 C500,280 420,280 300,196" marker-end="url(#m34d-ah)"></path>
+</g>
+<text fill="#7dd3fc" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="500" y="262">o resultado vira o novo dado — o ciclo gira toda semana</text>
+<text fill="#c084fc" font-family="Inter,sans-serif" font-size="15" font-weight="700" text-anchor="middle" x="500" y="36">O loop que fecha o curso</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> três caixas, um ciclo. <strong>Dado</strong> (painel) → <strong>Ajuste</strong> (uma mudança pequena) → <strong>Resultado</strong> (verde, a meta) → e a seta de baixo devolve ao Dado. Cada volta é uma semana. O segredo do −3,5 kg não foi força de vontade: foi o ciclo girando.</p>
+</div>
+<div class="space-y-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-purple-400 font-semibold">Dado</span> <span class="text-neutral-300">— o painel mostrou recuperação caindo nos dias de jantar tarde e o peso travado.</span></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-purple-400 font-semibold">Ajuste</span> <span class="text-neutral-300">— parar de comer por volta das 19h e ir pra cama <strong>cheio</strong> (sem fome), em vez de cortar comida no susto.</span></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-emerald-500/30 text-sm"><span class="text-emerald-400 font-semibold">Resultado</span> <span class="text-neutral-300">— <strong>−3,5 kg no sprint sem passar fome</strong>; recuperação mais alta e estável. Esse resultado vira o dado da semana seguinte.</span></div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">🏁</span> O curso inteiro em uma frase</h3>
+<p class="text-neutral-300 text-sm">Você construiu um coach que <strong>registra</strong> (Trilha 2), que <strong>conversa com você todo dia</strong> (Trilha 3) e que <strong>te mostra a história nos números</strong> (este módulo). O resto é girar o ciclo: ver, ajustar, confirmar. Os seus botões você aprende fazendo.</p>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-3-4#q1">
+<p class="font-medium mb-4">✅ Auto-checagem (opcional): o que levou o autor a −3,5 kg sem passar fome?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) Cortar drasticamente as calorias e aguentar a fome</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) Ver o dado no painel e fazer um ajuste pequeno — dormir cheio e parar de comer ~19h — repetindo o ciclo</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) Um suplemento mágico recomendado pela IA</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 mt-8 text-purple-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Dado</div><p class="text-xs text-neutral-400">O painel mostra onde você está.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Ajuste</div><p class="text-xs text-neutral-400">Uma mudança pequena e testável.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Resultado</div><p class="text-xs text-neutral-400">−3,5 kg sem fome: o loop funcionando.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Gira de novo</div><p class="text-xs text-neutral-400">O resultado vira o próximo dado.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-purple-900/40 via-dark-800 to-dark-800 rounded-xl border border-purple-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Resumo do módulo</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">/healthdb abre o painel ao vivo</strong><span class="text-neutral-400"> — deep-link com token; o token vira cookie HttpOnly no 1º load e some da URL.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">Sleep &amp; Recovery em 7 dias</strong><span class="text-neutral-400"> — o card mostra o padrão da semana, não um número solto.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">Tendências &gt; dia</strong><span class="text-neutral-400"> — peso, intake e vitals só fazem sentido pela inclinação ao longo do tempo.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">Ler como história</strong><span class="text-neutral-400"> — número → causa → próximo passo; revisão semanal com 1 ajuste.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">Dado → ajuste → resultado</strong><span class="text-neutral-400"> — o ciclo que levou a −3,5 kg sem passar fome. Segurança do painel pelo DASHBOARD_TOKEN.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-purple-400 mb-2">🎉 Você concluiu o curso!</h3>
+<p class="text-neutral-300 text-sm">Você concluiu o curso! Volte ao início para revisar qualquer trilha ou retomar de onde parou. Agora é girar o ciclo na sua própria rotina — ver, ajustar, confirmar.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Voltar para Como usar</a>
+<a class="flex-1 text-center px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition-colors" href="../../index.html">Concluir o curso →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — Curso INEMA · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Conteúdo educacional. Não é conselho médico. Consulte profissionais de saúde.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-3-4#q1', {
+        answer: 1,
+        explain: { 0: 'Não — o autor diz explicitamente "sem passar fome". Cortar à força não foi o caminho.', 1: 'Isso. Ver o dado, ajustar pouco (dormir cheio, parar de comer ~19h) e repetir o ciclo.', 2: 'Não — nada de suplemento mágico; foi o loop dado → ajuste → resultado.' }
+      });
+    }
+  </script>
+</body>
+</html>

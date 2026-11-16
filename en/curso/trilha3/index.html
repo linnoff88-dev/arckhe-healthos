@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Track 3 — How to use it | HealthOS</title>
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="modulo-"] { scroll-margin-top: 80px; }
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124,58,237,0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124,58,237,0.08); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124,58,237,0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124,58,237,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha3/" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha3/" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha3/" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha3/" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="./" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">EN</a><a href="../../../es/curso/trilha3/" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-purple-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#mapa">Skip to content</a>
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span><span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html"><span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentals</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html"><span class="sm:hidden">T2</span><span class="hidden sm:inline">Step by step</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-purple-400 bg-purple-500/10" href="index.html"><span class="sm:hidden">T3</span><span class="hidden sm:inline">How to use</span></a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="My journey" type="button"><span aria-hidden="true">◷</span><span class="sr-only">My journey</span><span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span></button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Appearance" type="button"><span aria-hidden="true">◑</span><span class="sr-only">Appearance</span></button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Theme</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Dark</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Clear</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sepia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Focus</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">High contrast</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Text size</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Width · line spacing</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Narrow</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Medium</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Wide</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compact</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Comfortable</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Source</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">System</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Reading</button>
+</div>
+</div>
+</nav>
+<header class="bg-gradient-to-br from-purple-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-track="3">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-semibold rounded-full mb-4">TRACK 3</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">📲 How to use it</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">Operate the coach day to day: the morning routine and slash commands, food and workouts by photo, memory/supplements, and the dashboard. From the number to action.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">4</div><div class="text-xs text-neutral-400">Modules</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">28</div><div class="text-xs text-neutral-400">Topics</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">~2h20</div><div class="text-xs text-neutral-400">Duration</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">Practical</div><div class="text-xs text-neutral-400">Level</div></div>
+</div>
+<div class="mt-6 max-w-2xl" data-inema-meter="trilha:3">
+<div class="flex items-center justify-between text-sm mb-1"><span class="text-neutral-400">Your path progress</span><span class="text-purple-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 of 28</span></span></div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-purple-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mt-8 overflow-hidden">
+<svg aria-label="The HealthOS daily-use cycle — read in the morning, log your day, let the coach remember and see it on the dashboard, then start again tomorrow with better tuning" class="w-full h-auto" role="img" viewbox="0 0 1000 200">
+<defs>
+<lineargradient id="t3hero-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#c084fc"></stop><stop offset="1" stop-color="#a855f7"></stop></lineargradient>
+<filter height="180%" id="t3hero-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="t3hero-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#a855f7" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="t3hero-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#c084fc"></path></marker>
+<marker id="t3hero-ah2" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#t3hero-grid)" height="200" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="14" font-weight="600">
+<g class="wf-a"><rect fill="#1a1230" height="46" rx="11" stroke="url(#t3hero-grad)" stroke-width="2" width="180" x="30" y="44"></rect><text fill="#e9d5ff" text-anchor="middle" x="120" y="73">🌅 Morning</text></g>
+<g class="wf-a"><rect fill="#1a1230" height="46" rx="11" stroke="url(#t3hero-grad)" stroke-width="2" width="180" x="270" y="44"></rect><text fill="#e9d5ff" text-anchor="middle" x="360" y="73">🍽️ Log</text></g>
+<g class="wf-a"><rect fill="#1a1230" height="46" rx="11" stroke="url(#t3hero-grad)" stroke-width="2" width="180" x="510" y="44"></rect><text fill="#e9d5ff" text-anchor="middle" x="600" y="73">🧲 Memory</text></g>
+<g class="wf-a"><g filter="url(#t3hero-glow)"><rect fill="#1a1230" height="46" rx="11" stroke="#c084fc" stroke-width="2.5" width="180" x="750" y="44"></rect></g><text fill="#f3e8ff" text-anchor="middle" x="840" y="73">📊 Dashboard</text></g>
+</g>
+<g fill="none" opacity="0.6" stroke="#c084fc" stroke-width="1.8">
+<path d="M210,67 L262,67" marker-end="url(#t3hero-ah)"></path>
+<path d="M450,67 L502,67" marker-end="url(#t3hero-ah)"></path>
+<path d="M690,67 L742,67" marker-end="url(#t3hero-ah)"></path>
+</g>
+<path d="M840,90 C840,162 120,162 120,92" fill="none" marker-end="url(#t3hero-ah2)" opacity="0.6" stroke="#38bdf8" stroke-dasharray="5 4" stroke-width="1.8"></path>
+<text fill="#7dd3fc" font-family="Inter,sans-serif" font-size="12" font-weight="600" text-anchor="middle" x="480" y="155">starts over tomorrow — more refined</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>How to read:</strong> usage is a cycle — you read in the morning, log the day, the coach remembers, and the dashboard shows the trend; the cyan arrow loops back because tomorrow the cycle starts again, better tuned to your numbers.</p>
+</div>
+</div>
+</header>
+<main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<!-- MAPA DA TRILHA -->
+<section class="mb-12" id="mapa">
+<h2 class="text-2xl font-bold mb-6">Trail map</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<a class="group bg-dark-800 rounded-xl border border-dark-600 hover:border-purple-500/30 p-5 transition-all" href="#modulo-3-1">
+<div class="flex items-center justify-between mb-2"><span class="text-purple-400 font-bold text-sm">3.1</span><span class="text-xs text-neutral-500">~35 min</span></div>
+<h3 class="font-semibold mb-1 group-hover:text-purple-400 transition-colors">🌅 The daily routine</h3>
+<p class="text-xs text-neutral-400">Morning, gating, commands</p>
+</a>
+<a class="group bg-dark-800 rounded-xl border border-dark-600 hover:border-purple-500/30 p-5 transition-all" href="#modulo-3-2">
+<div class="flex items-center justify-between mb-2"><span class="text-purple-400 font-bold text-sm">3.2</span><span class="text-xs text-neutral-500">~35 min</span></div>
+<h3 class="font-semibold mb-1 group-hover:text-purple-400 transition-colors">🍽️ Food and training by photo</h3>
+<p class="text-xs text-neutral-400">Photo becomes macro</p>
+</a>
+<a class="group bg-dark-800 rounded-xl border border-dark-600 hover:border-purple-500/30 p-5 transition-all" href="#modulo-3-3">
+<div class="flex items-center justify-between mb-2"><span class="text-purple-400 font-bold text-sm">3.3</span><span class="text-xs text-neutral-500">~35 min</span></div>
+<h3 class="font-semibold mb-1 group-hover:text-purple-400 transition-colors">🧲 Memory, patterns, and supplements</h3>
+<p class="text-xs text-neutral-400">Patterns and stack</p>
+</a>
+<a class="group bg-dark-800 rounded-xl border border-dark-600 hover:border-purple-500/30 p-5 transition-all" href="#modulo-3-4">
+<div class="flex items-center justify-between mb-2"><span class="text-purple-400 font-bold text-sm">3.4</span><span class="text-xs text-neutral-500">~35 min</span></div>
+<h3 class="font-semibold mb-1 group-hover:text-purple-400 transition-colors">📊 Dashboard and tracking</h3>
+<p class="text-xs text-neutral-400">The story in the numbers</p>
+</a>
+</div>
+</section>
+<h2 class="text-2xl font-bold mb-6">Detailed content</h2>
+<!-- MÓDULO 3.1 -->
+<div class="bg-dark-800 rounded-xl border border-dark-600 mb-6" data-inema-module="3-1" data-inema-track="3" id="modulo-3-1">
+<div class="p-6 border-b border-dark-600">
+<div class="flex items-center justify-between mb-2"><span class="text-purple-400 font-bold">3.1</span><span class="text-xs text-neutral-500">~35 min</span></div>
+<h3 class="text-2xl font-bold mb-2">🌅 The daily routine</h3>
+<p class="text-neutral-400 text-sm">Operate the coach every day: the morning message, green/amber/red gating, the core slash commands, and how to close out the day.</p>
+<div class="mt-3" data-inema-meter="modulo:3-1"><div class="flex items-center justify-between text-xs mb-1"><span class="text-neutral-500">Progress</span><span class="text-purple-400"><span data-inema-meter-frac="">0 of 7</span> · <span data-inema-meter-pct="">0%</span></span></div><div class="inema-bar h-1.5 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-purple-500" data-inema-meter-fill="" style="width:0%"></div></div></div>
+</div>
+<div class="divide-y divide-dark-600">
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">1</span><span class="text-lg">🌅</span><div><span class="font-medium">Morning check-in</span><span class="text-neutral-500 text-sm ml-2">- the first touch of the day</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The morning message with your recovery, sleep, and plan for the day.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">It’s the ritual that anchors decisions for the next few hours.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Recovery · plan · ritual.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">2</span><span class="text-lg">🚦</span><div><span class="font-medium">The gating logic</span><span class="text-neutral-500 text-sm ml-2">- green, amber, red</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">Recovery sets the tone: push (green), moderate (amber), or rest (red).</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Avoid training hard on a day that calls for recovery.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Gating · traffic light · load.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">3</span><span class="text-lg">⌨️</span><div><span class="font-medium">/checkin /today /sofar /newday</span><span class="text-neutral-500 text-sm ml-2">- the 4 basic commands</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The slash commands that request the status, the plan, the summary, and close out the day.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">They're the coach's remote control.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">/checkin · /today · /sofar · /newday.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">4</span><span class="text-lg">🔗</span><div><span class="font-medium">Yesterday → today</span><span class="text-neutral-500 text-sm ml-2">- the bridge between days</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">How the coach uses what happened yesterday to calibrate today.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Continuity is what makes coaching personal.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Carryover · context · trend.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">5</span><span class="text-lg">☕</span><div><span class="font-medium">"Coffee now?"</span><span class="text-neutral-500 text-sm ml-2">- a real question, your answer</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">A casual question that combines CYP1A2, timing, and sleep to answer.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Shows the coach making decisions based on your body, not the average.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Caffeine · window · CYP1A2.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">6</span><span class="text-lg">🌙</span><div><span class="font-medium">Close out the day (/newday)</span><span class="text-neutral-500 text-sm ml-2">- consolidate and turn the page</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The command that saves the day’s summary and prepares for the next one.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Without closing the loop, the coach loses the thread.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Summary · consolidation · reset.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">7</span><span class="text-lg">💬</span><div><span class="font-medium">Conversation best practices</span><span class="text-neutral-500 text-sm ml-2">- how to talk to the coach</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">How to ask, correct, and provide context for better answers.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Clear message = useful advice.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Context · objectivity · correction.</span></div></div></div></div>
+</div>
+<div class="p-4 bg-dark-700/30 flex justify-start space-x-3">
+<button class="px-4 py-2 text-sm bg-dark-600 hover:bg-dark-500 rounded-lg transition-colors" onclick="openModal('modal-3-1')">View in Modal</button>
+<a class="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors" href="modulo-3-1.html">View Full Version</a>
+</div>
+</div>
+<!-- MÓDULO 3.2 -->
+<div class="bg-dark-800 rounded-xl border border-dark-600 mb-6" data-inema-module="3-2" data-inema-track="3" id="modulo-3-2">
+<div class="p-6 border-b border-dark-600">
+<div class="flex items-center justify-between mb-2"><span class="text-purple-400 font-bold">3.2</span><span class="text-xs text-neutral-500">~35 min</span></div>
+<h3 class="text-2xl font-bold mb-2">🍽️ Food and training by photo</h3>
+<p class="text-neutral-400 text-sm">Log food and workouts by photo: AI estimates macros, saves them to food_log, and learns from your corrections.</p>
+<div class="mt-3" data-inema-meter="modulo:3-2"><div class="flex items-center justify-between text-xs mb-1"><span class="text-neutral-500">Progress</span><span class="text-purple-400"><span data-inema-meter-frac="">0 of 7</span> · <span data-inema-meter-pct="">0%</span></span></div><div class="inema-bar h-1.5 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-purple-500" data-inema-meter-fill="" style="width:0%"></div></div></div>
+</div>
+<div class="divide-y divide-dark-600">
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">1</span><span class="text-lg">📸</span><div><span class="font-medium">Photo → macros</span><span class="text-neutral-500 text-sm ml-2">- take it and estimate</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">You send a photo of your plate, and the AI estimates calories and macros.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Log it in seconds, without a scale or app.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Vision · estimate · macros.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">2</span><span class="text-lg">🗄️</span><div><span class="font-medium">food_log</span><span class="text-neutral-500 text-sm ml-2">- where food goes</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The table that stores every logged meal with its date and macros.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">It’s the history that becomes trends and adjustments.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">food_log · history · macros.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">3</span><span class="text-lg">🏋️</span><div><span class="font-medium">Log a workout</span><span class="text-neutral-500 text-sm ml-2">- effort becomes data</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">Log your workout by photo or text, including type, volume, and perceived effort.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Links training load to tomorrow’s recovery.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Volume · type · effort.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">4</span><span class="text-lg">🎬</span><div><span class="font-medium">Demo clip</span><span class="text-neutral-500 text-sm ml-2">- see the flow running</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">A short demo of sending a photo and getting estimated macros.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Seeing the full loop clears up the question of "how to do it."</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Demo · loop · feedback.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">5</span><span class="text-lg">✏️</span><div><span class="font-medium">Correct the AI</span><span class="text-neutral-500 text-sm ml-2">- it learns from you</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">When the estimate is wrong, you correct it and the coach adjusts the record.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Your data always beats the model's guess.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Correction · ground truth · adjustment.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">6</span><span class="text-lg">🔁</span><div><span class="font-medium">Yesterday in recovery</span><span class="text-neutral-500 text-sm ml-2">- yesterday’s food, today’s number</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">How yesterday’s meal shows up in today’s recovery and advice.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Closes the loop between choice and outcome.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Cause · effect · 24h.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">7</span><span class="text-lg">🩺</span><div><span class="font-medium">Blood pressure and weight</span><span class="text-neutral-500 text-sm ml-2">- the other records</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">Log blood pressure and weight along with food for the full picture.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Salt and weight affect blood pressure, and the coach notices.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Blood pressure · weight · trend.</span></div></div></div></div>
+</div>
+<div class="p-4 bg-dark-700/30 flex justify-start space-x-3">
+<button class="px-4 py-2 text-sm bg-dark-600 hover:bg-dark-500 rounded-lg transition-colors" onclick="openModal('modal-3-2')">View in Modal</button>
+<a class="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors" href="modulo-3-2.html">View Full Version</a>
+</div>
+</div>
+<!-- MÓDULO 3.3 -->
+<div class="bg-dark-800 rounded-xl border border-dark-600 mb-6" data-inema-module="3-3" data-inema-track="3" id="modulo-3-3">
+<div class="p-6 border-b border-dark-600">
+<div class="flex items-center justify-between mb-2"><span class="text-purple-400 font-bold">3.3</span><span class="text-xs text-neutral-500">~35 min</span></div>
+<h3 class="text-2xl font-bold mb-2">🧲 Memory, patterns, and supplements</h3>
+<p class="text-neutral-400 text-sm">The coach’s memory in practice: semantic recall, /advice, /supplements, patterns over time, and your number vs. the influencer’s.</p>
+<div class="mt-3" data-inema-meter="modulo:3-3"><div class="flex items-center justify-between text-xs mb-1"><span class="text-neutral-500">Progress</span><span class="text-purple-400"><span data-inema-meter-frac="">0 of 7</span> · <span data-inema-meter-pct="">0%</span></span></div><div class="inema-bar h-1.5 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-purple-500" data-inema-meter-fill="" style="width:0%"></div></div></div>
+</div>
+<div class="divide-y divide-dark-600">
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">1</span><span class="text-lg">🧲</span><div><span class="font-medium">Semantic recall</span><span class="text-neutral-500 text-sm ml-2">- remember by meaning</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The coach searches memories by meaning, not exact wording.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Lets it surf old patterns without you repeating everything.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Embedding · pgvector · recall.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">2</span><span class="text-lg">📚</span><div><span class="font-medium">/advice</span><span class="text-neutral-500 text-sm ml-2">- reconciled advice</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The command that cross-references expert advice with your numbers.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Gives grounded advice, not generic advice.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">RAG · citation · your data.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">3</span><span class="text-lg">💊</span><div><span class="font-medium">/supplements</span><span class="text-neutral-500 text-sm ml-2">- your stack</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The command that lists the supplements suggested by your flags.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">DNA+lab-based stack, not trend-based.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Stack · flag · dose.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">4</span><span class="text-lg">📈</span><div><span class="font-medium">Patterns over time</span><span class="text-neutral-500 text-sm ml-2">- what repeats</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">Trends the coach detects over the course of weeks.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">The pattern teaches you more than an isolated day.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Trend · window · signal.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">5</span><span class="text-lg">📝</span><div><span class="font-medium">Adjust the CLAUDE.md</span><span class="text-neutral-500 text-sm ml-2">- fine-tune the brain</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">Edit the profile file to change goals and the coach’s style.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">That’s where personalization really lives.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Profile · goals · style.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">6</span><span class="text-lg">⚖️</span><div><span class="font-medium">Influencer vs. your numbers</span><span class="text-neutral-500 text-sm ml-2">- who wins</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">Compare the viral recommendation with what your data says.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Specific beats generic, every time.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">General · specific · evidence.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">7</span><span class="text-lg">🩺</span><div><span class="font-medium">When to ignore the coach</span><span class="text-neutral-500 text-sm ml-2">- the AI’s limits</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The cases where symptoms or common sense call for a doctor.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">AI gets things wrong; always keep a doctor in the loop.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Limit · symptom · doctor.</span></div></div></div></div>
+</div>
+<div class="p-4 bg-dark-700/30 flex justify-start space-x-3">
+<button class="px-4 py-2 text-sm bg-dark-600 hover:bg-dark-500 rounded-lg transition-colors" onclick="openModal('modal-3-3')">View in Modal</button>
+<a class="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors" href="modulo-3-3.html">View Full Version</a>
+</div>
+</div>
+<!-- MÓDULO 3.4 -->
+<div class="bg-dark-800 rounded-xl border border-dark-600 mb-6" data-inema-module="3-4" data-inema-track="3" id="modulo-3-4">
+<div class="p-6 border-b border-dark-600">
+<div class="flex items-center justify-between mb-2"><span class="text-purple-400 font-bold">3.4</span><span class="text-xs text-neutral-500">~35 min</span></div>
+<h3 class="text-2xl font-bold mb-2">📊 Dashboard and tracking</h3>
+<p class="text-neutral-400 text-sm">Read your story in the numbers: /healthdb, sleep and recovery, trends, dashboard safety, and the weekly review.</p>
+<div class="mt-3" data-inema-meter="modulo:3-4"><div class="flex items-center justify-between text-xs mb-1"><span class="text-neutral-500">Progress</span><span class="text-purple-400"><span data-inema-meter-frac="">0 of 7</span> · <span data-inema-meter-pct="">0%</span></span></div><div class="inema-bar h-1.5 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-purple-500" data-inema-meter-fill="" style="width:0%"></div></div></div>
+</div>
+<div class="divide-y divide-dark-600">
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">1</span><span class="text-lg">🔗</span><div><span class="font-medium">/healthdb</span><span class="text-neutral-500 text-sm ml-2">- the dashboard door</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The command that opens the dashboard with a view of your data.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">That’s where text becomes a graphic.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Dashboard · access · overview.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">2</span><span class="text-lg">😴</span><div><span class="font-medium">Sleep &amp; Recovery</span><span class="text-neutral-500 text-sm ml-2">- the two main curves</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The sleep and recovery dashboards side by side over time.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Show the basis for almost every recommendation.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Sleep · recovery · curve.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">3</span><span class="text-lg">📉</span><div><span class="font-medium">Trends</span><span class="text-neutral-500 text-sm ml-2">- the direction, not the point</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The rows that reveal where the numbers go.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Trend &gt; one-off reading, always.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Moving average · direction · noise.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">4</span><span class="text-lg">📖</span><div><span class="font-medium">Read it as a story</span><span class="text-neutral-500 text-sm ml-2">- numbers become a narrative</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">Interpret the dashboard as the story of your weeks.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Stories stick; tables forget.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Narrative · context · arc.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">5</span><span class="text-lg">🔐</span><div><span class="font-medium">Dashboard security</span><span class="text-neutral-500 text-sm ml-2">- locked by default</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">How the dashboard stays private with RLS and secrets in ~/.env.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Health data is sensitive.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">RLS · ~/.env · private.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">6</span><span class="text-lg">🗓️</span><div><span class="font-medium">Weekly review</span><span class="text-neutral-500 text-sm ml-2">- the 10-minute ritual</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">A regular time each week to review trends and make adjustments.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">Without review, the data doesn’t become a decision.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Ritual · adjustment · cadence.</span></div></div></div></div>
+<div class="topic-item"><button class="w-full px-6 py-4 flex items-center space-x-3 hover:bg-dark-700/50 transition-colors text-left" onclick="toggleTopic(this)"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold flex items-center justify-center flex-shrink-0">7</span><span class="text-lg">🔁</span><div><span class="font-medium">Data → adjustment → result</span><span class="text-neutral-500 text-sm ml-2">- the cycle that closes</span></div></button><div class="topic-explanation px-6 pb-4"><div class="bg-dark-700/50 rounded-lg p-4 space-y-3 ml-9"><div><span class="text-purple-400 font-semibold">What is:</span> <span class="text-neutral-300 text-sm">The loop of reading the number, changing something, and measuring the effect.</span></div><div><span class="text-purple-400 font-semibold">Why learn:</span> <span class="text-neutral-300 text-sm">It’s the engine that improves the entire system.</span></div><div><span class="text-purple-400 font-semibold">Key concepts:</span> <span class="text-neutral-300 text-sm">Loop · experiment · result.</span></div></div></div></div>
+</div>
+<div class="p-4 bg-dark-700/30 flex justify-start space-x-3">
+<button class="px-4 py-2 text-sm bg-dark-600 hover:bg-dark-500 rounded-lg transition-colors" onclick="openModal('modal-3-4')">View in Modal</button>
+<a class="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors" href="modulo-3-4.html">View Full Version</a>
+</div>
+</div>
+<!-- NAV ENTRE TRILHAS -->
+<div class="flex flex-col sm:flex-row gap-4 mt-10">
+<a class="flex-1 text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors" href="../trilha2/index.html">← Track 2 — Step by step</a>
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="../../index.html">Start course →</a>
+</div>
+</main>
+<!-- MODAIS -->
+<div class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80" id="modal-3-1" onclick="if(event.target===this) closeModal()"><div class="bg-dark-800 rounded-xl w-full max-w-6xl h-[95vh] flex flex-col border border-dark-600"><div class="p-4 border-b border-dark-600 flex justify-between items-center flex-shrink-0"><div class="flex items-center space-x-3"><span class="text-purple-400 font-bold">3.1</span><span class="font-semibold">The daily routine</span></div><button class="text-neutral-400 hover:text-white text-2xl leading-none" onclick="closeModal()">×</button></div><iframe class="flex-1 w-full rounded-b-xl" src="modulo-3-1.html" title="Module 3.1"></iframe></div></div>
+<div class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80" id="modal-3-2" onclick="if(event.target===this) closeModal()"><div class="bg-dark-800 rounded-xl w-full max-w-6xl h-[95vh] flex flex-col border border-dark-600"><div class="p-4 border-b border-dark-600 flex justify-between items-center flex-shrink-0"><div class="flex items-center space-x-3"><span class="text-purple-400 font-bold">3.2</span><span class="font-semibold">Food and workouts by photo</span></div><button class="text-neutral-400 hover:text-white text-2xl leading-none" onclick="closeModal()">×</button></div><iframe class="flex-1 w-full rounded-b-xl" src="modulo-3-2.html" title="Module 3.2"></iframe></div></div>
+<div class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80" id="modal-3-3" onclick="if(event.target===this) closeModal()"><div class="bg-dark-800 rounded-xl w-full max-w-6xl h-[95vh] flex flex-col border border-dark-600"><div class="p-4 border-b border-dark-600 flex justify-between items-center flex-shrink-0"><div class="flex items-center space-x-3"><span class="text-purple-400 font-bold">3.3</span><span class="font-semibold">Memory, patterns, and supplements</span></div><button class="text-neutral-400 hover:text-white text-2xl leading-none" onclick="closeModal()">×</button></div><iframe class="flex-1 w-full rounded-b-xl" src="modulo-3-3.html" title="Module 3.3"></iframe></div></div>
+<div class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80" id="modal-3-4" onclick="if(event.target===this) closeModal()"><div class="bg-dark-800 rounded-xl w-full max-w-6xl h-[95vh] flex flex-col border border-dark-600"><div class="p-4 border-b border-dark-600 flex justify-between items-center flex-shrink-0"><div class="flex items-center space-x-3"><span class="text-purple-400 font-bold">3.4</span><span class="font-semibold">Dashboard and tracking</span></div><button class="text-neutral-400 hover:text-white text-2xl leading-none" onclick="closeModal()">×</button></div><iframe class="flex-1 w-full rounded-b-xl" src="modulo-3-4.html" title="Module 3.4"></iframe></div></div>
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — INEMA Course · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Educational content. Not medical advice. Consult healthcare professionals.</p>
+</div>
+</footer>
+<script>
+    function toggleTopic(button){ const item=button.closest('.topic-item'); const exp=item.querySelector('.topic-explanation'); const card=button.closest('.bg-dark-800'); card.querySelectorAll('.topic-explanation.active').forEach(e=>{ if(e!==exp) e.classList.remove('active'); }); exp.classList.toggle('active'); }
+    (function(){
+      const t=document.getElementById('theme-toggle'), di=document.getElementById('theme-toggle-dark-icon'), li=document.getElementById('theme-toggle-light-icon'), html=document.documentElement;
+      function sync(){ if(html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if(t) t.addEventListener('click',()=>{ html.classList.toggle('dark'); try{ if(window.INEMA&&INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark')?'inema-dark':'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); }catch(e){} sync(); });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>if (window.INEMA && typeof window.INEMA.init === 'function') window.INEMA.init();</script>
+</body>
+</html>

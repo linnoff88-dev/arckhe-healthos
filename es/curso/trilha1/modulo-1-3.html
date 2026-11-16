@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Módulo 1.3 — Genética aplicada (SNPs) | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento emerald (T1) */
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5,150,105,0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5,150,105,0.08); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5,150,105,0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5,150,105,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha1/modulo-1-3.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha1/modulo-1-3.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha1/modulo-1-3.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha1/modulo-1-3.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="../../../en/curso/trilha1/modulo-1-3.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="modulo-1-3.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-emerald-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Saltar al contenido</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-emerald-400 bg-emerald-500/10" href="index.html">
+<span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentos</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html">
+<span class="sm:hidden">T2</span><span class="hidden sm:inline">Paso a paso</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html">
+<span class="sm:hidden">T3</span><span class="hidden sm:inline">Cómo usar</span>
+</a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="Mi recorrido" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">Mi recorrido</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Apariencia" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Apariencia</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tema</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Oscuro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Claro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sepia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Enfoque</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">Alto contraste</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tamaño del texto</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Ancho · interlineado</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Estrecho</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Medio</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Ancho</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compacto</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Cómodo</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Fuente</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">Sistema</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Lectura</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Ruta de navegación" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-emerald-400" href="../../index.html">Inicio</a><span>/</span>
+<a class="hover:text-emerald-400" href="index.html">Fundamentos</a><span>/</span>
+<span class="text-emerald-400">Módulo 1.3</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-emerald-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="1-3" data-inema-track="1">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full mb-4">MÓDULO 1.3</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">🧬 Genética aplicada (SNPs)</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">Los genes son perillas, no un destino. Cómo las variaciones en tu ADN ajustan las dosis — <strong class="text-emerald-400">cafeína, grasa, vitamina D</strong> — y se convierten en reglas de coaching que el agente aplica en lugar de dar consejos genéricos.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">7</div><div class="text-xs text-neutral-400">Temas</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">~35</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">Básico</div><div class="text-xs text-neutral-400">Nivel</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">Teoría</div><div class="text-xs text-neutral-400">Tipo</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:1-3">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Tu progreso en este módulo</span>
+<span class="text-emerald-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 de 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-emerald-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Índice de la página" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Sección <span class="inema-toc-pos">1</span> de <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-1">1. Qué es un SNP</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-2">2. CYP1A2 — cafeína</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-3">3. APOE — grasa</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-4">4. MTHFR — metilación</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-5">5. COMT — enfoque</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-6">6. VDR — vitamina D</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-7">7. Indicadores de riesgo</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-1-3#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">🎛️ Qué es un SNP — los genes como botones</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-3-t1-p1">Tu ADN es un texto de miles de millones de "letras" (A, C, G, T). Casi todo es igual entre las personas, pero en algunos puntos una <strong class="text-emerald-400">solo cambia una letra</strong> de una persona a otra. Este punto de variación es un <strong class="text-emerald-400">SNP</strong>. No activa ni desactiva un gen; ajusta <em>qué tan fuerte</em> ese gen funciona — como un interruptor giratorio en una posición que tú no elegiste.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 ¿Nuevo por aquí? Dos términos antes de continuar</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>SNP</strong> (se lee "snip", de <em>Single-Nucleotide Polymorphism</em>) — es una posición del ADN donde una sola letra varía entre personas. Cada SNP es un «botón» que hace que un gen esté más o menos activo.</li>
+<li><strong>Genotipo</strong> — heredas dos copias de cada punto (una de tu madre y otra de tu padre). El par de letras que tienes en ese SNP (p. ej., AA, AC o CC) es tu genotipo: es la "posición con la que vino el botón de fábrica".</li>
+</ul>
+</div>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Cuatro genes representados como controles deslizantes: cafeína, grasa saturada, vitamina D y sal, cada uno con el botón en una posición distinta entre bajo y alto" class="w-full h-auto" role="img" viewbox="0 0 1000 280">
+<defs>
+<lineargradient id="m13a-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+<filter height="180%" id="m13a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m13a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+</defs>
+<rect fill="url(#m13a-grid)" height="280" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="13" font-weight="600">
+<text fill="#9fe9cf" font-size="12" x="40" y="34">menos activo</text>
+<text fill="#9fe9cf" font-size="12" text-anchor="end" x="960" y="34">más activo</text>
+<!-- slider 1: cafeína -->
+<text fill="#bfe6ff" x="40" y="80">☕ Cafeína (CYP1A2)</text>
+<line stroke="#1f3a4d" stroke-linecap="round" stroke-width="6" x1="300" x2="860" y1="75" y2="75"></line>
+<line opacity="0.6" stroke="#38bdf8" stroke-linecap="round" stroke-width="6" x1="300" x2="780" y1="75" y2="75"></line>
+<g class="wf-a" filter="url(#m13a-glow)"><circle cx="780" cy="75" fill="#0e2018" r="11" stroke="url(#m13a-grad)" stroke-width="3"></circle></g>
+<text fill="#9fe9cf" font-size="11" text-anchor="middle" x="780" y="102">metaboliza rápido</text>
+<!-- slider 2: gordura -->
+<text fill="#bfe6ff" x="40" y="138">🧈 Grasa sat. (APOE)</text>
+<line stroke="#1f3a4d" stroke-linecap="round" stroke-width="6" x1="300" x2="860" y1="133" y2="133"></line>
+<line opacity="0.6" stroke="#38bdf8" stroke-linecap="round" stroke-width="6" x1="300" x2="410" y1="133" y2="133"></line>
+<g class="wf-a" filter="url(#m13a-glow)"><circle cx="410" cy="133" fill="#0e2018" r="11" stroke="url(#m13a-grad)" stroke-width="3"></circle></g>
+<text fill="#9fe9cf" font-size="11" text-anchor="middle" x="410" y="160">más sensible</text>
+<!-- slider 3: vitamina D -->
+<text fill="#bfe6ff" x="40" y="196">☀️ Vitamina D (VDR)</text>
+<line stroke="#1f3a4d" stroke-linecap="round" stroke-width="6" x1="300" x2="860" y1="191" y2="191"></line>
+<line opacity="0.6" stroke="#38bdf8" stroke-linecap="round" stroke-width="6" x1="300" x2="500" y1="191" y2="191"></line>
+<g class="wf-a" filter="url(#m13a-glow)"><circle cx="500" cy="191" fill="#0e2018" r="11" stroke="url(#m13a-grad)" stroke-width="3"></circle></g>
+<text fill="#9fe9cf" font-size="11" text-anchor="middle" x="500" y="218">respuesta baja</text>
+<!-- slider 4: sal -->
+<text fill="#bfe6ff" x="40" y="254">🧂 Sal (ACE / AGT)</text>
+<line stroke="#1f3a4d" stroke-linecap="round" stroke-width="6" x1="300" x2="860" y1="249" y2="249"></line>
+<line opacity="0.6" stroke="#38bdf8" stroke-linecap="round" stroke-width="6" x1="300" x2="730" y1="249" y2="249"></line>
+<g class="wf-a" filter="url(#m13a-glow)"><circle cx="730" cy="249" fill="#0e2018" r="11" stroke="url(#m13a-grad)" stroke-width="3"></circle></g>
+<text fill="#9fe9cf" font-size="11" text-anchor="middle" x="730" y="276">más sensible</text>
+</g>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> cada línea es un gen y el botón verde es donde el <em>tu</em> El SNP lo dejó así. Nadie elige la posición — pero, al conocerla, puedes ajustar la dosis (de café, grasa, vitamina D, sal). Eso es lo que quiere decir "los genes son botones, no destino": la posición es fija, tu respuesta a ella no.</p>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> La idea en una frase</h3>
+<p class="text-neutral-300">El SNP no decide tu futuro — te dice <strong>en qué dosis</strong> algo te afecta. El coach no usa el gen para predecir enfermedades; lo usa para <strong>calibrar</strong> consejo (cuánto café, cuánta grasa, cuánto suplemento) para tu cuerpo.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">SNP</div><p class="text-xs text-neutral-400">Una letra del ADN que varía entre las personas.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Genotipo</div><p class="text-xs text-neutral-400">El par de letras que llevas ahí.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Botón, no destino</div><p class="text-xs text-neutral-400">Ajusta la dosis, no dicta el resultado.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Calibrar</div><p class="text-xs text-neutral-400">El gen adapta el consejo a tu cuerpo.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-1-3#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">☕ CYP1A2 — la velocidad del café</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-3-t2-p1">El gen <strong class="text-emerald-400">CYP1A2</strong> controla la enzima del hígado que descompone la cafeína. Tu variante determina si eres un <strong class="text-emerald-400">metabolizador rápido</strong> (elimina la cafeína en pocas horas) o <strong class="text-emerald-400">lento</strong> (la cafeína sigue circulando hasta la noche). Es el mismo café; lo que cambia es por cuánto tiempo te afecta. Eso define dos cosas prácticas: la <em>hora</em> del último café y la <em>dosis</em>.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<p class="text-sm text-neutral-300"><strong>Metabolizador (rápido / lento)</strong> — es la velocidad con la que tu cuerpo elimina una sustancia. "Rápido" significa que la cafeína desaparece pronto (toleras el café más tarde); "lento" significa que tarda en desaparecer (un café a las 16 h todavía afecta tu sueño). La "vida media" de la cafeína es el tiempo que tarda el cuerpo en eliminar la mitad.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">⚡ Metabolizador rápido</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">•</span><span>Elimina la cafeína rápido: tolera el café más temprano y en una dosis normal.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">•</span><span>Regla del coach: café temprano, y <strong>corte al inicio de la tarde</strong>.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">•</span><span>Menos riesgo de que la cafeína «se filtre» a la noche y arruine el sueño.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">🐢 Metabolizador lento</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">•</span><span>La cafeína circula durante horas: un café a las 15h todavía pesa a las 23h.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">•</span><span>Regla del coach: <strong>límite más bajo</strong> y dejar de tomarlo mucho más temprano.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">•</span><span>Más sensible al efecto sobre la presión y el sueño.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-gradient-to-br from-emerald-900/30 to-dark-800 rounded-xl border border-emerald-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-emerald-400 mb-4 flex items-center"><span class="mr-2">🧑‍💻</span> El caso del autor: un café al día, sin crash</h3>
+<p class="text-neutral-300 text-sm mb-4">Al conocer su propio CYP1A2, el autor convirtió una regla sencilla en un hábito: <strong>un único café</strong>, tomó alrededor de <strong>90 minutos después de una rutina matutina</strong> (despertar, hidratarte, luz/movimiento), sin tomar café después. Resultado reportado: energía estable y <strong>sin el bajón de la tarde</strong>.</p>
+<div class="space-y-3">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-4 border border-dark-600"><h4 class="font-semibold mb-1 text-sm">Despertar · rutina matutina</h4><p class="text-xs text-neutral-300">Hidrátate y muévete primero — sin cafeína de entrada.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-4 border border-dark-600"><h4 class="font-semibold mb-1 text-sm">~90 min después · el café</h4><p class="text-xs text-neutral-300">Un solo café, en el horario en que te da más beneficios sin afectar la noche.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-4 border border-dark-600"><h4 class="font-semibold mb-1 text-sm">Resto del día · cero café</h4><p class="text-xs text-neutral-300">Nada de refuerzo por la tarde; de ahí la ausencia del bajón.</p></div>
+</div>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">🔗</span> El gen no actúa solo</h3>
+<p class="text-neutral-300 text-sm">La hora ideal para tomar café también depende de la <strong>recuperación de hoy</strong> (Módulo 1.2): en un día verde, el coach da luz verde; en un día ámbar, retrocede. El gen da la regla de fondo; la señal del cuerpo de hoy ajusta su aplicación.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">CYP1A2</div><p class="text-xs text-neutral-400">La enzima que descompone la cafeína.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Rápido × lento</div><p class="text-xs text-neutral-400">Define hasta qué hora puedes tomar café.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Hora + dosis</div><p class="text-xs text-neutral-400">Lo que realmente ajusta el gen.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Sin fallos</div><p class="text-xs text-neutral-400">1 café ~90 min después de despertarte, y dejó de tomarlo.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-1-3#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">🧈 APOE — grasa, colesterol y riesgo</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-3-t3-p1">El gen <strong class="text-emerald-400">APOE</strong> participa en el transporte del colesterol en la sangre. Su variante influye en <strong class="text-emerald-400">qué tan sensible eres a la grasa saturada</strong> y cómo responde tu colesterol a la dieta. Hay tres «sabores» comunes: <strong>e2, e3 e e4</strong> — y e4 es lo que más atención requiere: se asocia con un mayor riesgo cardiovascular y, en estudios, con un mayor riesgo de Alzheimer.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Grasa saturada</strong> — el tipo de grasa más sólida a temperatura ambiente (mantequilla, carnes grasas, queso). En las personas sensibles, eleva más fácilmente el colesterol "malo".</li>
+<li><strong>Variante e4</strong> — una de las versiones de APOE. Quien la tiene tiende a ser <em>más</em> sensible a las grasas saturadas; es una señal para revisar la dieta y los análisis con más cuidado — no una sentencia.</li>
+<li><strong>Riesgo cardiovascular</strong> — probabilidad de problemas en el corazón y los vasos sanguíneos (p. ej., obstrucción de arterias). Los marcadores sanguíneos como la ApoB ayudan a medir ese riesgo.</li>
+</ul>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ Qué refuerza el coach (APOE sensible)</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Priorizar las grasas insaturadas (aceite de oliva, pescado, frutos secos).</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Monitorear <strong>ApoB</strong> y vigila de cerca el perfil lipídico en los análisis.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Leer la foto de la comida para detectar la carga de grasas saturadas.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Lo que señala que debes revisar</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Serie de comidas muy ricas en grasas saturadas.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>ApoB subiendo sin que la dieta haya cambiado.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Tratar el "colesterol" como un número único — el coach analiza el ApoB, no solo el total.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🧑‍💻</span> En el caso del autor</h3>
+<p class="text-neutral-300 text-sm">El ADN del autor indicó <strong>sensibilidad a las grasas saturadas</strong> (junto con sensibilidad a la sal, baja eliminación de toxinas e intolerancia a la lactosa). Por eso el agente <strong>construye alrededor de esto</strong>: al ver la foto de una comida, evalúa la grasa saturada de forma distinta a como lo haría para otra persona, en vez de soltar el consejo genérico "come menos grasa".</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">APOE</div><p class="text-xs text-neutral-400">Transporte de colesterol en la sangre.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">e4</div><p class="text-xs text-neutral-400">Más sensible a la grasa saturada.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">ApoB</div><p class="text-xs text-neutral-400">Marcador clave del riesgo, en la sangre.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">No es una sentencia</div><p class="text-xs text-neutral-400">Es una solicitud de atención, no un destino.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-1-3#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">🧪 MTHFR — metilación y vitaminas B</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-3-t4-p1">El gen <strong class="text-emerald-400">MTHFR</strong> comanda una enzima de la <strong class="text-emerald-400">metilación</strong> — un proceso químico que el cuerpo usa todo el tiempo, incluso para aprovechar las vitaminas B (folato y B12). Algunas variantes hacen más lenta esta enzima, lo que puede afectar el aprovechamiento de estas vitaminas y el nivel de <strong class="text-emerald-400">homocisteína</strong> en la sangre.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Metilación</strong> — piensa en una línea de montaje que «estampa» moléculas para activarlas. El cuerpo la usa para mil cosas (ADN, neurotransmisores, procesar vitaminas). MTHFR es una de las máquinas de esa línea.</li>
+<li><strong>Folato y B12</strong> — vitaminas del complejo B. El <strong>folato metilado</strong> (forma ya "activada") es la versión que el cuerpo usa directamente, útil cuando la metilación es más lenta.</li>
+<li><strong>Homocisteína</strong> — un aminoácido medido en la sangre. Cuando la metilación no funciona bien, tiende a subir; es el marcador que el coach observa en relación con MTHFR.</li>
+</ul>
+</div>
+<div class="bg-gradient-to-br from-emerald-900/30 to-dark-800 rounded-xl border border-emerald-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-emerald-400 mb-4 flex items-center"><span class="mr-2">🔗</span> Cómo el gen se convierte en una observación</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400 mt-1">•</span><span>MTHFR más lento → <strong>hacer seguimiento de la homocisteína</strong> en los análisis.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400 mt-1">•</span><span>La conversación sobre folato/B12 se convierte en <strong>pregunta para el médico</strong>, no una prescripción automática.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400 mt-1">•</span><span>El gen entra como <strong>contexto</strong> que el coach ya lleva consigo — no tienes que acordarte de contarlo.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Cuidado con el hype</h3>
+<p class="text-neutral-300 text-sm">MTHFR es uno de los genes más rodeados de exageraciones en internet. Tener una variante "lenta" es común y, por sí sola, no significa enfermedad. El coach la usa solo para <strong>sugerir un marcador para observar</strong> y consultar al médico, nunca para diagnosticar o recomendar suplementos por tu cuenta.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">MTHFR</div><p class="text-xs text-neutral-400">Enzima de la metilación.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Metilación</div><p class="text-xs text-neutral-400">Proceso que «activa» moléculas.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Folato / B12</div><p class="text-xs text-neutral-400">Las vitaminas B relacionadas con él.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Homocisteína</div><p class="text-xs text-neutral-400">El marcador sanguíneo que debes observar.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-1-3#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">🧠 COMT — dopamina, estrés y concentración</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-3-t5-p1">El gen <strong class="text-emerald-400">COMT</strong> regula la velocidad a la que el cerebro <strong class="text-emerald-400">limpia la dopamina y la noradrenalina</strong> — los mensajeros químicos del enfoque, la motivación y la respuesta al estrés. Limpiarlos rápido o despacio cambia cómo manejas la presión y cómo te afecta la cafeína. Por eso COMT suele "conversar" con CYP1A2 del Tema 2.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Dopamina / noradrenalina</strong> — neurotransmisores: sustancias que las neuronas usan para comunicarse. Están relacionados con el enfoque, la motivación, el placer y la "alerta" del estrés.</li>
+<li><strong>COMT rápido × lento</strong> — «rápido» elimina estos mensajeros con rapidez (calma bajo presión, pero puede faltar un poco de concentración); «lento» los mantiene durante más tiempo (concentración aguda en calma, pero puede acumular estrés). Ninguno es «mejor» —son perfiles.</li>
+</ul>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">⚡ COMT rápido</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">•</span><span>Elimina la dopamina rápido: tiende a mantener la calma bajo presión.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">•</span><span>Puede beneficiarse de un impulso (p. ej., cafeína bien programada) para concentrarse.</span></li>
+</ul>
+</div>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-6">
+<h4 class="font-bold text-blue-400 mb-4">🐢 COMT lento</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-blue-400">•</span><span>Mantiene la dopamina por más tiempo — enfoque agudo en un ambiente tranquilo.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">•</span><span>Más cafeína + estrés puede convertirse en ansiedad; el coach recomienda cautela con la dosis.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">☕</span> Dónde se encuentran COMT y CYP1A2</h3>
+<p class="text-neutral-300 text-sm">La cafeína actúa sobre los mismos mensajeros que regula COMT. Al combinar ambos genes, el coach calibra mejor la recomendación de café: un perfil «lento + lento» pide un límite más conservador; uno «rápido + rápido» tolera más. Es <strong>contexto acumulado</strong>, no un gen aislado.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">COMT</div><p class="text-xs text-neutral-400">Elimina dopamina y noradrenalina.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Enfoque × estrés</div><p class="text-xs text-neutral-400">El eje en el que influye.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Conversación con café</div><p class="text-xs text-neutral-400">Interactúa con el CYP1A2.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Perfil, no nota</div><p class="text-xs text-neutral-400">Rápido y lento son solo perfiles.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-1-3#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">☀️ VDR — el receptor de la vitamina D</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-3-t6-p1">No basta con tener vitamina D en la sangre — el cuerpo necesita <strong class="text-emerald-400">usarla</strong>. Quien crea ese vínculo es el <strong class="text-emerald-400">receptor de vitamina D (VDR)</strong>. Tu variante influye en qué tan bien se aprovecha la vitamina D y, en la práctica, ayuda a explicar por qué dos personas con la misma suplementación alcanzan niveles diferentes. Por eso el VDR ajusta la <strong class="text-emerald-400">respuesta</strong> e a <strong class="text-emerald-400">dosis</strong>.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Receptor</strong> — una «cerradura» de la célula en la que encaja la molécula (la llave) para producir su efecto. VDR es la cerradura de la vitamina D: si funciona peor, la misma dosis «rinde» menos.</li>
+<li><strong>Respuesta × dosis</strong> — «respuesta» es cuánto sube tu nivel de vitamina D con una dosis determinada; «dosis» es cuánto tomas. Saber sobre el VDR ayuda a entender por qué tu respuesta puede ser menor.</li>
+</ul>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ Qué hace el coach</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Cruza el VDR con el análisis de vitamina D para ver la <strong>respuesta real</strong>.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Sugiere <strong>reevaluar con el médico</strong> si el nivel no sube como se espera.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Recuerda el contexto (sol, estación, suplemento) al interpretar el número.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Lo que no hace</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Definir la dosis de suplementos por tu cuenta.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Suponer que «todo el mundo necesita una megadosis».</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Ignorar que el exceso de vitamina D también conlleva riesgos.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🔁</span> Gen + análisis = una lectura más justa</h3>
+<p class="text-neutral-300 text-sm">El VDR por sí solo no indica la dosis; el análisis por sí solo no explica el motivo. Juntos, explican tu respuesta y hacen más objetiva la conversación con el clínico — exactamente el puente que el siguiente tema formaliza como <strong>risk flag</strong>.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">VDR</div><p class="text-xs text-neutral-400">El receptor (cerradura) de la vitamina D.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Aprovechamiento</div><p class="text-xs text-neutral-400">Tenerlo en la sangre ≠ aprovecharlo bien.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Respuesta</div><p class="text-xs text-neutral-400">Cuánto sube el nivel con la dosis.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">El médico decide</div><p class="text-xs text-neutral-400">La dosis pasa por el clínico.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-1-3#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">🚩 Risk flags — el gen + el análisis se convierten en una regla</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-3-t7-p1">Los genes y los análisis por separado no ayudan a nadie. HealthOS los convierte en <strong class="text-emerald-400">risk flags</strong>: reglas binarias (activado/desactivado) que combinan un SNP con un marcador sanguíneo y activan una acción: una alerta, un suplemento para consultar con el médico o una meta. Eso es lo que hace que el coach sea <strong class="text-emerald-400">consciente del mecanismo</strong>: conoce el "porqué" en tu cuerpo, no solo la recomendación.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Indicador de riesgo</strong> — «bandera de riesgo». Es una regla sencilla en la base de datos: SI (gen X) Y (análisis Y por encima del límite), ENTONCES activa esta bandera. Está activada o desactivada —sin punto medio.</li>
+<li><strong>Consciente del mecanismo</strong> — «consciente del mecanismo»: en vez de solo decir «come menos grasa», el coach conoce la razón fisiológica en TI (ej.: APOE e4 + ApoB alto) y actúa en función de ella.</li>
+</ul>
+</div>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Flujo: el SNP del ADN y un marcador del análisis de sangre se combinan en una regla binaria que activa una risk flag, que a su vez activa una acción del coach" class="w-full h-auto" role="img" viewbox="0 0 1000 250">
+<defs>
+<lineargradient id="m13b-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+<filter height="180%" id="m13b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m13b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m13b-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+<marker id="m13b-ahg" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#34d399"></path></marker>
+</defs>
+<rect fill="url(#m13b-grid)" height="250" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="13" font-weight="600">
+<rect fill="#0e1b26" height="46" rx="11" stroke="#38bdf8" stroke-width="2" width="200" x="34" y="56"></rect><text fill="#bfe6ff" text-anchor="middle" x="134" y="78">🧬 APOE e4</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="134" y="94">SNP (ADN)</text>
+<rect fill="#0e1b26" height="46" rx="11" stroke="#38bdf8" stroke-width="2" width="200" x="34" y="148"></rect><text fill="#bfe6ff" text-anchor="middle" x="134" y="170">🩸 ApoB alto</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="134" y="186">análisis de sangre</text>
+<rect fill="#161a24" height="50" rx="11" stroke="#94a3b8" stroke-width="2" width="180" x="370" y="100"></rect><text fill="#e2e8f0" text-anchor="middle" x="460" y="122">⚙️ regla binaria</text><text fill="#cbd5e1" font-size="11" text-anchor="middle" x="460" y="139">SI … Y … ENTONCES</text>
+<g filter="url(#m13b-glow)"><rect fill="#1f1010" height="54" rx="12" stroke="#fb7185" stroke-width="2.5" width="180" x="640" y="98"></rect></g><text fill="#fda4af" text-anchor="middle" x="730" y="120">🚩 risk flag</text><text fill="#fecdd3" font-size="11" text-anchor="middle" x="730" y="138">riesgo CV elevado</text>
+<g filter="url(#m13b-glow)"><rect fill="#0e2018" height="48" rx="12" stroke="url(#m13b-grad)" stroke-width="2.5" width="320" x="640" y="176"></rect></g><text fill="#34d399" text-anchor="middle" x="800" y="198">🎯 acción del coach</text><text fill="#9fe9cf" font-size="11" text-anchor="middle" x="800" y="214">alerta + meta de ApoB + llevar al médico</text>
+</g>
+<g fill="none" opacity="0.65" stroke="#38bdf8" stroke-width="2">
+<path d="M234,79 C300,79 320,118 370,122" marker-end="url(#m13b-ah)"></path>
+<path d="M234,171 C300,171 320,132 370,128" marker-end="url(#m13b-ah)"></path>
+<path d="M550,125 L640,125" marker-end="url(#m13b-ah)"></path>
+</g>
+<path d="M730,152 C730,168 760,172 770,176" fill="none" marker-end="url(#m13b-ahg)" opacity="0.8" stroke="#34d399" stroke-width="2"></path>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="500" y="242">el gen explica el porqué; el examen muestra el estado actual; la flag convierte ambos en acción</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> a la izquierda entran el gen (cian, desde arriba) y el examen (cian, desde abajo); pasan por una regla binaria; si la regla «se cumple», se enciende la bandera de riesgo roja; la bandera activa la acción verde del coach. Sin el gen, sería un consejo genérico; sin el examen, sería teoría. La bandera solo existe cuando ambos coinciden.</p>
+</div>
+<div class="bg-gradient-to-br from-emerald-900/30 to-dark-800 rounded-xl border border-emerald-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-emerald-400 mb-4 flex items-center"><span class="mr-2">🧑‍💻</span> El caso del autor, en flags</h3>
+<p class="text-neutral-300 text-sm mb-4">El ADN del autor reveló cuatro señales — y el agente fue <strong>construido alrededor de ellos</strong>, no en torno a consejos genéricos:</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">🧈 Sensibilidad a la grasa saturada</span><p class="text-xs text-neutral-400 mt-1">Pesa la grasa de las comidas y haz seguimiento del ApoB.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">🧂 Sensibilidad a la sal</span><p class="text-xs text-neutral-400 mt-1">Mira el sodio de las comidas y la presión después del almuerzo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">🧹 Baja eliminación de toxinas</span><p class="text-xs text-neutral-400 mt-1">Más cautela con la carga y la exposición; habla con el médico.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600 text-sm"><span class="text-emerald-400 font-semibold">🥛 Intolerancia a la lactosa</span><p class="text-xs text-neutral-400 mt-1">Señala los lácteos en lugar de asumir que todo te sienta bien.</p></div>
+</div>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Cuidados con el ADN (no es consejo médico)</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span><strong>Las muestras de ADN enviadas por correo se degradan.</strong> El panel de la clínica y el de Ancestry pueden <em>no coincidir</em> — confía en el informe clínico, no en un kit de tienda.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Una risk flag es una <strong>solicitud de atención</strong>, no un diagnóstico. El coach deriva al médico; no prescribe ni modifica la medicación.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Es el ejemplo de <strong>una</strong> persona, que consultó a médicos en cada paso. No es una prescripción para ti.</span></li>
+</ul>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Indicador de riesgo</div><p class="text-xs text-neutral-400">Regla binaria gen + examen → acción.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Consciente del mecanismo</div><p class="text-xs text-neutral-400">Sabes por qué sucede en tu cuerpo.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Construido a tu medida</div><p class="text-xs text-neutral-400">Las flags del autor dan forma al agente.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Médico en el circuito</div><p class="text-xs text-neutral-400">La flag señala; el clínico decide.</p></div>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-1-3#q1">
+<p class="font-medium mb-4">✅ Autoevaluación (opcional): ¿qué hace que una risk flag vuelva al coach "consciente del mecanismo"?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) Predice enfermedades a partir del gen por sí solo</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) Combina un SNP con un marcador del análisis en una regla binaria que activa una acción</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) Sustituye la consulta médica</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-emerald-900/40 via-dark-800 to-dark-800 rounded-xl border border-emerald-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Resumen del módulo</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">El SNP es un botón, no un destino</strong><span class="text-neutral-400"> — una letra del ADN que ajusta la dosis con la que algo te afecta.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Cada gen afina un consejo</strong><span class="text-neutral-400"> — CYP1A2 (café), APOE (grasa), MTHFR (vitaminas B), COMT (concentración), VDR (vitamina D).</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Los genes interactúan entre sí</strong><span class="text-neutral-400"> — COMT y CYP1A2 juntos calibran mejor la cafeína que cualquiera de ellos por separado.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Los indicadores de riesgo convierten ADN + examen en acción</strong><span class="text-neutral-400"> — una regla binaria (p. ej., APOE e4 + ApoB alto) es lo que hace que el coach sea consciente de los mecanismos.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">No es consejo médico</strong><span class="text-neutral-400"> — el kit de correo se degrada, la flag solo lo señala; el clínico decide.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-emerald-400 mb-2">Próximo módulo:</h3>
+<p class="text-neutral-300 text-sm">1.4 — Cómo la IA se convierte en coach: el snapshot, las herramientas y el razonamiento que toma esas señales (wearable, sangre, ADN, dieta) y devuelve un consejo específico.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Volver a Fundamentos</a>
+<a class="flex-1 text-center px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-500 transition-colors" href="modulo-1-4.html">Próximo módulo →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — Curso INEMA · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Contenido educativo. No es consejo médico. Consulta con profesionales de la salud.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-1-3#q1', {
+        answer: 1,
+        explain: { 0: 'Não — o gene sozinho não prevê doença; ele calibra a dose.', 1: 'Isso. A flag cruza SNP + exame numa regra binária e dispara a ação — o coach age sabendo o porquê.', 2: 'Não — a flag aponta; quem decide é o clínico.' }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Module 3.3 — Memory, patterns, and supplements | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento purple (T3) */
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124,58,237,0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124,58,237,0.08); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124,58,237,0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124,58,237,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha3/modulo-3-3.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha3/modulo-3-3.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha3/modulo-3-3.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha3/modulo-3-3.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="modulo-3-3.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">EN</a><a href="../../../es/curso/trilha3/modulo-3-3.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-purple-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Skip to content</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html">
+<span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentals</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html">
+<span class="sm:hidden">T2</span><span class="hidden sm:inline">Step by step</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-purple-400 bg-purple-500/10" href="index.html">
+<span class="sm:hidden">T3</span><span class="hidden sm:inline">How to use</span>
+</a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="My journey" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">My journey</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Appearance" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Appearance</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Theme</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Dark</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Clear</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sepia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Focus</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">High contrast</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Text size</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Width · line spacing</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Narrow</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Medium</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Wide</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compact</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Comfortable</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Source</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">System</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Reading</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Navigation path" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-purple-400" href="../../index.html">Home</a><span>/</span>
+<a class="hover:text-purple-400" href="index.html">How to use</a><span>/</span>
+<span class="text-purple-400">Module 3.3</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-purple-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="3-3" data-inema-track="3">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-semibold rounded-full mb-4">MODULE 3.3</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">🧲 Memory, patterns, and supplements</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">What helps the coach improve over time: the <strong class="text-purple-400">semantic recall</strong>, o <code class="font-mono text-base bg-dark-700 px-1.5 rounded">/advice</code> reconciled with your data, the <code class="font-mono text-base bg-dark-700 px-1.5 rounded">/supplements</code> connected to the risk flags, and when to ignore the coach.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">7</div><div class="text-xs text-neutral-400">Topics</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">~35</div><div class="text-xs text-neutral-400">Minutes</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">Practical</div><div class="text-xs text-neutral-400">Level</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-purple-400">Use</div><div class="text-xs text-neutral-400">Type</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:3-3">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Your progress in this module</span>
+<span class="text-purple-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 of 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-purple-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Page index" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Section <span class="inema-toc-pos">1</span> of <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-1">1. Semantic recall</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-2">2. /advice</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-3">3. /supplements</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-4">4. Patterns over time</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-5">5. Adjust the CLAUDE.md</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-6">6. Influencer × your numbers</a></li>
+<li><a class="inema-toc-link hover:text-purple-400" href="#topico-7">7. When to Ignore the Coach</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-3-3#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">🧲 Semantic recall in action</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-3-t1-p1">The sentence that shows the coach “remembering” is always similar: <em>"the last time you ate dinner late, your recovery dropped to 52% the next day"</em>. It isn’t guessing — every message from you became a line with memory <strong class="text-purple-400">semantics</strong>, and when you ask something similar to a past question, it <strong class="text-purple-400">surfs</strong> this history and retrieves the relevant passage from weeks ago.</p>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-purple-400 mb-2">🟢 New here? Three words before you continue</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>Embedding (vector)</strong> — is your sentence turned into a list of numbers that captures the <em>meaning</em>, not the exact words. “Can I eat something sweet today?” and “Can I have dessert?” land close together in the space, even when phrased differently. In HealthOS, OpenAI generates it (the key <code class="font-mono text-xs bg-dark-700 px-1 rounded">OPENAI_API_KEY</code>).</li>
+<li><strong>pgvector</strong> — a Postgres extension (in your Supabase) that stores these vectors and finds the closest ones by similarity. It’s what the migration <code class="font-mono text-xs bg-dark-700 px-1 rounded">0001_init.sql</code> turns on.</li>
+<li><strong>Semantic recall</strong> — “search by meaning.” Instead of looking for the exact word, the coach searches past messages for ones with a meaning similar to what you just said.</li>
+</ul>
+</div>
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Semantic recall flow: your message becomes an embedding (vector), pgvector searches by similarity, and the coach retrieves the pattern from weeks ago" class="w-full h-auto" role="img" viewbox="0 0 1000 220">
+<defs>
+<lineargradient id="m33a-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#c084fc"></stop><stop offset="1" stop-color="#a855f7"></stop></lineargradient>
+<filter height="180%" id="m33a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m33a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#a855f7" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m33a-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m33a-grid)" height="220" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<g class="wf-a"><rect fill="#0e1b26" height="56" rx="12" stroke="#38bdf8" stroke-width="2" width="180" x="24" y="82"></rect><text fill="#bfe6ff" text-anchor="middle" x="114" y="106">💬 Your message</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="114" y="124">"can I eat dinner late?"</text></g>
+<g class="wf-a"><rect fill="#0e1b26" height="56" rx="12" stroke="#38bdf8" stroke-width="2" width="170" x="256" y="82"></rect><text fill="#bfe6ff" text-anchor="middle" x="341" y="106">🔢 Embedding</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="341" y="124">becomes a vector (meaning)</text></g>
+<g class="wf-a"><rect fill="#0e1b26" height="56" rx="12" stroke="#38bdf8" stroke-width="2" width="180" x="478" y="82"></rect><text fill="#bfe6ff" text-anchor="middle" x="568" y="106">🗄️ pgvector</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="568" y="124">similarity search</text></g>
+<g filter="url(#m33a-glow)"><rect fill="#1a1230" height="64" rx="14" stroke="url(#m33a-grad)" stroke-width="2.5" width="208" x="712" y="78"></rect></g>
+<text fill="#c084fc" font-size="14" text-anchor="middle" x="816" y="104">🧠 Retrieved pattern</text><text fill="#d8b4fe" font-size="11" text-anchor="middle" x="816" y="124">"dinner at 9 p.m. → recovery 52%"</text>
+</g>
+<g fill="none" opacity="0.6" stroke="#38bdf8" stroke-width="2">
+<path d="M204,110 L256,110" marker-end="url(#m33a-ah)"></path>
+<path d="M426,110 L478,110" marker-end="url(#m33a-ah)"></path>
+<path d="M658,110 L712,110" marker-end="url(#m33a-ah)"></path>
+</g>
+<text fill="#d8b4fe" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="500" y="186">the coach opens the response with “last time you…” — the excerpt came from weeks ago</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>How to read:</strong> from left to right is the search: today's phrase (cyan) becomes a vector, pgvector finds the most similar past entry, and the coach brings up the pattern (purple). It's not the latest message—it's the most <em>relevant</em>, even if it’s from weeks ago.</p>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-3-t1-p2">In practice, this changes the tone: instead of "avoid eating dinner late" (generic), you get "<strong class="text-purple-400">you</strong> already seen this bring your number down three times.” The coach is surfing your own patterns — and that's why it gets more useful the more weeks you build up.</p>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Key concepts</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">By meaning</div><p class="text-xs text-neutral-400">Finds similar past entries, not the exact word.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Vector + pgvector</div><p class="text-xs text-neutral-400">Phrase becomes numbers; the database finds the closest match.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">"Last time…"</div><p class="text-xs text-neutral-400">The sentence that shows the memory at work.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Improves over time</div><p class="text-xs text-neutral-400">More weeks = more patterns to ride.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Mark as read</span><span class="inema-label-done">Read ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-3-3#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">📚 /advice — reconciled expert tip</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-3-t2-p1">You saw an influencer say "fasting for 16 hours every day speeds up fat loss." The <code class="font-mono text-sm bg-dark-700 px-1 rounded">/advice</code> take this tip, look up the source in an expert tips database (<strong class="text-purple-400">RAG</strong>, with citations) and — here’s the clever part — <strong class="text-purple-400">reconciles with your numbers</strong> before returning it. The generic tip becomes "for you, today, does this make sense or not?"</p>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-purple-400 mb-2">🟢 New here?</p>
+<p class="text-sm text-neutral-300"><strong>RAG (Retrieval-Augmented Generation)</strong> — “retrieval-augmented generation.” Instead of answering from memory, the coach first <em>search</em> real excerpts (the expert tip + your data line) and only then writes, <em>citing</em> where it came from. That's what prevents guesswork and makes the answer traceable.</p>
+</div>
+<!-- COPY-RUN -->
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 bg-purple-500/10">
+<p class="text-sm font-semibold text-purple-400">▶️ Copy and run — ask for /advice about a tip</p>
+<p class="text-xs text-neutral-400 mt-1"><strong>Goal:</strong> see the coach reconcile an influencer tip with your data, with the source cited.</p>
+</div>
+<div class="relative">
+<button class="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600" onclick="copyBox(this)" type="button">Copy</button>
+<pre class="bg-dark-900 text-neutral-100 text-sm font-mono p-5 overflow-x-auto"><code># No Telegram, mande para o bot:
+/advice &lt;cole-aqui-a-dica-que-voce-ouviu&gt;
+
+# Ex.: /advice jejum de 16h todo dia acelera a perda de gordura
+
+# Prefere terminal? advice.py é o único script que precisa de requests:
+pip install requests
+python3 agent/scripts/advice.py "jejum 16/8 acelera a perda de gordura"</code></pre>
+</div>
+<div class="px-5 py-3 border-t border-dark-600 text-sm text-neutral-300">
+<strong class="text-purple-400">How to verify:</strong> the response <em>cite the source</em> and closes by reconciling with you—something like "the tip exists, <em>but</em> your AM cortisol is already high and you sleep ~6h: aggressive fasting could make your cortisol worse; discuss it with your doctor first". In the build checklist, this is item <em>"Influencer advice RAG returns cited tips reconciled to your data"</em>.
+          </div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> The difference in one sentence</h3>
+<p class="text-neutral-300 text-sm">A chatbot repeats the influencer’s tip. The <code class="font-mono text-xs bg-dark-700 px-1 rounded">/advice</code> a <strong>compare against your lab results and genetics</strong> — and tells you when popular advice doesn’t work for your body.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Key concepts</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Cited RAG</div><p class="text-xs text-neutral-400">Finds the source and cites where it came from.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Reconciles</div><p class="text-xs text-neutral-400">Checks the tip against your numbers.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">requests</div><p class="text-xs text-neutral-400">The only dependency outside the standard library.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Always verify</div><p class="text-xs text-neutral-400">The output is a question for your doctor, not an order.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Mark as read</span><span class="inema-label-done">Read ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-3-3#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">💊 /supplements — stack linked to your flags</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-3-t3-p1">O <code class="font-mono text-sm bg-dark-700 px-1 rounded">/supplements</code> doesn’t return the trendy list. It returns the <strong class="text-purple-400">your</strong> schedule, where each item is tied to a <strong class="text-purple-400">risk flag</strong> coming from your DNA and lab results. In the design, each marker or SNP maps to a flag → a supplement → a target in the schema. That’s how the advice is mechanism-aware, not a guess.</p>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-purple-400 mb-2">🟢 New here?</p>
+<p class="text-sm text-neutral-300"><strong>Risk flag</strong> — a “risk flag” the system raises when one of your test results or genes calls for attention (e.g., <em>sensitive to saturated fat</em>, <em>sensitive to salt</em>, <em>low vitamin D</em>, <em>poor toxin clearance</em>). Each flag points to a supplement or a target in the database—it’s the link between your raw data and the action.</p>
+</div>
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="DNA and tests trigger risk flags; each risk flag maps to a supplement stack item with a target in the schema" class="w-full h-auto" role="img" viewbox="0 0 1000 270">
+<defs>
+<lineargradient id="m33b-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#c084fc"></stop><stop offset="1" stop-color="#a855f7"></stop></lineargradient>
+<filter height="180%" id="m33b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m33b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#a855f7" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m33b-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m33b-grid)" height="270" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<text fill="#9ad6ff" font-size="11" text-anchor="middle" x="120" y="24">sources</text>
+<text fill="#9ad6ff" font-size="11" text-anchor="middle" x="470" y="24">risk flags</text>
+<text fill="#d8b4fe" font-size="11" text-anchor="middle" x="830" y="24">stack + target</text>
+<g class="wf-a"><rect fill="#0e1b26" height="46" rx="11" stroke="#38bdf8" stroke-width="2" width="180" x="30" y="70"></rect><text fill="#bfe6ff" text-anchor="middle" x="120" y="98">🧬 DNA (SNPs)</text></g>
+<g class="wf-a"><rect fill="#0e1b26" height="46" rx="11" stroke="#38bdf8" stroke-width="2" width="180" x="30" y="156"></rect><text fill="#bfe6ff" text-anchor="middle" x="120" y="184">🩸 Blood tests</text></g>
+<g><rect fill="#0e1b26" height="44" rx="11" stroke="#38bdf8" stroke-width="2" width="200" x="370" y="42"></rect><text fill="#bfe6ff" text-anchor="middle" x="470" y="69">🧂 salt-sensitive</text></g>
+<g><rect fill="#0e1b26" height="44" rx="11" stroke="#38bdf8" stroke-width="2" width="200" x="370" y="114"></rect><text fill="#bfe6ff" text-anchor="middle" x="470" y="141">🥓 saturated fat</text></g>
+<g><rect fill="#0e1b26" height="44" rx="11" stroke="#38bdf8" stroke-width="2" width="200" x="370" y="186"></rect><text fill="#bfe6ff" text-anchor="middle" x="470" y="213">☀️ low vitamin D</text></g>
+<g filter="url(#m33b-glow)"><rect fill="#1a1230" height="74" rx="14" stroke="url(#m33b-grad)" stroke-width="2.5" width="210" x="730" y="98"></rect></g>
+<text fill="#c084fc" font-size="14" text-anchor="middle" x="835" y="128">💊 /supplements</text><text fill="#d8b4fe" font-size="11" text-anchor="middle" x="835" y="150">schedule + target in the schema</text>
+</g>
+<g fill="none" opacity="0.5" stroke="#38bdf8" stroke-width="1.8">
+<path d="M210,93 C300,93 300,64 370,64" marker-end="url(#m33b-ah)"></path>
+<path d="M210,93 C300,93 300,136 370,136" marker-end="url(#m33b-ah)"></path>
+<path d="M210,179 C300,179 300,208 370,208" marker-end="url(#m33b-ah)"></path>
+<path d="M210,179 C300,179 300,136 370,136" marker-end="url(#m33b-ah)"></path>
+</g>
+<g fill="none" opacity="0.7" stroke="#a855f7" stroke-width="2">
+<path d="M570,64 C650,64 650,128 730,132" marker-end="url(#m33b-ah)"></path>
+<path d="M570,136 L730,136" marker-end="url(#m33b-ah)"></path>
+<path d="M570,208 C650,208 650,144 730,140" marker-end="url(#m33b-ah)"></path>
+</g>
+<text fill="#d8b4fe" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="500" y="256">each marker/SNP → a flag → a supplement or target in the schema</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>How to read:</strong> your data (cyan, on the left) triggers flags in the middle; each flag (purple arrows) pulls an item from the stack on the right. Change your DNA/test results and the stack changes — that's why it's <em>your</em>, not generic.</p>
+</div>
+<!-- COPY-RUN -->
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 bg-purple-500/10">
+<p class="text-sm font-semibold text-purple-400">▶️ Copy and run — ask for today's stack</p>
+<p class="text-xs text-neutral-400 mt-1"><strong>Goal:</strong> see the supplement schedule tied to your goals + risk flags, with the reason for each item.</p>
+</div>
+<div class="relative">
+<button class="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600" onclick="copyBox(this)" type="button">Copy</button>
+<pre class="bg-dark-900 text-neutral-100 text-sm font-mono p-5 overflow-x-auto"><code># No Telegram, mande para o bot:
+/supplements
+
+# Quer conferir os dados crus que alimentam o stack?
+python3 agent/scripts/db.py select goals
+python3 agent/scripts/db.py select lab_results   # &lt;suas-flags-vêm-daqui&gt;</code></pre>
+</div>
+<div class="px-5 py-3 border-t border-dark-600 text-sm text-neutral-300">
+<strong class="text-purple-400">How to verify:</strong> a schedule comes out (morning / workout / evening), and each item carries the <em>reason</em> tied to a flag — e.g.: "Vitamin D 4000 IU: your VDR SNP + low test result" or "Omega-3: saturated fat flag". If an item doesn't trace back to a flag or target, it shouldn't be there.
+          </div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Key concepts</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Flag → item</div><p class="text-xs text-neutral-400">Each supplement has a traceable reason.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">DNA + tests</div><p class="text-xs text-neutral-400">The flags come from your actual dashboard.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Schedule</div><p class="text-xs text-neutral-400">Morning / workout / evening, not a loose list.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Mechanism-aware</div><p class="text-xs text-neutral-400">Explains why it matters for your body, not just "take it."</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Mark as read</span><span class="inema-label-done">Read ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-3-3#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">📈 Patterns over time</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-3-t4-p1">Because everything becomes <strong class="text-purple-400">structured line</strong> in the database, the coach doesn’t just react to the latest message — it sees patterns over <strong class="text-purple-400">weeks</strong>. The insight that made the biggest impression on the author: the body is interconnected. Poor sleep raises cortisol, and cortisol <strong class="text-purple-400">amplifies everything</strong> — blood pressure, hunger, recovery. The coach told him to rest — and he took his first voluntary rest day in months.</p>
+<div class="rounded-2xl border border-purple-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Cascade: poor sleep raises cortisol, which amplifies pressure, hunger, and declining recovery; the coach reads the pattern and recommends a rest day" class="w-full h-auto" role="img" viewbox="0 0 1000 200">
+<defs>
+<lineargradient id="m33c-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#c084fc"></stop><stop offset="1" stop-color="#a855f7"></stop></lineargradient>
+<filter height="180%" id="m33c-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m33c-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#a855f7" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m33c-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m33c-grid)" height="200" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<rect fill="#1f1010" height="52" rx="12" stroke="#fb7185" stroke-width="2" width="160" x="24" y="74"></rect><text fill="#fda4af" text-anchor="middle" x="104" y="96">😴 Poor sleep</text><text fill="#fecdd3" font-size="11" text-anchor="middle" x="104" y="114">repeated during the week</text>
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="160" x="232" y="74"></rect><text fill="#bfe6ff" text-anchor="middle" x="312" y="96">📈 Cortisol rises</text><text fill="#9ad6ff" font-size="11" text-anchor="middle" x="312" y="114">the “amplifier”</text>
+<rect fill="#0e1b26" height="52" rx="12" stroke="#38bdf8" stroke-width="2" width="170" x="440" y="74"></rect><text fill="#bfe6ff" text-anchor="middle" x="525" y="92">🌀 Amplifies everything</text><text fill="#9ad6ff" font-size="10.5" text-anchor="middle" x="525" y="110">BP ↑ · hunger ↑ · recovery ↓</text>
+<g filter="url(#m33c-glow)"><rect fill="#1a1230" height="60" rx="14" stroke="url(#m33c-grad)" stroke-width="2.5" width="170" x="660" y="70"></rect></g><text fill="#c084fc" text-anchor="middle" x="745" y="94">🛌 Coach: rest</text><text fill="#d8b4fe" font-size="11" text-anchor="middle" x="745" y="112">1st voluntary rest day</text>
+</g>
+<g fill="none" opacity="0.6" stroke="#38bdf8" stroke-width="2">
+<path d="M184,100 L232,100" marker-end="url(#m33c-ah)"></path>
+<path d="M392,100 L440,100" marker-end="url(#m33c-ah)"></path>
+<path d="M610,100 L660,100" marker-end="url(#m33c-ah)"></path>
+</g>
+<path d="M745,130 C745,172 104,172 104,128" fill="none" marker-end="url(#m33c-ah)" opacity="0.75" stroke="#a855f7" stroke-dasharray="6 5" stroke-width="2"></path>
+<text fill="#d8b4fe" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="430" y="190">rest breaks the cascade — and the following week starts with better recovery</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>How to read:</strong> from left to right is the cascade (sleep → cortisol → everything gets worse); the purple dashed line is the coach <em>interrupting</em> the cycle with a rest day. The insight only appears because the memory is structured and sees the whole week.</p>
+</div>
+<div class="space-y-4 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center"><span class="text-purple-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Week 1 — loose ends</h4><p class="text-sm text-neutral-300">Each day is just a number. Recovery goes up and down without an apparent explanation.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center"><span class="text-purple-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Week 2 — the coach connects the dots</h4><p class="text-sm text-neutral-300">"On nights with &lt; 6 hours of sleep, your recovery drops the next day." Structured memory became a correlation.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center"><span class="text-purple-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-purple-500/30"><h4 class="font-semibold mb-1 text-purple-400">Insight — the body is interconnected</h4><p class="text-sm text-neutral-300">Poor sleep → high cortisol → everything gets worse. The coach started telling you when to push and when to rest. Result: the first voluntary rest day in months.</p></div>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> Why this only works with structured memory</h3>
+<p class="text-neutral-300 text-sm">A pattern is a <strong>correlation over time</strong>. Without structured rows (sleep, recovery, BP, food) recorded day after day, there’s nothing to correlate — you’d only have the latest message. Memory <em>é</em> the product.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Key concepts</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Interconnected</div><p class="text-xs text-neutral-400">Sleep affects cortisol, which affects everything.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Cortisol amplifies</div><p class="text-xs text-neutral-400">Pulls pressure, hunger, and recovery decline.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Pattern &gt; reaction</div><p class="text-xs text-neutral-400">Weeks, not just the latest message.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Rest day</div><p class="text-xs text-neutral-400">Rest became a data-guided decision.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Mark as read</span><span class="inema-label-done">Read ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-3-3#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">📝 Edit CLAUDE.md</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-3-t5-p1">O <code class="font-mono text-sm bg-dark-700 px-1 rounded">CLAUDE.md</code> é o <strong class="text-purple-400">coach brain</strong> — profile, goals, style, and the patterns you’ve already learned about yourself. As use reveals new things (like the sleep cascade in topic 4), you go back and edit it. That’s how the author made the coach “savage” on purpose: polite reminders don’t work for him, so he asked the coach to push him for energy and check-ins.</p>
+<!-- COPY-RUN -->
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 bg-purple-500/10">
+<p class="text-sm font-semibold text-purple-400">▶️ Copy and run — teach the coach a new pattern</p>
+<p class="text-xs text-neutral-400 mt-1"><strong>Goal:</strong> log a pattern you discovered and the style you want in the coach’s brain.</p>
+</div>
+<div class="relative">
+<button class="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600" onclick="copyBox(this)" type="button">Copy</button>
+<pre class="bg-dark-900 text-neutral-100 text-sm font-mono p-5 overflow-x-auto"><code># Abra o cérebro do coach e cole no fim:
+#   agent/CLAUDE.md
+
+## Estilo do coach
+- Seja direto e "savage": me cobre energia e check-ins.
+  Não respondo a lembrete educado.
+
+## Padrões que eu já aprendi
+- Jantar depois das 20h derruba meu recovery no dia seguinte.
+- Café só 90 min após acordar; nada de cafeína após as 14h.
+- &lt;cole-aqui-o-seu-próximo-padrão&gt;</code></pre>
+</div>
+<div class="px-5 py-3 border-t border-dark-600 text-sm text-neutral-300">
+<strong class="text-purple-400">How to verify:</strong> save, restart the agent, and send a regular message. The <em>tone</em> changes (more accountability), and the new rules show up in the responses. <strong>Attention:</strong> your <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> filled in has a real profile — never commit it to git.
+          </div>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🔁</span> It’s a loop, not a one-time config</h3>
+<p class="text-neutral-300 text-sm">The coach spots a pattern → you confirm → you save it to the <code class="font-mono text-xs bg-dark-700 px-1 rounded">CLAUDE.md</code> → it starts using it from then on. The more you teach it, the more it sounds like <em>you</em> getting to know your body.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Key concepts</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">The brain</div><p class="text-xs text-neutral-400">CLAUDE.md stores your profile, goals, and style.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">You edit</div><p class="text-xs text-neutral-400">Learned something? Save it there and the coach will use it.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">"Savage" optional</div><p class="text-xs text-neutral-400">Set the tone: from gentle to ruthless.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Outside Git</div><p class="text-xs text-neutral-400">A completed real profile is never versioned.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Mark as read</span><span class="inema-label-done">Read ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-3-3#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">⚖️ Influencer × your numbers</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-3-t6-p1">The golden rule of design: <strong class="text-purple-400">the data owner always wins</strong>. Any outside advice — no matter how famous the person who gave it is — is reconciled against your numbers. When generic advice conflicts with your lab results, your lab results win.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Generic influencer advice</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>"Everyone should take 5g of creatine and cut salt." — the same advice for 10 million people.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Doesn’t know who you are <em>sensitive to salt</em> (raises blood pressure by 10–15% after a salty lunch).</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>"Coffee all day keeps you productive." — without checking your caffeine gene or your hydration.</span></li>
+</ul>
+</div>
+<div class="bg-purple-900/20 rounded-xl border border-purple-500/30 p-6">
+<h4 class="font-bold text-purple-400 mb-4">✓ Reconciled with your data</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>"The tip is there, but your dashboard calls for attention to salt — let’s go by your number."</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>"You metabolize caffeine quickly: 1 coffee early, cut it off in the afternoon — the rest was thirst."</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>Cites the tip’s source AND shows your data side by side, so you can decide with your doctor.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-dark-800 rounded-xl border border-purple-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-purple-400 mb-3 flex items-center"><span class="mr-2">🧬</span> Genes are dials, not destiny</h3>
+<p class="text-neutral-300 text-sm">The author’s DNA flagged sensitivity to saturated fat and salt, poor toxin clearance, and lactose intolerance. The coach <strong>builds on top of these flags</strong> — instead of repeating generic advice. It’s the opposite of following this week’s influencer.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-purple-400">Key concepts</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Your data wins</div><p class="text-xs text-neutral-400">Your number takes precedence over the external guidance.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Genes = dials</div><p class="text-xs text-neutral-400">Adjust the dose; they’re not a verdict.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Side by side</div><p class="text-xs text-neutral-400">A cited tip + your test, so you can decide.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Anti-hype</div><p class="text-xs text-neutral-400">Specific beats generic, always.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Mark as read</span><span class="inema-label-done">Read ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-3-3#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">🩺 When to ignore the coach</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m3-3-t7-p1">The coach is a tool for <strong class="text-purple-400">logging and reasoning</strong>, not a doctor. All this memory and personalization <strong class="text-purple-400">no</strong> turn the coach into a clinical authority. Sometimes the right response is to close Telegram and call a professional.</p>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Red alert — stop and see a clinician</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Any acute symptom (chest pain, shortness of breath, very high blood pressure). The coach <strong>doesn’t diagnose</strong> and is instructed to forward it.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Change a supplement or—never—medication. It <strong>doesn’t touch medication</strong>; interactions are something to discuss with a doctor/nutritionist.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>AI can <strong>hallucinate</strong>: confidently state something wrong or make up a number. Treat every suggestion as a question to take to your doctor.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>DNA samples mailed in degrade — the clinic’s panel and Ancestry’s may not match. Don’t make any decisions based on a single report.</span></li>
+</ul>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-purple-900/20 rounded-xl border border-purple-500/30 p-6">
+<h4 class="font-bold text-purple-400 mb-4">✓ Healthy use of the coach</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>Log, see the trend, and formulate <strong>better questions</strong> for your doctor.</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>Take the plan to a clinician <em>before</em> to follow—as the author did at every step.</span></li>
+<li class="flex items-start space-x-2"><span class="text-purple-400">✓</span><span>Treat the output as a hypothesis to verify, not an order to follow.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Following blindly</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Taking a new dose just because the coach suggested it, without a clinician in the loop.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Ignore a symptom because "recovery was green".</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Confusing personalization with diagnosis — they’re different things.</span></li>
+</ul>
+</div>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-3-3#q1">
+<p class="font-medium mb-4">✅ Self-check (optional): the coach suggested a new supplement dose. What’s the right approach?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) Take it right away — it already knows my data</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) Take the suggestion (and the reason behind it) to my doctor/nutritionist before changing anything</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) Ignore it — all supplements are the same</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 mt-8 text-purple-400">Key concepts</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Doctor in the loop</div><p class="text-xs text-neutral-400">Have a clinician verify everything.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Can hallucinate</div><p class="text-xs text-neutral-400">Being confident and wrong is possible.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Doesn’t diagnose</div><p class="text-xs text-neutral-400">Refers you elsewhere; it doesn’t change medication.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-purple-400 font-bold text-sm mb-1">Hypothesis, not an order</div><p class="text-xs text-neutral-400">Question for the doctor, not a prescription.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:bg-purple-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Mark as read</span><span class="inema-label-done">Read ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-purple-900/40 via-dark-800 to-dark-800 rounded-xl border border-purple-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Module summary</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">Semantic recall</strong><span class="text-neutral-400"> — the sentence becomes a vector, pgvector finds similar past entries, and the coach opens with "last time you…".</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">/advice reconciled</strong><span class="text-neutral-400"> — cited RAG that compares the expert’s advice with your numbers.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">/supplements by flag</strong><span class="text-neutral-400"> — each item in the stack tied to a risk flag from your DNA + lab tests.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">Patterns over time</strong><span class="text-neutral-400"> — structured memory becomes insight: sleep → cortisol → the first voluntary rest day.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-purple-400 mt-1">✓</span><div><strong class="text-neutral-100">You’re in control</strong><span class="text-neutral-400"> — edit the CLAUDE.md, let your data outweigh the influencer, and ignore the coach when it’s time to involve your doctor.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-purple-400 mb-2">Next module:</h3>
+<p class="text-neutral-300 text-sm">3.4 — Dashboard and tracking: the trends dashboard, the Sleep &amp; Recovery card, and how to read multiple weeks at once.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Back to How to use</a>
+<a class="flex-1 text-center px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition-colors" href="modulo-3-4.html">Next module →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — INEMA Course · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Educational content. Not medical advice. Consult healthcare professionals.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+    // copiar blocos copy-run
+    function copyBox(btn){
+      try {
+        const pre = btn.parentElement.querySelector('pre');
+        const txt = pre ? pre.innerText : '';
+        navigator.clipboard.writeText(txt).then(()=>{ const o=btn.textContent; btn.textContent='Copiado ✓'; setTimeout(()=>btn.textContent=o,1500); });
+      } catch(e){}
+    }
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-3-3#q1', {
+        answer: 1,
+        explain: { 0: 'Não — personalização não vira autoridade clínica; leve ao médico antes.', 1: 'Isso. A saída do coach é hipótese para verificar com o seu clínico, nunca ordem.', 2: 'Errado — suplementos e doses não são intercambiáveis; sempre com profissional.' }
+      });
+    }
+  </script>
+</body>
+</html>

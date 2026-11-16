@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Módulo 2.1 — Requisitos previos y cuentas | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento blue (T2) */
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37,99,235,0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37,99,235,0.08); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37,99,235,0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37,99,235,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha2/modulo-2-1.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha2/modulo-2-1.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha2/modulo-2-1.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha2/modulo-2-1.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="../../../en/curso/trilha2/modulo-2-1.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="modulo-2-1.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-blue-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Saltar al contenido</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html"><span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentos</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-blue-400 bg-blue-500/10" href="index.html"><span class="sm:hidden">T2</span><span class="hidden sm:inline">Paso a paso</span></a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html"><span class="sm:hidden">T3</span><span class="hidden sm:inline">Cómo usar</span></a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="Mi recorrido" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">Mi recorrido</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Apariencia" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Apariencia</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tema</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Oscuro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Claro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sepia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Enfoque</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">Alto contraste</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tamaño del texto</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Ancho · interlineado</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Estrecho</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Medio</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Ancho</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compacto</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Cómodo</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Fuente</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">Sistema</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Lectura</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Ruta de navegación" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-blue-400" href="../../index.html">Inicio</a><span>/</span>
+<a class="hover:text-blue-400" href="index.html">Paso a paso</a><span>/</span>
+<span class="text-blue-400">Módulo 2.1</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-blue-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="2-1" data-inema-track="2">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full mb-4">MÓDULO 2.1</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">🧰 Requisitos previos y cuentas</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">Antes de construir: instala lo básico, crea las cuentas (<strong class="text-blue-400">Supabase, Telegram, OpenAI, Gemini, WHOOP</strong>) y armar el <code class="font-mono text-base bg-dark-700 px-1.5 py-0.5 rounded">~/.env</code>. Cada pieza con su porqué, para que sepas qué estás conectando antes de seguir con la base de datos.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">7</div><div class="text-xs text-neutral-400">Temas</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">~35</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Intermedio</div><div class="text-xs text-neutral-400">Nivel</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Práctico</div><div class="text-xs text-neutral-400">Tipo</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:2-1">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Tu progreso en este módulo</span>
+<span class="text-blue-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 de 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-blue-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Índice de la página" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Sección <span class="inema-toc-pos">1</span> de <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-1">1. Qué instalar</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-2">2. Proyecto Supabase</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-3">3. Bot en Telegram</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-4">4. OpenAI y Gemini</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-5">5. WHOOP (opcional)</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-6">6. El archivo ~/.env</a></li>
+<li><a class="inema-toc-link hover:text-blue-400" href="#topico-7">7. Lista de verificación de preparación</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-2-1#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">🐍 Qué instalar en la máquina</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-1-t1-p1">El HealthOS es deliberadamente simple: los scripts son <strong class="text-blue-400">Python puro (stdlib)</strong> — solo el <code class="font-mono text-sm bg-dark-700 px-1 rounded">advice.py</code> pide <code class="font-mono text-sm bg-dark-700 px-1 rounded">pip install requests</code>. Antes de crear cualquier cuenta, deja cuatro herramientas básicas listas en la máquina. Las instalas una vez y sigues con el resto.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí? Dos términos antes de continuar</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>CLI</strong> — «interfaz de línea de comandos»: un programa que ejecutas escribiendo en la terminal, sin una ventana gráfica. El <em>Supabase CLI</em> es lo que envía la base de datos a la nube mediante un comando.</li>
+<li><strong>Runtime</strong> — el "motor" que ejecuta un tipo de código. <em>Python</em> ejecuta los scripts; <em>Node</em> ejecuta el agente y el servidor del dashboard.</li>
+</ul>
+</div>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Cuatro herramientas básicas —Python, Node, ffmpeg y Supabase CLI— convergen en un entorno listo para construir HealthOS" class="w-full h-auto" role="img" viewbox="0 0 1000 220">
+<defs>
+<lineargradient id="m21c-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m21c-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m21c-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m21c-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m21c-grid)" height="220" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="13" font-weight="600">
+<g class="wf-a"><rect fill="#0e1622" height="40" rx="10" stroke="#38bdf8" stroke-width="2" width="210" x="40" y="22"></rect><text fill="#bcd9ff" text-anchor="middle" x="145" y="47">🐍 Python 3.9+</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="40" rx="10" stroke="#38bdf8" stroke-width="2" width="210" x="40" y="78"></rect><text fill="#bcd9ff" text-anchor="middle" x="145" y="103">🟢 Node</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="40" rx="10" stroke="#38bdf8" stroke-width="2" width="210" x="40" y="134"></rect><text fill="#bcd9ff" text-anchor="middle" x="145" y="159">🎬 ffmpeg (clips)</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="22" rx="8" stroke="#38bdf8" stroke-width="2" width="210" x="40" y="190"></rect><text fill="#bcd9ff" font-size="11" text-anchor="middle" x="145" y="206">🗄️ Supabase CLI</text></g>
+</g>
+<g fill="none" opacity="0.5" stroke="#38bdf8" stroke-width="1.8">
+<path d="M250,42 C400,42 440,100 560,108" marker-end="url(#m21c-ah)"></path>
+<path d="M250,98 C400,98 460,106 560,110" marker-end="url(#m21c-ah)"></path>
+<path d="M250,154 C400,154 460,118 560,112" marker-end="url(#m21c-ah)"></path>
+<path d="M250,201 C400,201 440,124 560,114" marker-end="url(#m21c-ah)"></path>
+</g>
+<g filter="url(#m21c-glow)"><rect fill="#0e1622" height="64" rx="14" stroke="url(#m21c-grad)" stroke-width="2.5" width="220" x="560" y="80"></rect></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="16" font-weight="600" text-anchor="middle" x="670" y="107">✅ Entorno listo</text>
+<text fill="#9ec5fe" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="670" y="128">para construir tu HealthOS</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> las cuatro herramientas básicas (cian, a la izquierda) solo necesitan existir una vez. Python y Node son obligatorios; ffmpeg solo hace falta si vas a generar clips de entrenamiento; Supabase CLI envía la base de datos en la Ruta 2.2.</p>
+</div>
+<div class="overflow-x-auto mb-6">
+<table class="w-full text-sm border border-dark-600 rounded-lg overflow-hidden">
+<thead class="bg-dark-800 text-blue-400"><tr><th class="text-left px-4 py-2 font-semibold">Herramienta</th><th class="text-left px-4 py-2 font-semibold">¿Obligatoria?</th><th class="text-left px-4 py-2 font-semibold">Para qué</th></tr></thead>
+<tbody class="divide-y divide-dark-600 text-neutral-300">
+<tr class="bg-dark-800/40"><td class="px-4 py-2 font-mono">Python 3.9+</td><td class="px-4 py-2 text-blue-400">Sí</td><td class="px-4 py-2">Ejecuta los scripts (stdlib). Solo <code class="font-mono text-xs bg-dark-700 px-1 rounded">advice.py</code> usa <code class="font-mono text-xs bg-dark-700 px-1 rounded">pip install requests</code>.</td></tr>
+<tr><td class="px-4 py-2 font-mono">Node</td><td class="px-4 py-2 text-blue-400">Sí</td><td class="px-4 py-2">Ejecuta el agente y el servidor del dashboard.</td></tr>
+<tr class="bg-dark-800/40"><td class="px-4 py-2 font-mono">ffmpeg</td><td class="px-4 py-2 text-neutral-400">Opcional</td><td class="px-4 py-2">Solo para <code class="font-mono text-xs bg-dark-700 px-1 rounded">exercise_clip.py</code> (clips de demostración de entrenamiento).</td></tr>
+<tr><td class="px-4 py-2 font-mono">Supabase CLI</td><td class="px-4 py-2 text-blue-400">Sí</td><td class="px-4 py-2">Aplica las migrations (crea las 14 tablas); se usó en la 2.2.</td></tr>
+</tbody>
+</table>
+</div>
+<!-- CODE BOX 1 (COPY-RUN) -->
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 flex items-center gap-2"><span class="text-blue-400">▶</span><span class="text-sm font-semibold text-neutral-100">Objetivo: confirmar que Python y Node estén instalados (y en las versiones correctas)</span></div>
+<pre class="bg-dark-900 p-5 overflow-x-auto text-sm leading-relaxed"><code class="font-mono text-neutral-300">python3 --version &amp;&amp; node --version</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 text-sm text-neutral-400"><strong class="text-blue-400">Cómo verificar:</strong> debe imprimir dos líneas, p. ej.: <code class="font-mono text-xs bg-dark-700 px-1 rounded">Python 3.11.6</code> e <code class="font-mono text-xs bg-dark-700 px-1 rounded">v20.11.0</code>. Si Python aparece por debajo de la versión 3.9 o muestra "command not found", instálalo o actualízalo antes de continuar. (ffmpeg y Supabase CLI: comprueba con <code class="font-mono text-xs bg-dark-700 px-1 rounded">ffmpeg -version</code> e <code class="font-mono text-xs bg-dark-700 px-1 rounded">supabase --version</code> — el primero solo si vas a usar clips.)</div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Stdlib</div><p class="text-xs text-neutral-400">Los scripts no dependen de paquetes externos (casi no hay nada que instalar).</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Python + Node</div><p class="text-xs text-neutral-400">Los dos motores obligatorios: scripts y agente.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">ffmpeg opcional</div><p class="text-xs text-neutral-400">Solo para clips de entrenamiento.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Supabase CLI</div><p class="text-xs text-neutral-400">Impulsa la base de datos; protagonista de la 2.2.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-2-1#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">☁️ Crear el proyecto privado de Supabase</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-1-t2-p1">O <strong class="text-blue-400">Supabase</strong> es donde se almacenarán TODOS tus datos de salud —comida, entrenamiento, peso, análisis, signos vitales, metas y la memoria de los mensajes. Por eso tiene que estar <strong class="text-blue-400">privado, en tu cuenta</strong>. Aquí solo creas el proyecto y guardas cuatro secretos; crear las tablas es el paso 2.2.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<p class="text-sm text-neutral-300"><strong>Supabase</strong> es una base de datos PostgreSQL en la nube + almacenamiento de archivos, con un panel web. Piensa en él como el «disco duro del coach»: todo lo que registras se convierte en una fila ahí, y el agente consulta esos datos en cada conversación.</p>
+</div>
+<div class="space-y-4 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Crea la cuenta y un proyecto nuevo</h4><p class="text-sm text-neutral-300">En <code class="font-mono text-xs bg-dark-700 px-1 rounded">supabase.com</code>, «New project». El plan <strong>gratuito</strong> es suficiente para una persona.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Elige una región adecuada</h4><p class="text-sm text-neutral-300">Prefiere la región más cercana a ti (menos latencia). Para Brasil, normalmente <code class="font-mono text-xs bg-dark-700 px-1 rounded">South America (São Paulo)</code>.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Define y guarda la contraseña de la base de datos</h4><p class="text-sm text-neutral-300">La contraseña de la base de datos se convierte en el <code class="font-mono text-xs bg-dark-700 px-1 rounded">SUPABASE_DB_PASSWORD</code> — Supabase CLI la necesitará en la 2.2 para enviar las migrations.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">4</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Copia la URL y las claves (Settings → API)</h4><p class="text-sm text-neutral-300">Obtén el <code class="font-mono text-xs bg-dark-700 px-1 rounded">SUPABASE_URL</code>, a <code class="font-mono text-xs bg-dark-700 px-1 rounded">SUPABASE_ANON_KEY</code> (pública) y la <code class="font-mono text-xs bg-dark-700 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> (servidor). Guárdalo para el tema 6.</p></div>
+</div>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🔒</span> Anon × Service-role — dos claves, dos mundos</h3>
+<p class="text-neutral-300 text-sm">A <strong>anon</strong> es pública; con la RLS activada y sin políticas (lo haces en la 2.2), no lee <em>nada</em>. A <strong>service-role</strong> es la clave del servidor: ignora la RLS y tiene acceso total. Por eso, el rol de servicio <strong>nunca</strong> va al navegador ni a git — solo al <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Privado</div><p class="text-xs text-neutral-400">El proyecto es tuyo, en tu cuenta.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Región</div><p class="text-xs text-neutral-400">Cerca de ti = menos latencia.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Contraseña de la base de datos</div><p class="text-xs text-neutral-400">Se convierte en DB_PASSWORD para las migrations.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">URL + 2 claves</div><p class="text-xs text-neutral-400">Anon pública, service-role del servidor.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-2-1#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">🤖 Crear el bot en Telegram (@BotFather)</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-1-t3-p1">Telegram es la <strong class="text-blue-400">puerta de entrada</strong> del coach: conversas por mensaje. Para que esto exista, creas un bot con el <strong class="text-blue-400">@BotFather</strong> (el "bot oficial que crea bots") y obtén su token: el <code class="font-mono text-sm bg-dark-700 px-1 rounded">HEALTH_BOT_TOKEN</code>.</p>
+<div class="space-y-4 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Abre @BotFather en Telegram</h4><p class="text-sm text-neutral-300">Busca <code class="font-mono text-xs bg-dark-700 px-1 rounded">@BotFather</code> (el verificado, con la insignia azul) e inicia la conversación.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Envía <code class="font-mono text-xs bg-dark-700 px-1 rounded">/newbot</code> y nombra</h4><p class="text-sm text-neutral-300">Elige un nombre para mostrar y un username que termine en <code class="font-mono text-xs bg-dark-700 px-1 rounded">bot</code> (p. ej.: <code class="font-mono text-xs bg-dark-700 px-1 rounded">meu_health_os_bot</code>).</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Copia el token que te da</h4><p class="text-sm text-neutral-300">Viene algo como <code class="font-mono text-xs bg-dark-700 px-1 rounded">123456789:AAH...xyz</code>. Este es el <code class="font-mono text-xs bg-dark-700 px-1 rounded">HEALTH_BOT_TOKEN</code> — guárdalo para el tema 6.</p></div>
+</div>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> El token es la llave de la puerta</h3>
+<p class="text-neutral-300 text-sm">Cualquiera con el <code class="font-mono text-xs bg-dark-700 px-1 rounded">HEALTH_BOT_TOKEN</code> controla tu bot. No lo pegues en un chat ni lo subas a git. Si se filtra, usa <code class="font-mono text-xs bg-dark-700 px-1 rounded">/revoke</code> en @BotFather para generar uno nuevo en el momento.</p>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> Dónde se usa el token</h3>
+<p class="text-neutral-300 text-sm">Además de <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>, el agente apunta a esa variable en el <code class="font-mono text-xs bg-dark-700 px-1 rounded">agent.yaml</code> (campo <code class="font-mono text-xs bg-dark-700 px-1 rounded">telegram_bot_token_env</code>). De hecho, activas esto en la Trilha 2.3: aquí solo necesitas tener el token a mano.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">@BotFather</div><p class="text-xs text-neutral-400">El bot oficial que crea tu bot.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">/newbot</div><p class="text-xs text-neutral-400">Comando que genera el bot y el token.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">HEALTH_BOT_TOKEN</div><p class="text-xs text-neutral-400">La clave de la puerta de entrada.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">/revoke</div><p class="text-xs text-neutral-400">Cambia el token si se filtra.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-2-1#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">🔑 Claves de OpenAI y Gemini</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-1-t4-p1">Dos claves cubren dos trabajos diferentes. La <strong class="text-blue-400">OpenAI</strong> genera los <em>embeddings</em> de la memoria (es como el coach recuerda tu historial). El <strong class="text-blue-400">Gemini</strong> (Google) hace la <em>visión</em>: transforma la foto de una comida o de un análisis en datos.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<p class="text-sm text-neutral-300"><strong>Embedding</strong> es convertir un texto en un vector de números que captura el «sentido». Los mensajes parecidos se convierten en vectores cercanos —así es como el coach encuentra lo que dijiste hace semanas (memoria semántica), en vez de guardar solo lo último que dijiste.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6">
+<h4 class="font-bold text-blue-400 mb-3">🧠 OPENAI_API_KEY</h4>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-blue-400 mt-0.5">•</span><span>Crea en <code class="font-mono text-xs bg-dark-700 px-1 rounded">platform.openai.com</code> → Claves de API.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400 mt-0.5">•</span><span>Usada para <strong>embeddings</strong> de la memoria semántica.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400 mt-0.5">•</span><span>El costo de los embeddings es de <strong>centavos</strong>.</span></li>
+</ul>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6">
+<h4 class="font-bold text-blue-400 mb-3">📸 GOOGLE_API_KEY</h4>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-blue-400 mt-0.5">•</span><span>Crea en <code class="font-mono text-xs bg-dark-700 px-1 rounded">aistudio.google.com</code> → Obtener clave de API.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400 mt-0.5">•</span><span>Visión <strong>Gemini</strong>: foto de comida → macros, análisis → marcadores.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400 mt-0.5">•</span><span>Costo de <strong>centavos por foto</strong>.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">💰</span> Cuánto cuesta</h3>
+<p class="text-neutral-300 text-sm">Para una persona, el uso típico ronda <strong>US$ 10–20/mes</strong> sumando las llamadas de LLM, con embeddings y visión, en centavos. Configura un límite de gasto en cada cuenta para dormir tranquilo.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Embeddings</div><p class="text-xs text-neutral-400">OpenAI: la base de la memoria semántica.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Visión</div><p class="text-xs text-neutral-400">Gemini: la foto se convierte en datos estructurados.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Dos cuentas</div><p class="text-xs text-neutral-400">OpenAI y Google AI Studio.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Barato</div><p class="text-xs text-neutral-400">Centavos por foto/embedding.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-2-1#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">⌚ Cuenta WHOOP + app de desarrollo (opcional)</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-1-t5-p1">WHOOP es el ejemplo de wearable del blueprint, pero es <strong class="text-blue-400">100% opcional</strong>. El mismo patrón (OAuth + sync diario) sirve para Oura, Garmin, Fitbit o el registro manual. El coach y el dashboard trabajan con lo que aparezca en la tabla <code class="font-mono text-sm bg-dark-700 px-1 rounded">vitals</code>, venga de donde venga.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-blue-400 mb-2">🟢 ¿Nuevo por aquí?</p>
+<p class="text-sm text-neutral-300"><strong>OAuth</strong> es el apretón de manos que permite que tu app lea tus datos en la WHOOP <em>sin</em> guardar tu contraseña. Autorizas una vez; WHOOP devuelve un <code class="font-mono text-xs bg-dark-700 px-1 rounded">refresh_token</code> que el sync usa (y rota) cada mañana.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6">
+<h4 class="font-bold text-blue-400 mb-4">✓ Tiene WHOOP</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Crea una app en <code class="font-mono text-xs bg-dark-700 px-1 rounded">developer.whoop.com</code>.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Obtén el <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_CLIENT_ID</code> e o <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_CLIENT_SECRET</code>.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>La API es <strong>gratuita</strong> con la suscripción. El <code class="font-mono text-xs bg-dark-700 px-1 rounded">REFRESH_TOKEN</code> la callback se completa en la 2.4.</span></li>
+</ul>
+</div>
+<div class="bg-dark-800 rounded-xl border border-dark-600 p-6">
+<h4 class="font-bold text-neutral-300 mb-4">○ No tienes WHOOP</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-neutral-400">○</span><span>Deja las tres variables <code class="font-mono text-xs bg-dark-700 px-1 rounded">WHOOP_*</code> vacías.</span></li>
+<li class="flex items-start space-x-2"><span class="text-neutral-400">○</span><span>Usa otro wearable con el mismo patrón o registra manualmente la recuperación y el sueño.</span></li>
+<li class="flex items-start space-x-2"><span class="text-neutral-400">○</span><span>Todo lo demás del curso funciona igual.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> Dos trampas que la 2.4 resuelve</h3>
+<p class="text-neutral-300 text-sm">Cuando actives la sincronización de verdad (Ruta 2.4), hay dos cosas que pueden complicarse: Cloudflare bloquea el user-agent predeterminado de Python (envía uno de navegador) y el refresh-token debe ser <strong>rotado en cada run</strong>. Aquí solo necesitas tener las credenciales; el resto viene después.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Opcional</div><p class="text-xs text-neutral-400">Cualquier fuente sirve, incluso manual.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">App dev</div><p class="text-xs text-neutral-400">Genera CLIENT_ID y CLIENT_SECRET.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">OAuth</div><p class="text-xs text-neutral-400">Autoriza sin guardar la contraseña.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Tabla vitals</div><p class="text-xs text-neutral-400">El destino común de cualquier wearable.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-2-1#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">📄 El archivo ~/.env</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-1-t6-p1">Todo lo que reuniste — token, URL, claves — converge en <strong class="text-blue-400">un único archivo</strong>: o <code class="font-mono text-sm bg-dark-700 px-1 rounded">~/.env</code>, en tu home (el <code class="font-mono text-sm bg-dark-700 px-1 rounded">~</code> es el atajo a tu carpeta de usuario). Se encuentra <strong class="text-blue-400">fuera de git</strong>, siempre. El agente lee los secretos desde ahí para funcionar.</p>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Cinco cuentas y claves — Supabase, Telegram, OpenAI, Gemini y WHOOP — convergen en el archivo ~/.env, que el agente lee para funcionar" class="w-full h-auto" role="img" viewbox="0 0 1000 290">
+<defs>
+<lineargradient id="m21a-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m21a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m21a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m21a-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m21a-grid)" height="290" width="1000" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="13" font-weight="600">
+<g class="wf-a"><rect fill="#0e1622" height="38" rx="10" stroke="#38bdf8" stroke-width="2" width="200" x="36" y="20"></rect><text fill="#bcd9ff" text-anchor="middle" x="136" y="44">☁️ Supabase (URL+keys)</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="38" rx="10" stroke="#38bdf8" stroke-width="2" width="200" x="36" y="74"></rect><text fill="#bcd9ff" text-anchor="middle" x="136" y="98">🤖 Telegram (token)</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="38" rx="10" stroke="#38bdf8" stroke-width="2" width="200" x="36" y="128"></rect><text fill="#bcd9ff" text-anchor="middle" x="136" y="152">🧠 OpenAI (key)</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="38" rx="10" stroke="#38bdf8" stroke-width="2" width="200" x="36" y="182"></rect><text fill="#bcd9ff" text-anchor="middle" x="136" y="206">📸 Gemini (key)</text></g>
+<g class="wf-a"><rect fill="#0e1622" height="38" rx="10" stroke="#38bdf8" stroke-width="2" width="200" x="36" y="236"></rect><text fill="#bcd9ff" text-anchor="middle" x="136" y="260">⌚ WHOOP (opcional)</text></g>
+</g>
+<g fill="none" opacity="0.5" stroke="#38bdf8" stroke-width="1.8">
+<path d="M236,39 C360,39 410,130 500,145" marker-end="url(#m21a-ah)"></path>
+<path d="M236,93 C360,93 420,135 500,147" marker-end="url(#m21a-ah)"></path>
+<path d="M236,147 L500,147" marker-end="url(#m21a-ah)"></path>
+<path d="M236,201 C360,201 420,159 500,149" marker-end="url(#m21a-ah)"></path>
+<path d="M236,255 C360,255 410,164 500,151" marker-end="url(#m21a-ah)"></path>
+</g>
+<g filter="url(#m21a-glow)"><rect fill="#0e1622" height="62" rx="14" stroke="url(#m21a-grad)" stroke-width="2.5" width="190" x="500" y="116"></rect></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="17" font-weight="600" text-anchor="middle" x="595" y="143">📄 ~/.env</text>
+<text fill="#9ec5fe" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="595" y="164">un archivo, en tu home</text>
+<path d="M690,147 L760,147" fill="none" marker-end="url(#m21a-ah)" opacity="0.85" stroke="#60a5fa" stroke-width="2"></path>
+<g filter="url(#m21a-glow)"><rect fill="#0e1622" height="62" rx="14" stroke="url(#m21a-grad)" stroke-width="2.5" width="200" x="760" y="116"></rect></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="15" font-weight="600" text-anchor="middle" x="860" y="143">🤖 Agente</text>
+<text fill="#9ec5fe" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="860" y="164">lee los secretos y ejecuta</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> las cinco fuentes (cian, a la izquierda) vierten sus claves en un solo lugar — el <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> (azul, en el centro). El agente solo lee este archivo. WHOOP aparece con línea discontinua porque es opcional.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Todas las variables y para qué sirven</h3>
+<div class="overflow-x-auto mb-6">
+<table class="w-full text-sm border border-dark-600 rounded-lg overflow-hidden">
+<thead class="bg-dark-800 text-blue-400"><tr><th class="text-left px-4 py-2 font-semibold">Variable</th><th class="text-left px-4 py-2 font-semibold">Para qué</th></tr></thead>
+<tbody class="divide-y divide-dark-600 text-neutral-300">
+<tr class="bg-dark-800/40"><td class="px-4 py-2 font-mono text-xs">HEALTH_BOT_TOKEN</td><td class="px-4 py-2">Token del bot de Telegram (de @BotFather).</td></tr>
+<tr><td class="px-4 py-2 font-mono text-xs">SUPABASE_URL</td><td class="px-4 py-2">Dirección de tu proyecto: <code class="font-mono text-xs bg-dark-700 px-1 rounded">https://&lt;ref&gt;.supabase.co</code>.</td></tr>
+<tr class="bg-dark-800/40"><td class="px-4 py-2 font-mono text-xs">SUPABASE_SERVICE_ROLE_KEY</td><td class="px-4 py-2">Acceso del servidor a la base de datos (ignora la RLS). Nunca en el navegador.</td></tr>
+<tr><td class="px-4 py-2 font-mono text-xs">SUPABASE_ANON_KEY</td><td class="px-4 py-2">Clave pública — con RLS activada, no puede leer nada.</td></tr>
+<tr class="bg-dark-800/40"><td class="px-4 py-2 font-mono text-xs">SUPABASE_DB_PASSWORD</td><td class="px-4 py-2">Contraseña de la base de datos para que Supabase CLI ejecute las migrations.</td></tr>
+<tr><td class="px-4 py-2 font-mono text-xs">OPENAI_API_KEY</td><td class="px-4 py-2">Embeddings de la memoria semántica.</td></tr>
+<tr class="bg-dark-800/40"><td class="px-4 py-2 font-mono text-xs">GOOGLE_API_KEY</td><td class="px-4 py-2">Visión Gemini (foto de comida / examen / entrenamiento).</td></tr>
+<tr><td class="px-4 py-2 font-mono text-xs">DASHBOARD_TOKEN</td><td class="px-4 py-2">Protege el dashboard web (un secreto aleatorio tuyo).</td></tr>
+<tr class="bg-dark-800/40"><td class="px-4 py-2 font-mono text-xs">WHOOP_CLIENT_ID</td><td class="px-4 py-2">ID de tu app WHOOP (opcional).</td></tr>
+<tr><td class="px-4 py-2 font-mono text-xs">WHOOP_CLIENT_SECRET</td><td class="px-4 py-2">Secreto de tu app de WHOOP (opcional).</td></tr>
+<tr class="bg-dark-800/40"><td class="px-4 py-2 font-mono text-xs">WHOOP_REFRESH_TOKEN</td><td class="px-4 py-2">La escribe la callback OAuth y se rota con cada sincronización.</td></tr>
+</tbody>
+</table>
+</div>
+<!-- CODE BOX 2 (COPY-RUN: o .env completo) -->
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 flex items-center gap-2"><span class="text-blue-400">▶</span><span class="text-sm font-semibold text-neutral-100">Objetivo: crear el ~/.env completo (cambia las partes en &lt;...&gt; por tus valores)</span></div>
+<pre class="bg-dark-900 p-5 overflow-x-auto text-xs sm:text-sm leading-relaxed"><code class="font-mono text-neutral-300"># ~/.env — segredos do HealthOS. NUNCA versionar (fica na home, fora do git).
+
+# Telegram (do @BotFather)
+HEALTH_BOT_TOKEN=&lt;seu-token-do-botfather&gt;
+
+# Supabase (Settings -&gt; API e Database)
+SUPABASE_URL=https://&lt;project-ref&gt;.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=&lt;service-role-key&gt;
+SUPABASE_ANON_KEY=&lt;anon-public-key&gt;
+SUPABASE_DB_PASSWORD=&lt;senha-do-banco&gt;
+
+# Modelos
+OPENAI_API_KEY=&lt;sk-...&gt;
+GOOGLE_API_KEY=&lt;sua-chave-gemini&gt;
+
+# Dashboard
+DASHBOARD_TOKEN=&lt;um-segredo-aleatorio-seu&gt;
+
+# WHOOP (OPCIONAL — qualquer wearable ou registro manual serve)
+WHOOP_CLIENT_ID=&lt;client-id-do-app-whoop&gt;
+WHOOP_CLIENT_SECRET=&lt;client-secret-do-app-whoop&gt;
+WHOOP_REFRESH_TOKEN=&lt;deixe-vazio-a-callback-preenche&gt;</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 text-sm text-neutral-400"><strong class="text-blue-400">Cómo verificar:</strong> guarda como <code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>. La recomendación para el repo es copiar de <code class="font-mono text-xs bg-dark-700 px-1 rounded">agent/.env.example</code> y completar. No quedó ningún <code class="font-mono text-xs bg-dark-700 px-1 rounded">&lt;...&gt;</code>? Entonces está listo para el siguiente paso.</div>
+</div>
+<!-- CODE BOX 3 (COPY-RUN: verificar) -->
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 border-b border-dark-600 flex items-center gap-2"><span class="text-blue-400">▶</span><span class="text-sm font-semibold text-neutral-100">Objetivo: confirmar que el archivo existe y que las claves están completas</span></div>
+<pre class="bg-dark-900 p-5 overflow-x-auto text-sm leading-relaxed"><code class="font-mono text-neutral-300"># 1) o arquivo existe?
+ls -l ~/.env
+
+# 2) nenhum valor ficou como placeholder &lt;...&gt;?
+grep -n '&lt;' ~/.env || echo "OK: nenhum placeholder sobrando"</code></pre>
+<div class="px-5 py-3 border-t border-dark-600 text-sm text-neutral-400"><strong class="text-blue-400">Cómo verificar:</strong> o <code class="font-mono text-xs bg-dark-700 px-1 rounded">ls</code> debe listar el archivo (si aparece "No such file", no está en el directorio home). El <code class="font-mono text-xs bg-dark-700 px-1 rounded">grep</code> debe imprimir <code class="font-mono text-xs bg-dark-700 px-1 rounded">OK: nenhum placeholder sobrando</code> — si enumera filas, todavía hay <code class="font-mono text-xs bg-dark-700 px-1 rounded">&lt;...&gt;</code> para intercambiar.</div>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Nunca hagas commit del ~/.env</h3>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Vive en tu <strong>inicio</strong> (<code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code>), <strong>nunca</strong> en un <code class="font-mono text-xs bg-dark-700 px-1 rounded">.env</code> dentro del proyecto.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Fuera de Git, siempre. Quien tenga estas claves tiene acceso a tus datos de salud.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Si se filtra una clave, revócala y genera otra de inmediato en la cuenta de origen.</span></li>
+</ul>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Un archivo</div><p class="text-xs text-neutral-400">Todo converge en el ~/.env.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">En la página de inicio</div><p class="text-xs text-neutral-400">~/.env, no dentro del proyecto.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Fuera de Git</div><p class="text-xs text-neutral-400">Los secretos nunca se versionan.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">11 variables</div><p class="text-xs text-neutral-400">3 de ellas (WHOOP) opcionales.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-2-1#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">✅ Lista de verificación de preparación</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-1-t7-p1">Antes de seguir con la base de datos (Módulo 2.2), confirma que cada pieza esté en su lugar. El diagrama de abajo muestra <strong class="text-blue-400">qué va dónde</strong> — qué clave alimenta cada capacidad del coach. Si todo eso está listo, ya puedes empezar.</p>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Mapa de qué va dónde: cada variable de entorno alimenta una capacidad del coach — token para la conversación, Supabase para la base de datos y la memoria, OpenAI para la memoria semántica, Gemini para la visión, WHOOP para el wearable" class="w-full h-auto" role="img" viewbox="0 0 1000 300">
+<defs>
+<lineargradient id="m21b-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#60a5fa"></stop><stop offset="1" stop-color="#3b82f6"></stop></lineargradient>
+<filter height="180%" id="m21b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m21b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#3b82f6" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m21b-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m21b-grid)" height="300" width="1000" x="0" y="0"></rect>
+<text fill="#9ec5fe" font-family="Inter,sans-serif" font-size="12" font-weight="600" text-anchor="middle" x="180" y="22">LA CLAVE</text>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="12" font-weight="600" text-anchor="middle" x="760" y="22">LA CAPACIDAD</text>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<rect fill="#0e1622" height="38" rx="10" stroke="#38bdf8" stroke-width="2" width="280" x="40" y="38"></rect><text fill="#bcd9ff" text-anchor="middle" x="180" y="62">HEALTH_BOT_TOKEN</text>
+<rect fill="#0e1622" height="38" rx="10" stroke="#38bdf8" stroke-width="2" width="280" x="40" y="92"></rect><text fill="#bcd9ff" text-anchor="middle" x="180" y="116">SUPABASE_* (url+keys)</text>
+<rect fill="#0e1622" height="38" rx="10" stroke="#38bdf8" stroke-width="2" width="280" x="40" y="146"></rect><text fill="#bcd9ff" text-anchor="middle" x="180" y="170">OPENAI_API_KEY</text>
+<rect fill="#0e1622" height="38" rx="10" stroke="#38bdf8" stroke-width="2" width="280" x="40" y="200"></rect><text fill="#bcd9ff" text-anchor="middle" x="180" y="224">GOOGLE_API_KEY</text>
+<rect fill="#0e1622" height="38" rx="10" stroke="#38bdf8" stroke-width="2" width="280" x="40" y="254"></rect><text fill="#bcd9ff" text-anchor="middle" x="180" y="278">WHOOP_* (opcional)</text>
+</g>
+<g fill="none" opacity="0.55" stroke="#38bdf8" stroke-width="2">
+<path d="M320,57 L620,57" marker-end="url(#m21b-ah)"></path>
+<path d="M320,111 L620,111" marker-end="url(#m21b-ah)"></path>
+<path d="M320,165 L620,165" marker-end="url(#m21b-ah)"></path>
+<path d="M320,219 L620,219" marker-end="url(#m21b-ah)"></path>
+<path d="M320,273 L620,273" marker-end="url(#m21b-ah)"></path>
+</g>
+<g font-family="Inter,sans-serif" font-size="12.5" font-weight="600">
+<g filter="url(#m21b-glow)"><rect fill="#0e1622" height="38" rx="10" stroke="url(#m21b-grad)" stroke-width="2" width="340" x="620" y="38"></rect></g><text fill="#9ec5fe" text-anchor="middle" x="790" y="62">💬 Conversación en Telegram</text>
+<g filter="url(#m21b-glow)"><rect fill="#0e1622" height="38" rx="10" stroke="url(#m21b-grad)" stroke-width="2" width="340" x="620" y="92"></rect></g><text fill="#9ec5fe" text-anchor="middle" x="790" y="116">🗄️ Base de datos + memoria (Supabase)</text>
+<g filter="url(#m21b-glow)"><rect fill="#0e1622" height="38" rx="10" stroke="url(#m21b-grad)" stroke-width="2" width="340" x="620" y="146"></rect></g><text fill="#9ec5fe" text-anchor="middle" x="790" y="170">🧠 Memoria semántica (embeddings)</text>
+<g filter="url(#m21b-glow)"><rect fill="#0e1622" height="38" rx="10" stroke="url(#m21b-grad)" stroke-width="2" width="340" x="620" y="200"></rect></g><text fill="#9ec5fe" text-anchor="middle" x="790" y="224">📸 Visión: la foto se convierte en datos</text>
+<g filter="url(#m21b-glow)"><rect fill="#0e1622" height="38" rx="10" stroke="url(#m21b-grad)" stroke-width="2" width="340" x="620" y="254"></rect></g><text fill="#9ec5fe" text-anchor="middle" x="790" y="278">⌚ Wearable: recuperación, sueño</text>
+</g>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Cómo leer:</strong> cada clave de la izquierda (cian) conecta UNA capacidad del coach de la derecha (azul). Si falta la de la izquierda, la de la derecha no se activa. Solo la última fila (WHOOP) es opcional — sin ella, el coach funciona igual, con registro manual.</p>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-blue-400 mb-4 flex items-center"><span class="mr-2">✅</span> Estás listo si…</h3>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span><code class="font-mono text-xs bg-dark-700 px-1 rounded">python3 --version</code> ≥ 3.9 e <code class="font-mono text-xs bg-dark-700 px-1 rounded">node --version</code> responden.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Proyecto privado de Supabase creado en una región adecuada; URL + 2 claves + contraseña de la base de datos guardadas.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Bot creado en @BotFather; <code class="font-mono text-xs bg-dark-700 px-1 rounded">HEALTH_BOT_TOKEN</code> en la mano.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span><code class="font-mono text-xs bg-dark-700 px-1 rounded">OPENAI_API_KEY</code> e <code class="font-mono text-xs bg-dark-700 px-1 rounded">GOOGLE_API_KEY</code> creadas.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>(Opcional) Creaste la app de WHOOP o decidiste registrar los datos manualmente.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span><code class="font-mono text-xs bg-dark-700 px-1 rounded">~/.env</code> armado y verificado — sin ningún <code class="font-mono text-xs bg-dark-700 px-1 rounded">&lt;...&gt;</code> sobrando.</span></li>
+</ul>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-2-1#q1">
+<p class="font-medium mb-4">✅ Autoevaluación (opcional): ¿dónde deben estar tus claves y secretos de HealthOS?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) En un archivo .env dentro del repositorio, incluido en el commit junto con el código</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) En ~/.env, en tu directorio personal, fuera de git</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) Escritas directamente en el código de los scripts</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-blue-400">Conceptos clave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Qué va en cada lugar</div><p class="text-xs text-neutral-400">Cada clave activa una capacidad.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Si falta = se borró</div><p class="text-xs text-neutral-400">Sin la clave, la capacidad no se activa.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">WHOOP opcional</div><p class="text-xs text-neutral-400">La única línea que puede quedar vacía.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-blue-400 font-bold text-sm mb-1">Listo p/ 2.2</div><p class="text-xs text-neutral-400">Todo listo → vamos a la base de datos.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como leído</span><span class="inema-label-done">Leído ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-blue-900/40 via-dark-800 to-dark-800 rounded-xl border border-blue-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Resumen del módulo</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Instala lo básico</strong><span class="text-neutral-400"> — Python 3.9+ y Node (obligatorios), ffmpeg (solo clips) y Supabase CLI. Los scripts usan la biblioteca estándar; solo advice.py requiere requests.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Crea las cuentas</strong><span class="text-neutral-400"> — Supabase privado (URL + 2 claves + contraseña), bot en @BotFather (token), OpenAI (embeddings) y Gemini (visión).</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">WHOOP es opcional</strong><span class="text-neutral-400"> — sirve cualquier wearable o registro manual; todo va a la tabla vitals.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Todo converge en ~/.env</strong><span class="text-neutral-400"> — un archivo en tu directorio home, fuera de git; el agente lee los secretos desde allí.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Qué va en cada lugar</strong><span class="text-neutral-400"> — cada clave activa una capacidad del coach; sin ella, esa parte no funciona.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-blue-400 mb-2">Próximo módulo:</h3>
+<p class="text-neutral-300 text-sm">2.2 — La base de datos: aplicar las migraciones en Supabase, habilitar pgvector, crear las 14 tablas y el bucket de fotos, y bloquear todo con RLS.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Volver a Paso a paso</a>
+<a class="flex-1 text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors" href="modulo-2-2.html">Próximo módulo →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — Curso INEMA · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Contenido educativo. No es consejo médico. Consulta con profesionales de la salud.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-2-1#q1', {
+        answer: 1,
+        explain: { 0: 'Não — um .env no repositório vaza segredos no git. Esse é o erro clássico.', 1: 'Isso. ~/.env mora na sua home, fora do git, e o agente lê os segredos de lá.', 2: 'Não — chave hardcoded no código vaza junto com ele e é difícil de rotacionar.' }
+      });
+    }
+  </script>
+</body>
+</html>

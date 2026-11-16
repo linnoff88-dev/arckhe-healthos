@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="healthos" name="inema-course"/>
+<title>Módulo 1.2 — Os sinais do corpo | HealthOS</title>
+<!-- ANTI-FOUC: script bloqueante, ANTES do Tailwind. Aplica tema + leitura antes do 1º paint. -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o){var r={};for(var x in o)r[x]=o[x];return r;}
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) { var parsed = JSON.parse(raw); if (parsed && typeof parsed==='object'){ for (var k in DEF) if (parsed[k]!=null) p[k]=parsed[k]; } }
+        else { var legacy = localStorage.getItem('theme'); if (legacy==='light') p.theme='claro'; else if (legacy==='dark') p.theme='inema-dark'; }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = { 'inema-dark':{dark:true,attr:null,cs:'dark'},'claro':{dark:false,attr:null,cs:'light'},'sepia':{dark:false,attr:'sepia',cs:'light'},'foco':{dark:null,attr:'foco',cs:null},'contraste':{dark:true,attr:'contraste',cs:'dark'} };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark===true) html.classList.add('dark'); else if (t.dark===false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark')?'dark':'light'));
+      html.setAttribute('data-font', p.font||'inter'); html.setAttribute('data-accent', p.accent||'emerald');
+      var s = html.style, scale = (+p.fontScale||100);
+      s.setProperty('--inema-font-scale',(scale/100).toString()); s.setProperty('font-size',scale+'%');
+      s.setProperty('--measure',(+p.lineWidth||68)+'ch'); s.setProperty('--lh-body',(+p.leading||1.7).toString());
+      var fam = p.font==='system' ? 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' : (p.font==='leitura' ? '"Atkinson Hyperlegible","Inter",system-ui,sans-serif' : '"Inter",system-ui,sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC={emerald:[152,76,45],blue:[217,91,60],purple:[258,90,66],amber:[38,92,50],teal:[174,72,41],rose:[350,89,60]};
+      var a=ACC[p.accent]||ACC.emerald; s.setProperty('--accent-h',a[0]+''); s.setProperty('--accent-s',a[1]+'%'); s.setProperty('--accent-l',a[2]+'%'); s.setProperty('--accent','hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme='dark'; } catch(e){} }
+  })();
+  </script>
+<!-- Manifesto do curso (IDÊNTICO em todas as páginas) -->
+<script data-inema-manifest="" type="application/json">
+  {
+    "course": "healthos",
+    "tracks": [
+      { "n": "1", "title": "Fundamentos", "modules": [
+        { "id": "1-1", "title": "O que é o HealthOS", "topics": 7, "href": "curso/trilha1/modulo-1-1.html" },
+        { "id": "1-2", "title": "Os sinais do corpo", "topics": 7, "href": "curso/trilha1/modulo-1-2.html" },
+        { "id": "1-3", "title": "Genética aplicada", "topics": 7, "href": "curso/trilha1/modulo-1-3.html" },
+        { "id": "1-4", "title": "Como a IA vira coach", "topics": 7, "href": "curso/trilha1/modulo-1-4.html" }
+      ]},
+      { "n": "2", "title": "Passo a passo", "modules": [
+        { "id": "2-1", "title": "Pré-requisitos e contas", "topics": 7, "href": "curso/trilha2/modulo-2-1.html" },
+        { "id": "2-2", "title": "Banco de dados (Supabase)", "topics": 7, "href": "curso/trilha2/modulo-2-2.html" },
+        { "id": "2-3", "title": "O agente e o bot", "topics": 7, "href": "curso/trilha2/modulo-2-3.html" },
+        { "id": "2-4", "title": "Wearable + agendamento", "topics": 7, "href": "curso/trilha2/modulo-2-4.html" }
+      ]},
+      { "n": "3", "title": "Como usar", "modules": [
+        { "id": "3-1", "title": "A rotina diária", "topics": 7, "href": "curso/trilha3/modulo-3-1.html" },
+        { "id": "3-2", "title": "Comida e treino por foto", "topics": 7, "href": "curso/trilha3/modulo-3-2.html" },
+        { "id": "3-3", "title": "Memória, padrões e suplementos", "topics": 7, "href": "curso/trilha3/modulo-3-3.html" },
+        { "id": "3-4", "title": "Dashboard e acompanhamento", "topics": 7, "href": "curso/trilha3/modulo-3-4.html" }
+      ]}
+    ]
+  }
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{ primary:'#FACC15', dark:{900:'#111827',800:'#1f2937',700:'#374151',600:'#4b5563'} } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../assets/learn.css" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+    [id^="topico-"], [id^="resumo"], main [id] { scroll-margin-top: 80px; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #9ca3af; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+    /* Light mode - acento emerald (T1) */
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5,150,105,0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5,150,105,0.08); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5,150,105,0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5,150,105,0.18); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+    /* Light mode - gradientes + especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161,98,7,0.08); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161,98,7,0.25); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255,255,255,0.95); }
+    /* Dark - bordas suavizadas */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+    /* SVG diagramas: suavizar no claro */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    /* pulso dos diagramas */
+    @keyframes wf-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+    }
+  </style>
+<link href="https://inematds.github.io/healthos/curso/trilha1/modulo-1-2.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/healthos/en/curso/trilha1/modulo-1-2.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/healthos/es/curso/trilha1/modulo-1-2.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="modulo-1-2.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">PT</a><a href="../../en/curso/trilha1/modulo-1-2.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="../../es/curso/trilha1/modulo-1-2.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">ES</a></div>
+<a class="skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-dark-800 focus:text-emerald-400 focus:px-4 focus:py-2 focus:rounded-lg" href="#conteudo">Pular para o conteúdo</a>
+<!-- NAV -->
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-4">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🫀</span>
+<span class="font-bold text-lg hidden sm:inline">HealthOS</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+</div>
+<div class="flex items-center space-x-1 sm:space-x-2">
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-emerald-400 bg-emerald-500/10" href="index.html">
+<span class="sm:hidden">T1</span><span class="hidden sm:inline">Fundamentos</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html">
+<span class="sm:hidden">T2</span><span class="hidden sm:inline">Passo a passo</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html">
+<span class="sm:hidden">T3</span><span class="hidden sm:inline">Como usar</span>
+</a>
+<button class="ml-1 p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300 relative" data-inema-journey-open="" title="Minha jornada" type="button">
+<span aria-hidden="true">◷</span><span class="sr-only">Minha jornada</span>
+<span class="inema-journey-badge hidden absolute -top-1 -right-1 text-[10px] px-1 rounded bg-emerald-500 text-dark-900 font-bold" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<button aria-expanded="false" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors text-neutral-300" data-inema-appearance-toggle="[data-inema-appearance]" title="Aparência" type="button">
+<span aria-hidden="true">◑</span><span class="sr-only">Aparência</span>
+</button>
+<button class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- Painel de aparência -->
+<div class="inema-appearance-pop hidden absolute right-4 mt-1 bg-dark-800 border border-dark-600 rounded-xl p-4 shadow-xl z-50 w-72" data-inema-appearance="">
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tema</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="inema-dark">Escuro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="claro">Claro</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="sepia">Sépia</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-theme="foco">Foco</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs col-span-2" data-inema-set-theme="contraste">Alto contraste</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Tamanho do texto</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-fontscale="100">A</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-sm" data-inema-set-fontscale="112">A+</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-base" data-inema-set-fontscale="125">A++</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Largura · entrelinha</p>
+<div class="inema-segment grid grid-cols-3 gap-1 mb-2">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="60">Estreito</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="68">Médio</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-linewidth="75">Largo</button>
+</div>
+<div class="inema-segment grid grid-cols-2 gap-1 mb-3">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.45">Compacto</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-leading="1.7">Confortável</button>
+</div>
+<p class="text-xs text-neutral-400 mb-2 font-semibold">Fonte</p>
+<div class="inema-segment grid grid-cols-3 gap-1">
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="inter">Inter</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="system">Sistema</button>
+<button class="px-2 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-xs" data-inema-set-font="leitura">Leitura</button>
+</div>
+</div>
+</nav>
+<!-- BREADCRUMB -->
+<nav aria-label="Trilha de navegação" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-emerald-400" href="../../index.html">Início</a><span>/</span>
+<a class="hover:text-emerald-400" href="index.html">Fundamentos</a><span>/</span>
+<span class="text-emerald-400">Módulo 1.2</span>
+</div>
+</nav>
+<!-- HEADER -->
+<header class="bg-gradient-to-br from-emerald-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="1-2" data-inema-track="1">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full mb-4">MÓDULO 1.2</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">📈 Os sinais do corpo</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">O que cada número quer dizer — recovery, HRV, RHR, sono e os marcadores de sangue. Aqui você aprende a <strong class="text-emerald-400">LER o painel do corpo</strong>, sem decoreba. Não é uma tabela de "valores ideais": é entender o que cada sinal mede e por que olhar a tendência, não o ponto.</p>
+<div class="grid grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">7</div><div class="text-xs text-neutral-400">Tópicos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">~35</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">Básico</div><div class="text-xs text-neutral-400">Nível</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">Teoria</div><div class="text-xs text-neutral-400">Tipo</div></div>
+</div>
+<!-- medidor do módulo -->
+<div class="mt-6 max-w-2xl" data-inema-meter="modulo:1-2">
+<div class="flex items-center justify-between text-sm mb-1">
+<span class="text-neutral-400">Seu progresso neste módulo</span>
+<span class="text-emerald-400 font-semibold"><span data-inema-meter-pct="">0%</span> · <span data-inema-meter-frac="">0 de 7</span></span>
+</div>
+<div class="inema-bar h-2 rounded-full bg-dark-700 overflow-hidden"><div class="inema-bar__fill h-full bg-emerald-500" data-inema-meter-fill="" style="width:0%"></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[220px_1fr] lg:gap-10">
+<!-- TOC -->
+<nav aria-label="Índice da página" class="hidden lg:block sticky top-24 self-start text-sm" data-inema-toc="">
+<p class="text-neutral-400 mb-2">Seção <span class="inema-toc-pos">1</span> de <span class="inema-toc-total">7</span></p>
+<ol class="space-y-1 text-neutral-400">
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-1">1. Recovery %</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-2">2. HRV</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-3">3. RHR</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-4">4. Sono e sleep debt</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-5">5. HOMA-IR</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-6">6. ApoB e Lp(a)</a></li>
+<li><a class="inema-toc-link hover:text-emerald-400" href="#topico-7">7. Pressão e peso</a></li>
+</ol>
+</nav>
+<main class="inema-prose min-w-0" id="conteudo">
+<!-- INTRO -->
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6 mb-12">
+<p class="text-neutral-300 text-sm leading-relaxed"><strong class="text-emerald-400">Antes de começar:</strong> todos os números deste módulo são <strong>ilustrativos</strong> — servem para ensinar como LER o sinal, não como meta para você. Nada aqui é conselho médico. O que importa não é decorar "o valor bom"; é entender o que cada sinal mede e olhar a <strong class="text-emerald-400">tendência</strong> ao longo dos dias, comparada à sua própria linha de base.</p>
+</div>
+<!-- TÓPICO 1 -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-1" id="topico-1">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">1</span>
+<h2 class="text-2xl font-bold">🔋 Recovery % — o número que abre o dia</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t1-p1">Se você só pudesse olhar UM número de manhã, seria o <strong class="text-emerald-400">recovery</strong>. É a métrica âncora do dia: um único valor de 0 a 100 que resume "como o corpo acordou". Ele não te diz o que aconteceu — ele te diz quanto o corpo está pronto para gastar hoje. Tudo no HealthOS gira em torno desse número de abertura.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 Novo aqui? O que é "recovery"</p>
+<p class="text-sm text-neutral-300"><strong>Recovery (recuperação)</strong> é uma nota de prontidão que a wearable calcula durante o sono, combinando vários sinais (variabilidade cardíaca, frequência de repouso, sono). Pense num "medidor de bateria" do corpo: 0% é exausto, 100% é a postos. Não é saúde nem condicionamento — é só <em>quanto você se recuperou desde ontem</em>.</p>
+</div>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Semáforo do recovery: o número da manhã cai numa faixa verde, âmbar ou vermelha, e cada faixa sugere uma ação — puxar, moderar ou descansar" class="w-full h-auto" role="img" viewbox="0 0 1000 250">
+<defs>
+<lineargradient id="m12a-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+<filter height="180%" id="m12a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m12a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+<marker id="m12a-ah" markerheight="9" markerwidth="9" orient="auto" refx="6.5" refy="4.5"><path d="M0,0 L8,4.5 L0,9 L2.4,4.5 Z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m12a-grid)" height="250" width="1000" x="0" y="0"></rect>
+<g filter="url(#m12a-glow)"><rect fill="#0e2018" height="66" rx="14" stroke="url(#m12a-grad)" stroke-width="2.5" width="188" x="36" y="92"></rect></g>
+<text fill="#34d399" font-family="Inter,sans-serif" font-size="16" font-weight="600" text-anchor="middle" x="130" y="120">🔋 Recovery</text>
+<text fill="#9fe9cf" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="130" y="142">número 0–100 da manhã</text>
+<g fill="none" opacity="0.55" stroke="#38bdf8" stroke-width="1.8">
+<path d="M224,110 C320,110 340,52 440,52" marker-end="url(#m12a-ah)"></path>
+<path d="M224,125 C320,125 340,125 440,125" marker-end="url(#m12a-ah)"></path>
+<path d="M224,140 C320,140 340,198 440,198" marker-end="url(#m12a-ah)"></path>
+</g>
+<g font-family="Inter,sans-serif" font-size="13" font-weight="600">
+<g class="wf-a"><rect fill="#0e2417" height="48" rx="11" stroke="#34d399" stroke-width="2" width="210" x="440" y="28"></rect><text fill="#bdf3da" x="462" y="52">🟢 67–100 · Verde</text><text fill="#86d6b6" font-size="11" x="462" y="68">recuperado</text></g>
+<g class="wf-a"><rect fill="#241d0e" height="48" rx="11" stroke="#fbbf24" stroke-width="2" width="210" x="440" y="101"></rect><text fill="#fcd96b" x="462" y="125">🟡 34–66 · Âmbar</text><text fill="#e8c468" font-size="11" x="462" y="141">parcial</text></g>
+<g class="wf-a"><rect fill="#241011" height="48" rx="11" stroke="#fb7185" stroke-width="2" width="210" x="440" y="174"></rect><text fill="#fda4af" x="462" y="198">🔴 0–33 · Vermelho</text><text fill="#f4929d" font-size="11" x="462" y="214">drenado</text></g>
+</g>
+<g fill="none" stroke-width="2">
+<path d="M650,52 L726,52" marker-end="url(#m12a-ah)" opacity="0.8" stroke="#34d399"></path>
+<path d="M650,125 L726,125" marker-end="url(#m12a-ah)" opacity="0.8" stroke="#fbbf24"></path>
+<path d="M650,198 L726,198" marker-end="url(#m12a-ah)" opacity="0.8" stroke="#fb7185"></path>
+</g>
+<g font-family="Inter,sans-serif" font-size="13.5" font-weight="600">
+<rect fill="#0e2018" height="44" rx="11" stroke="#34d399" stroke-width="2" width="238" x="726" y="30"></rect><text fill="#bdf3da" text-anchor="middle" x="845" y="58">💪 Puxar — treino forte</text>
+<rect fill="#1a160a" height="44" rx="11" stroke="#fbbf24" stroke-width="2" width="238" x="726" y="103"></rect><text fill="#fcd96b" text-anchor="middle" x="845" y="131">🚶 Moderar — leve</text>
+<rect fill="#1a0d0e" height="44" rx="11" stroke="#fb7185" stroke-width="2" width="238" x="726" y="176"></rect><text fill="#fda4af" text-anchor="middle" x="845" y="204">😴 Descansar</text>
+</g>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> o número da manhã cai numa faixa (esquerda → centro) e a faixa sugere a <strong>ação</strong> do dia (centro → direita). Verde puxa, âmbar modera, vermelho descansa. As faixas são ilustrativas — o coach usa esse "gating" para calibrar o que recomendar.</p>
+</div>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-emerald-400 mb-4 flex items-center"><span class="mr-2">📊</span> As três faixas (box de dados ilustrativo)</h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<div class="bg-dark-900/60 rounded-lg p-4 border border-emerald-500/30"><div class="text-emerald-400 font-bold mb-1">Verde · 67–100</div><p class="text-xs text-neutral-400">Corpo a postos. Dia de carga: treino forte cabe, recuperação dá suporte.</p></div>
+<div class="bg-dark-900/60 rounded-lg p-4 border border-yellow-400/30"><div class="text-yellow-400 font-bold mb-1">Âmbar · 34–66</div><p class="text-xs text-neutral-400">Recuperação parcial. Mantém o movimento, mas sem heroísmo.</p></div>
+<div class="bg-dark-900/60 rounded-lg p-4 border border-red-500/30"><div class="text-red-400 font-bold mb-1">Vermelho · 0–33</div><p class="text-xs text-neutral-400">Drenado. Sinal para descansar, dormir e baixar a intensidade.</p></div>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> Por que é a métrica âncora</h3>
+<p class="text-neutral-300 text-sm">O recovery é a <strong>primeira pergunta do dia</strong>: ele transforma um monte de sinais em uma decisão simples (puxar / moderar / descansar). É também o fechamento do loop do Módulo 1.1 — a escolha de hoje aparece no recovery de amanhã. Por isso o coach abre a revisão da manhã sempre por ele.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">0–100</div><p class="text-xs text-neutral-400">Uma nota de prontidão, não de saúde.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Gating</div><p class="text-xs text-neutral-400">A faixa (verde/âmbar/vermelho) sugere a ação.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Âncora</div><p class="text-xs text-neutral-400">O primeiro número que o dia consulta.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Fecha o loop</div><p class="text-xs text-neutral-400">A escolha de hoje vira o recovery de amanhã.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 2 -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-2" id="topico-2">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">2</span>
+<h2 class="text-2xl font-bold">💓 HRV — variabilidade da frequência cardíaca</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t2-p1">O coração não bate como um relógio: o intervalo entre dois batimentos varia milissegundo a milissegundo. A <strong class="text-emerald-400">HRV</strong> mede exatamente essa variação. Parece contraintuitivo, mas aqui <strong class="text-emerald-400">mais variação é melhor</strong> — é o principal ingrediente do recovery, e o sinal mais sensível de como o corpo está lidando com estresse e cansaço.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 Novo aqui? O que é "HRV"</p>
+<p class="text-sm text-neutral-300"><strong>HRV (Heart Rate Variability — variabilidade da frequência cardíaca)</strong> é a diferença, em milissegundos, entre os intervalos de batimentos do coração. Um corpo descansado tem o "freio" do sistema nervoso (parassimpático) atuando, e isso deixa os intervalos mais irregulares → HRV mais <strong>alta</strong>. Estresse, álcool, sono ruim ou treino pesado apertam esse freio e a HRV <strong>cai</strong>. É um número muito pessoal: o que importa é a SUA linha de base, não a do vizinho.</p>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t2-p2">Um valor de <strong class="text-emerald-400">64 ms</strong> (ilustrativo) não significa nada sozinho — só ganha sentido comparado aos seus últimos dias. O coach olha o desvio da sua média: "HRV 18% abaixo da sua base de 7 dias" diz muito mais do que o número cru.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ O que tende a SUBIR a HRV</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Sono profundo e suficiente.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Hidratação e dias leves após carga.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Respiração lenta, baixo estresse.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ O que tende a DERRUBAR a HRV</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Álcool à noite (clássico — derruba forte).</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Jantar tarde e pesado, sono curto.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Treino muito intenso sem recuperação, estresse, doença chegando.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">💡</span> A regra de ouro da HRV</h3>
+<p class="text-neutral-300 text-sm">Nunca compare a sua HRV com a de outra pessoa — a faixa "normal" varia enormemente de corpo para corpo. Compare só com <strong>você mesmo</strong>, ao longo do tempo. A pergunta certa é "está acima ou abaixo da minha média?", nunca "é um número bom?".</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Milissegundos</div><p class="text-xs text-neutral-400">Variação no intervalo entre batimentos.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Mais = melhor</div><p class="text-xs text-neutral-400">HRV alta = bom tônus de recuperação.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Pessoal</div><p class="text-xs text-neutral-400">Compare só com a sua própria base.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Sensível</div><p class="text-xs text-neutral-400">Cai rápido com álcool e estresse.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 3 -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-3" id="topico-3">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">3</span>
+<h2 class="text-2xl font-bold">❤️ RHR — frequência cardíaca de repouso</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t3-p1">A <strong class="text-emerald-400">RHR (Resting Heart Rate — frequência cardíaca de repouso)</strong> é quantas vezes o coração bate por minuto quando você está totalmente em repouso, geralmente medida durante o sono. É o sinal mais simples do módulo: <strong class="text-emerald-400">menor costuma ser melhor</strong>. Um coração condicionado bombeia mais sangue por batida, então precisa bater menos. Mas, como tudo aqui, o ouro está na tendência — não no número de um dia.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 Novo aqui? RHR é o "espelho" da HRV</p>
+<p class="text-sm text-neutral-300">RHR e HRV andam juntas, em direções opostas: numa noite ruim, a RHR <strong>sobe</strong> e a HRV <strong>cai</strong>. Quando a RHR amanhece 4–5 bpm acima da sua média (ilustrativo), normalmente houve álcool, jantar tarde, estresse — ou um resfriado chegando. É um dos primeiros avisos de que o corpo está pedindo trégua.</p>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t3-p2">Por isso não se lê a RHR como uma foto, e sim como um <strong class="text-emerald-400">filme</strong>. A linha do tempo abaixo mostra uma semana ilustrativa: repare como um único dia alto não significa nada, mas a subida sustentada conta uma história.</p>
+<div class="space-y-4 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">S</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Seg–Qua · 53 bpm</h4><p class="text-sm text-neutral-300">Base estável. Tudo na média. O coach nem comenta — é o "normal" da semana.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-400/20 flex items-center justify-center"><span class="text-yellow-400 font-bold">Q</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold mb-1">Qui · 56 bpm</h4><p class="text-sm text-neutral-300">+3 num dia só. Sozinho, é ruído — pode ter sido um jantar tarde. Ainda não é padrão.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center"><span class="text-red-400 font-bold">!</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-red-500/30"><h4 class="font-semibold mb-1">Sex–Sáb · 57 → 58 bpm</h4><p class="text-sm text-neutral-300">Agora SIM vira sinal: três dias seguidos acima da base. O coach sugere desacelerar, dormir mais e observar se um resfriado está chegando.</p></div>
+</div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">bpm em repouso</div><p class="text-xs text-neutral-400">Batidas por minuto dormindo/parado.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Menor = melhor</div><p class="text-xs text-neutral-400">Coração condicionado bate menos.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Espelho da HRV</div><p class="text-xs text-neutral-400">Sobe quando a HRV cai.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Tendência</div><p class="text-xs text-neutral-400">Leia o filme, não a foto de um dia.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 4 -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-4" id="topico-4">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">4</span>
+<h2 class="text-2xl font-bold">😴 Sono e sleep debt — a dívida que amplifica tudo</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t4-p1">O sono é o motor da recuperação — é durante ele que a HRV sobe, a RHR cai e o recovery se recarrega. Mas o número que de fato importa não é "quantas horas dormi ontem", e sim a <strong class="text-emerald-400">sleep debt</strong>: o quanto você está devendo de sono, acumulado.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 Novo aqui? O que é "sleep debt"</p>
+<p class="text-sm text-neutral-300"><strong>Sleep debt (dívida de sono)</strong> é a diferença entre o sono que você <em>teve</em> e o sono que o corpo <em>precisava</em>. Dormiu 6h quando precisava de 8h? São 2h de dívida naquela noite. Como a dívida se acumula e se paga aos poucos, o coach acompanha uma <strong>média móvel de 7 dias</strong> — uma média deslizante que sempre olha a última semana, suavizando uma noite ruim isolada e revelando o débito que vem se empilhando.</p>
+</div>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Gráfico ilustrativo de uma semana de sono: barras das horas dormidas, a linha tracejada da necessidade, o vão abaixo dela como dívida acumulada, e a linha da média móvel de 7 dias" class="w-full h-auto" role="img" viewbox="0 0 1000 270">
+<defs>
+<lineargradient id="m12b-grad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#38bdf8"></stop><stop offset="1" stop-color="#0ea5e9"></stop></lineargradient>
+<filter height="180%" id="m12b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m12b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+</defs>
+<rect fill="url(#m12b-grid)" height="270" width="1000" x="0" y="0"></rect>
+<!-- eixo -->
+<line stroke="#475569" stroke-width="1.5" x1="70" x2="70" y1="40" y2="210"></line>
+<line stroke="#475569" stroke-width="1.5" x1="70" x2="950" y1="210" y2="210"></line>
+<text fill="#94a3b8" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="40" y="70">9h</text>
+<text fill="#94a3b8" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="40" y="106">8h</text>
+<text fill="#94a3b8" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="40" y="178">6h</text>
+<!-- linha de necessidade (8h) -->
+<line stroke="#34d399" stroke-dasharray="7 5" stroke-width="2" x1="70" x2="950" y1="106" y2="106"></line>
+<text fill="#34d399" font-family="Inter,sans-serif" font-size="12" font-weight="600" text-anchor="end" x="946" y="100">necessidade ~8h</text>
+<!-- barras (horas dormidas) -->
+<g fill="#9ad6ff" font-family="Inter,sans-serif" font-size="11">
+<rect fill="url(#m12b-grad)" height="122" opacity="0.9" rx="5" width="70" x="100" y="88"></rect><text text-anchor="middle" x="135" y="228">Seg</text>
+<rect fill="url(#m12b-grad)" height="68" opacity="0.9" rx="5" width="70" x="210" y="142"></rect><text text-anchor="middle" x="245" y="228">Ter</text>
+<rect fill="url(#m12b-grad)" height="50" opacity="0.9" rx="5" width="70" x="320" y="160"></rect><text text-anchor="middle" x="355" y="228">Qua</text>
+<rect fill="url(#m12b-grad)" height="86" opacity="0.9" rx="5" width="70" x="430" y="124"></rect><text text-anchor="middle" x="465" y="228">Qui</text>
+<rect fill="url(#m12b-grad)" height="42" opacity="0.9" rx="5" width="70" x="540" y="168"></rect><text text-anchor="middle" x="575" y="228">Sex</text>
+<rect fill="url(#m12b-grad)" height="140" opacity="0.9" rx="5" width="70" x="650" y="70"></rect><text text-anchor="middle" x="685" y="228">Sáb</text>
+<rect fill="url(#m12b-grad)" height="110" opacity="0.9" rx="5" width="70" x="760" y="100"></rect><text text-anchor="middle" x="795" y="228">Dom</text>
+</g>
+<!-- média móvel 7 dias -->
+<g filter="url(#m12b-glow)"><polyline fill="none" points="135,118 245,128 355,140 465,138 575,150 685,138 795,134" stroke="#34d399" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline></g>
+<circle cx="795" cy="134" fill="#34d399" r="5"></circle>
+<text fill="#86d6b6" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="500" y="258">linha verde = média móvel de 7 dias · o vão entre a barra e a linha tracejada = dívida daquela noite</text>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> cada barra (ciano) é uma noite; a linha tracejada é o quanto o corpo precisava. Tudo que fica ABAIXO dela é dívida. A linha verde (média móvel) ignora o sobe-e-desce diário e mostra a tendência da semana — é nela que o coach se apoia. Números ilustrativos.</p>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-3 flex items-center"><span class="mr-2">⚠️</span> Sono ruim amplifica todo o resto</h3>
+<p class="text-neutral-300 text-sm mb-3">Dormir mal não é só "ficar com sono". Ele <strong>sobe o cortisol</strong> (o hormônio do estresse) e isso reverbera em quase todos os outros sinais ao mesmo tempo:</p>
+<ul class="space-y-2 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>HRV cai e RHR sobe → o recovery despenca no dia seguinte.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>A glicose em jejum tende a subir → piora a leitura de resistência à insulina (tópico 5).</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400 mt-1">•</span><span>Fome e vontade de açúcar aumentam → as escolhas do dia ficam mais difíceis.</span></li>
+</ul>
+<p class="text-neutral-400 text-xs mt-3">Por isso o sono é o "multiplicador": é o primeiro lugar onde o coach mira quando vários sinais pioram juntos.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Dívida</div><p class="text-xs text-neutral-400">Sono que precisava − sono que teve.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Média móvel</div><p class="text-xs text-neutral-400">7 dias suavizam a noite isolada.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Multiplicador</div><p class="text-xs text-neutral-400">Sobe cortisol e amplifica o resto.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Motor</div><p class="text-xs text-neutral-400">É no sono que a recuperação acontece.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 5 -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-5" id="topico-5">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">5</span>
+<h2 class="text-2xl font-bold">🩸 HOMA-IR — o sinal da resistência à insulina</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t5-p1">Aqui saímos da wearable e entramos no <strong class="text-emerald-400">sangue</strong>. Esses marcadores não mudam todo dia — você os mede num exame a cada poucos meses — mas dão o pano de fundo metabólico que o coach cruza com os sinais diários. O primeiro é o <strong class="text-emerald-400">HOMA-IR</strong>, um índice de quão bem o seu corpo lida com açúcar.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 Novo aqui? O que é "HOMA-IR"</p>
+<p class="text-sm text-neutral-300"><strong>HOMA-IR</strong> é um índice calculado a partir da <strong>glicose</strong> e da <strong>insulina em jejum</strong> (os dois medidos no mesmo exame de sangue). Ele estima a <strong>resistência à insulina</strong> — quando as células passam a "ouvir menos" a insulina, o corpo precisa produzir mais dela para guardar o mesmo açúcar. Resumindo a regra de leitura: <strong>quanto menor, melhor</strong> a sensibilidade à insulina; valores mais altos sugerem que o corpo está trabalhando mais para controlar a glicose.</p>
+</div>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-emerald-400 mb-4 flex items-center"><span class="mr-2">📊</span> Como ler a faixa (box de dados ilustrativo)</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+<div class="bg-dark-900/60 rounded-lg p-4 border border-emerald-500/30"><div class="text-emerald-400 font-bold text-sm mb-1">&lt; 1,0</div><p class="text-xs text-neutral-400">Sensibilidade ótima.</p></div>
+<div class="bg-dark-900/60 rounded-lg p-4 border border-dark-600"><div class="text-neutral-200 font-bold text-sm mb-1">1,0 – 1,9</div><p class="text-xs text-neutral-400">Faixa comum.</p></div>
+<div class="bg-dark-900/60 rounded-lg p-4 border border-yellow-400/30"><div class="text-yellow-400 font-bold text-sm mb-1">2,0 – 2,9</div><p class="text-xs text-neutral-400">Atenção, vale acompanhar.</p></div>
+<div class="bg-dark-900/60 rounded-lg p-4 border border-red-500/30"><div class="text-red-400 font-bold text-sm mb-1">≥ 3,0</div><p class="text-xs text-neutral-400">Resistência provável — leve ao médico.</p></div>
+</div>
+<p class="text-xs text-neutral-500 mt-3">Faixas ilustrativas — referências variam por laboratório e por pessoa. Interprete sempre com um profissional.</p>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">🔗</span> Por que o coach se importa</h3>
+<p class="text-neutral-300 text-sm">O HOMA-IR conecta o sangue com a rotina: noites de sono ruim, álcool e refeições muito pesadas em açúcar tendem a piorar a glicose em jejum. Com o marcador no banco, o coach consegue dizer coisas como "sua sensibilidade à insulina não está ótima — por isso vamos cuidar do carbo perto do treino e do horário do jantar", aterrando a dica num número seu, não numa regra geral.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Glicose + insulina</div><p class="text-xs text-neutral-400">Os dois em jejum, mesmo exame.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Menor = melhor</div><p class="text-xs text-neutral-400">Mais sensibilidade à insulina.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Pano de fundo</div><p class="text-xs text-neutral-400">Muda a cada meses, não a cada dia.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Conecta a rotina</div><p class="text-xs text-neutral-400">Sono e dieta mexem na glicose.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 6 -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-6" id="topico-6">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">6</span>
+<h2 class="text-2xl font-bold">🫀 ApoB e Lp(a) — o risco cardiovascular</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t6-p1">Você provavelmente já ouviu falar de "colesterol LDL". Os dois marcadores deste tópico vão um passo além: <strong class="text-emerald-400">ApoB</strong> e <strong class="text-emerald-400">Lp(a)</strong> são considerados sinais mais finos do risco cardiovascular — e é com eles que o coach prefere raciocinar.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-5 mb-6">
+<p class="text-sm font-semibold text-emerald-400 mb-2">🟢 Novo aqui? O que são "ApoB" e "Lp(a)"</p>
+<ul class="space-y-2 text-sm text-neutral-300">
+<li><strong>ApoB (apolipoproteína B)</strong> — cada partícula "ruim" de gordura no sangue carrega exatamente uma proteína ApoB. Então medir ApoB é literalmente <em>contar as partículas</em> que podem entupir artéria — e a contagem de partículas costuma prever risco melhor do que medir só a quantidade de colesterol (LDL).</li>
+<li><strong>Lp(a) — "L-P-pequeno-a"</strong> — um tipo específico de partícula cujo nível é definido quase só pela <strong>genética</strong>. Quase não muda com dieta ou exercício, então basta medir <em>uma vez na vida</em>: serve para saber se você herdou um risco cardiovascular extra.</li>
+</ul>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Olhar só o LDL</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Mede a <strong>massa</strong> de colesterol, não quantas partículas existem.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Pode "parecer ok" mesmo com muitas partículas pequenas circulando.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Esconde o risco herdado da Lp(a), que ele nem enxerga.</span></li>
+</ul>
+</div>
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ Raciocinar com ApoB + Lp(a)</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>ApoB <strong>conta as partículas</strong> — mais alinhado ao risco real.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Acompanha tendência ao longo dos exames (menor = melhor).</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Lp(a) revela o componente genético — medido uma vez, fica registrado.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">🧬</span> Lp(a): o cartão genético</h3>
+<p class="text-neutral-300 text-sm">Como a Lp(a) é praticamente fixa pela genética, ela funciona como um aviso de fábrica: se vier alta, não é "culpa" da sua dieta, e sim um motivo para cuidar ainda mais dos fatores que VOCÊ controla (ApoB, pressão, sono). Isso conversa direto com a Trilha 1 → Módulo 1.3 (Genética aplicada), onde os genes viram dosagem. <strong>Nada disso é diagnóstico</strong> — é insumo para uma conversa com o médico.</p>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Conta partículas</div><p class="text-xs text-neutral-400">ApoB = 1 proteína por partícula.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Mais preditivo</div><p class="text-xs text-neutral-400">ApoB costuma bater melhor que LDL.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Lp(a) genética</div><p class="text-xs text-neutral-400">Risco herdado; mede uma vez.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Insumo, não laudo</div><p class="text-xs text-neutral-400">Leva ao médico, não diagnostica.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- TÓPICO 7 -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-7" id="topico-7">
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center space-x-4">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl flex-shrink-0">7</span>
+<h2 class="text-2xl font-bold">🩺 Pressão e peso — leia a tendência, não o ponto</h2>
+</div>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm flex-shrink-0" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span class="hidden sm:inline">Tenho dúvida</span></button>
+</div>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t7-p1">Os dois últimos sinais são os mais cotidianos: <strong class="text-emerald-400">pressão arterial</strong> e <strong class="text-emerald-400">peso</strong>. Você mede no dia a dia (manguito e balança), eles entram no banco, e o coach os cruza com tudo o que viu até aqui. A lição central deste tópico vale para o módulo inteiro: <strong class="text-emerald-400">um ponto isolado é ruído; a tendência é o sinal</strong>.</p>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-6 overflow-hidden">
+<svg aria-label="Painel do corpo: um monitor com seis blocos — recovery, HRV, RHR, sono, HOMA-IR e ApoB — cada um com um valor ilustrativo e uma mini tendência, lidos todos de uma vez" class="w-full h-auto" role="img" viewbox="0 0 1000 300">
+<defs>
+<lineargradient id="m12c-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+<filter height="180%" id="m12c-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<pattern height="32" id="m12c-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#10b981" opacity="0.12" r="1.3"></circle></pattern>
+</defs>
+<rect fill="url(#m12c-grid)" height="300" width="1000" x="0" y="0"></rect>
+<!-- moldura do monitor -->
+<g filter="url(#m12c-glow)"><rect fill="#0c1714" height="252" rx="18" stroke="url(#m12c-grad)" stroke-width="2.5" width="920" x="40" y="24"></rect></g>
+<rect fill="#0e2018" height="44" rx="18" width="920" x="40" y="24"></rect>
+<text fill="#34d399" font-family="Inter,sans-serif" font-size="15" font-weight="600" x="64" y="53">📊 Painel do corpo — hoje (valores ilustrativos)</text>
+<text fill="#86d6b6" font-family="Inter,sans-serif" font-size="12" text-anchor="end" x="936" y="53">tendência de 7 dias</text>
+<!-- 6 tiles -->
+<g font-family="Inter,sans-serif">
+<!-- Recovery -->
+<g class="wf-a"><rect fill="#0e1b26" height="80" rx="12" stroke="#34d399" stroke-width="1.6" width="280" x="64" y="88"></rect>
+<text fill="#9ad6ff" font-size="12" x="84" y="116">🔋 Recovery</text>
+<text fill="#34d399" font-size="26" font-weight="700" x="84" y="150">71%</text>
+<polyline fill="none" points="210,150 234,144 258,152 282,138 306,140 326,132" stroke="#38bdf8" stroke-linecap="round" stroke-width="2.5"></polyline></g>
+<!-- HRV -->
+<g class="wf-a"><rect fill="#0e1b26" height="80" rx="12" stroke="#38bdf8" stroke-width="1.6" width="280" x="360" y="88"></rect>
+<text fill="#9ad6ff" font-size="12" x="380" y="116">💓 HRV</text>
+<text fill="#bfe6ff" font-size="26" font-weight="700" x="380" y="150">64 ms</text>
+<polyline fill="none" points="506,148 530,140 554,150 578,138 602,142 622,134" stroke="#38bdf8" stroke-linecap="round" stroke-width="2.5"></polyline></g>
+<!-- RHR -->
+<g class="wf-a"><rect fill="#0e1b26" height="80" rx="12" stroke="#38bdf8" stroke-width="1.6" width="280" x="656" y="88"></rect>
+<text fill="#9ad6ff" font-size="12" x="676" y="116">❤️ RHR</text>
+<text fill="#bfe6ff" font-size="26" font-weight="700" x="676" y="150">54 bpm</text>
+<polyline fill="none" points="802,140 826,144 850,138 874,146 898,142 918,148" stroke="#38bdf8" stroke-linecap="round" stroke-width="2.5"></polyline></g>
+<!-- Sono -->
+<g class="wf-a"><rect fill="#0e1b26" height="80" rx="12" stroke="#38bdf8" stroke-width="1.6" width="280" x="64" y="180"></rect>
+<text fill="#9ad6ff" font-size="12" x="84" y="208">😴 Sono (média 7d)</text>
+<text fill="#bfe6ff" font-size="26" font-weight="700" x="84" y="242">7h20</text>
+<polyline fill="none" points="210,240 234,232 258,238 282,228 306,234 326,224" stroke="#38bdf8" stroke-linecap="round" stroke-width="2.5"></polyline></g>
+<!-- HOMA-IR -->
+<g class="wf-a"><rect fill="#0e1b26" height="80" rx="12" stroke="#38bdf8" stroke-width="1.6" width="280" x="360" y="180"></rect>
+<text fill="#9ad6ff" font-size="12" x="380" y="208">🩸 HOMA-IR</text>
+<text fill="#bfe6ff" font-size="26" font-weight="700" x="380" y="242">1,1</text>
+<text fill="#86d6b6" font-size="11" x="560" y="246">sangue · trimestral</text></g>
+<!-- ApoB -->
+<g class="wf-a"><rect fill="#0e1b26" height="80" rx="12" stroke="#38bdf8" stroke-width="1.6" width="280" x="656" y="180"></rect>
+<text fill="#9ad6ff" font-size="12" x="676" y="208">🫀 ApoB</text>
+<text fill="#bfe6ff" font-size="26" font-weight="700" x="676" y="242">78 mg/dL</text>
+<text fill="#86d6b6" font-size="11" x="856" y="246">sangue · trimestral</text></g>
+</g>
+</svg>
+<p class="text-xs text-neutral-400 mt-2 px-1">📊 <strong>Como ler:</strong> este é "o painel do corpo" deste módulo. Você não lê um número de cada vez — lê o conjunto de uma vez, e cada mini-linha é a <strong>tendência</strong>, não o valor de hoje. Pressão e peso entram no mesmo painel. Tudo ilustrativo.</p>
+</div>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-emerald-400 mb-3 flex items-center"><span class="mr-2">🧂</span> O caso do almoço salgado</h3>
+<p class="text-neutral-300 text-sm">No exemplo do autor, um único almoço bem salgado fez a pressão subir <strong class="text-emerald-400">10–15%</strong> na medição seguinte. Se você lesse só aquele ponto, entraria em pânico. Mas a leitura certa é: foi o sódio retendo líquido naquele dia — o ponto volta ao normal, e a <strong>tendência</strong> da semana segue estável. Mesma história no peso: ele oscila com água, sal e horário; a balança de um dia é ruído, a média da semana é informação.</p>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-3 flex items-center"><span class="mr-2">📈</span> A regra que vale para todos os sinais</h3>
+<p class="text-neutral-300 text-sm">Recovery, HRV, RHR, sono, HOMA-IR, ApoB, pressão, peso — todos pedem a mesma leitura: <strong>tendência sobre ponto, e contexto sobre número cru</strong>. É exatamente por isso que o coach guarda tudo no banco: só com histórico dá para distinguir um soluço de um padrão.</p>
+</div>
+<!-- Checagem leve opcional -->
+<div class="inema-check mt-8 bg-dark-800 border border-dark-600 rounded-xl p-6" data-inema-check="modulo-1-2#q1">
+<p class="font-medium mb-4">✅ Auto-checagem (opcional): você vê sua RHR subir 2 bpm num único dia. Qual a leitura certa?</p>
+<div class="inema-check-options space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">a) Entrar em pânico — algo está errado com certeza</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">b) Olhar a TENDÊNCIA de vários dias antes de concluir — um ponto isolado é ruído</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">c) Ignorar a RHR para sempre, ela não serve</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<h3 class="text-lg font-semibold mb-3 text-emerald-400 mt-8">Conceitos-chave</h3>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Diárias</div><p class="text-xs text-neutral-400">Pressão e peso, medidos em casa.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Sódio engana</div><p class="text-xs text-neutral-400">Salgado sobe a pressão do dia.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Tendência</div><p class="text-xs text-neutral-400">O ponto é ruído; a média é sinal.</p></div>
+<div class="bg-dark-800 rounded-lg p-4 border border-dark-600"><div class="text-emerald-400 font-bold text-sm mb-1">Painel único</div><p class="text-xs text-neutral-400">Leia todos os sinais juntos.</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-ico-todo">○</span><span aria-hidden="true" class="inema-ico-done">●</span>
+<span class="inema-label-todo">Marcar como lido</span><span class="inema-label-done">Lido ✓</span>
+</button>
+</div>
+</section>
+<!-- RESUMO -->
+<section class="mb-12" id="resumo">
+<div class="bg-gradient-to-br from-emerald-900/40 via-dark-800 to-dark-800 rounded-xl border border-emerald-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">📋</span> Resumo do módulo</h2>
+<div class="space-y-4 mb-8 text-sm">
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Recovery é a âncora</strong><span class="text-neutral-400"> — um número 0–100 que abre o dia e faz o gating verde/âmbar/vermelho → puxar/moderar/descansar.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">HRV e RHR são espelhos</strong><span class="text-neutral-400"> — HRV alta e RHR baixa = bem recuperado; ambas comparadas à SUA base, não à dos outros.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Sleep debt multiplica</strong><span class="text-neutral-400"> — média móvel de 7 dias; sono ruim sobe cortisol e piora todo o resto ao mesmo tempo.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">O sangue dá o pano de fundo</strong><span class="text-neutral-400"> — HOMA-IR (resistência à insulina), ApoB (conta partículas) e Lp(a) (risco genético) cruzam com a rotina.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Tendência &gt; ponto</strong><span class="text-neutral-400"> — pressão e peso oscilam com sal e água; leia o filme da semana, não a foto do dia. Nada aqui é conselho médico.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-emerald-400 mb-2">Próximo módulo:</h3>
+<p class="text-neutral-300 text-sm">1.3 — Genética aplicada: como os SNPs do seu DNA viram dosagem (cafeína, gordura, vitamina D, sal) e por que a genética ajusta os botões que você acabou de aprender a ler.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Voltar para Fundamentos</a>
+<a class="flex-1 text-center px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-500 transition-colors" href="modulo-1-3.html">Próximo módulo →</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FOOTER -->
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>HealthOS — Curso INEMA · <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> · 2026</p>
+<p class="mt-2 text-xs">⚠️ Conteúdo educacional. Não é conselho médico. Números ilustrativos. Consulte profissionais de saúde.</p>
+</div>
+</footer>
+<!-- SCRIPTS -->
+<script>
+    // v1 core: theme toggle (absorvido pelo learn.js)
+    (function(){
+      const t = document.getElementById('theme-toggle');
+      const di = document.getElementById('theme-toggle-dark-icon');
+      const li = document.getElementById('theme-toggle-light-icon');
+      const html = document.documentElement;
+      function sync(){ if (html.classList.contains('dark')){ li.classList.remove('hidden'); di.classList.add('hidden'); } else { di.classList.remove('hidden'); li.classList.add('hidden'); } }
+      sync();
+      if (t) t.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        try { if (window.INEMA && INEMA.setPref) INEMA.setPref('theme', html.classList.contains('dark') ? 'inema-dark' : 'claro'); else localStorage.setItem('theme', html.classList.contains('dark')?'dark':'light'); } catch(e){}
+        sync();
+      });
+    })();
+    function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.remove('hidden'); document.body.style.overflow='hidden'; } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+<script src="../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') {
+      window.INEMA.init();
+      if (INEMA.registerCheck) INEMA.registerCheck('modulo-1-2#q1', {
+        answer: 1,
+        explain: { 0: 'Calma — um único dia alto quase sempre é ruído (jantar tarde, uma taça de vinho).', 1: 'Isso. Um ponto isolado não conta história; só a tendência de vários dias vira sinal.', 2: 'Não — a RHR é ótima justamente quando lida como tendência ao longo do tempo.' }
+      });
+    }
+  </script>
+</body>
+</html>
